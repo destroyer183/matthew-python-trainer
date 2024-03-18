@@ -1,0 +1,34 @@
+
+
+have a main python file with an upper class
+    when run,
+    make all level folders hidden
+    make all gui-related files & folders hidden
+
+    prompt user to sign in or create an account
+    create a new account file for a new account
+        filename will be username
+        password will be the first characters in the file, with the end of the password represented with a terminating characters
+
+    load new info by picking a file based on the username input, and compare inputted password to password on account
+
+    display progress
+
+
+
+store all login info and progress data in a txt file
+use python hex file editing to store data in a way that won't allow matthew to look at the solutions
+https://docs.python.org/3/library/mmap.html 
+
+
+
+make subclasses for each type of problem (math, lists, strings, loops, dictionaries)
+use the subclasses to make guis for each type of problem
+    when run, 
+    display a list of all the problems, with either a green(complete), grey(incomplete) or red(incorrect) circle next to it
+    count every correct solution, and when all solutions are correct, display something to show this
+    when every problem type has been completed for a difficulty level, 
+
+
+
+use the subclasses to give inputs to matthew's code and my code, and compare inputs
