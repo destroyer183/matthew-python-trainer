@@ -3,6 +3,9 @@ from tkinter import *
 import os
 import sys
 import shutil
+import pathlib
+import binascii
+import mmap
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -102,22 +105,35 @@ class Gui(main.QuestionTester):
         self.login_error_text.configure(font=('Cascadia Code', 10))
 
         # check if the username exists
-        if username + '.txt' not in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+        if username not in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
 
             # place error text on screen
             self.login_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
 
         else:
-            account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}.txt"
+            account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}\\{username}"
 
         
 
         # check if the password matches the found username
-        if True:
+        with open(account_directory, 'r+b') as f:
+
+            for line in f:
+
+                account_password = self.hex_to_string(line)
+                break
+
+        if account_password != password:
 
             # place error text on screen
             self.login_error_text.configure(font=('Cascadia Code', 10), text = 'Password is incorrect.')
             self.login_error_text.place(relx = 0.5, y = 180, anchor = CENTER)
+
+        else:
+
+            
+
+            pass
 
 
 
@@ -187,7 +203,7 @@ class Gui(main.QuestionTester):
         self.create_account_error_text = tk.Label(self.parent, text = 'Username taken.', bg = 'dimgrey', fg = 'red')
         self.create_account_error_text.configure(font=('Cascadia Code', 10))
 
-        if username + '.txt' in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+        if username in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
 
             # place error text on screen
             self.create_account_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
@@ -203,9 +219,6 @@ class Gui(main.QuestionTester):
 
 
         
-
-
-
     def make_account(self, username = None, password = None, confirm_password = None):
 
         if username is None: username = self.username_box.get(1.0, tk.END).strip()
@@ -214,23 +227,37 @@ class Gui(main.QuestionTester):
 
         if self.verify_details(username, password, confirm_password): return
 
-        directory = os.getcwd()
-
-        current_directory = ''
-
-        for char in directory:
-
-            if char == '\\':
-
-                current_directory += '/'
-
-                continue
-
-            current_directory += char
-
-        print(f"current directory: {current_directory}")
-
-        source_file = 'gui_code/accounts/account_template.txt'
+        current_directory = os.getcwd().replace('\\', '/')
+        source_file = 'gui_code/accounts/account_template'
         destination_folder = 'gui_code/accounts/'
 
-        shutil.copyfile(f"{current_directory}/{source_file}", f"{current_directory}/{destination_folder}{username}.txt")
+
+        self.create_account_directory(current_directory, source_file, destination_folder, username)
+
+        self.set_account_password(f"{current_directory}/{destination_folder}{username}/{username}", password)
+
+
+
+    def create_account_directory(self, directory, source_file, destination, username):
+
+        shutil.copytree(f"{directory}/{source_file}", f"{directory}/{destination}{username}")
+
+        old_file = pathlib.Path(f"{directory}/{destination}{username}/data_template")
+        new_file = pathlib.Path(f"{directory}/{destination}{username}/{username}")
+
+        os.rename(old_file, new_file)
+
+
+
+    def set_account_password(self, account, password):
+
+        password = self.string_to_int(password)
+
+        password = ('').join(password)
+
+        password = binascii.unhexlify(password)
+
+        with open(account, 'r+b') as f:
+            f.write(password + b'\n')
+
+

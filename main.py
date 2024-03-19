@@ -2,8 +2,25 @@ import tkinter as tk
 from tkinter import *
 import os
 import shutil
+import binascii
 import mmap
 from gui_code import main_gui
+
+
+
+chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>? '
+
+char_values = {}
+
+for value, key in enumerate(chars):
+
+    if len(str(value)) == 1:
+
+        char_values[key] = f'0{value}'
+    
+    else:
+
+        char_values[key] = str(value)
 
 
 
@@ -13,7 +30,7 @@ class QuestionTester:
     account = None
 
     def __init__(self, gui) -> None:
-        
+
         self.gui = main_gui.Gui(gui)
     
 
@@ -46,6 +63,53 @@ class QuestionTester:
 
         if type == 'password':
             pass
+
+
+
+    def string_to_int(self, input = None):
+
+        if input is None:
+            print('no value given\n\n')
+
+        output = []
+
+        for value in input:
+
+            output.append(char_values[value])
+
+        return output
+
+
+
+    def hex_to_string(self, input = None):
+
+        if input is None:
+            print('no value given\n\n')
+
+        input = input.strip()
+
+        input = [x for x in input]
+
+        output = ''
+
+        for value in input:
+
+            value = hex(value)[2:]
+
+            if len(value) == 1:
+                value = f"0{value}"
+
+            output += list(char_values.keys())[list(char_values.values()).index(value)]
+
+        return output
+
+
+
+
+
+
+
+
 
 
 

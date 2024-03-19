@@ -1,1 +1,26 @@
+0: incorrect submission
+1: correct submission
+' ': no submission
+
+
+
 password
+000000000 - basics
+0000 - functions
+
+00000000 - strings lvl 1
+00000000 - math lvl 1
+0000000 - loops lvl 1
+00000000 - lists lvl 1
+000000000 - dictionaries lvl 1
+
+000000 - strings lvl 2
+00000000 - math lvl 2
+00000000 - loops lvl 2
+00000000 - lists lvl 2
+00000000 - dictionaries lvl 2
+
+0000000 - lists lvl 3
+0000000000 - strings lvl 3
+
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

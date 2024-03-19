@@ -16,10 +16,12 @@ have a main python file with an upper class
 
 
 
-store all login info and progress data in a txt file
-use python hex file editing to store data in a way that won't allow matthew to look at the solutions
-https://docs.python.org/3/library/mmap.html 
-
+store all login info and progress data in a file with no file type
+to write to file:
+    take string
+    convert to integers
+    unhexlify
+    write
 
 
 make subclasses for each type of problem (math, lists, strings, loops, dictionaries)
