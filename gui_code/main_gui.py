@@ -111,12 +111,12 @@ class Gui(main.QuestionTester):
             self.login_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
 
         else:
-            account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}\\{username}"
+            account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}"
 
         
 
         # check if the password matches the found username
-        with open(account_directory, 'r+b') as f:
+        with open(f"{account_directory}\\{username}", 'r+b') as f:
 
             for line in f:
 
@@ -131,7 +131,9 @@ class Gui(main.QuestionTester):
 
         else:
 
+            main.QuestionTester.account = account_directory
             
+            # load account data and change gui
 
             pass
 

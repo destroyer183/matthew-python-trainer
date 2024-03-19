@@ -54,18 +54,6 @@ class QuestionTester:
 
 
 
-    def update_account(self):
-        pass
-
-
-
-    def read_account(self, type):
-
-        if type == 'password':
-            pass
-
-
-
     def string_to_int(self, input = None):
 
         if input is None:
@@ -105,13 +93,66 @@ class QuestionTester:
 
 
 
+    def initialize_account(self, directory):
+        pass
+
+
+
+    def update_account(self):
+        pass
+
+
+
+    def read_account(self, type):
+        pass
 
 
 
 
+    
 
 
 
+
+'''
+have a large dictionary that stores all the question data
+
+make every level and folder/group an object - each difficulty group, type of question, and question
+
+class names: Question, QuestionGroup, GroupDifficulty
+
+QuestionGroup will inherit from GroupDifficulty, mainly the method that checks the completion of the contents
+
+'''
+
+class GroupDifficulty:
+
+    def __init__(self, directory, difficulty) -> None:
+
+        self.directory = directory
+        self.difficulty = difficulty
+        self.unlocked = False
+        self.completed = False
+        # directory path
+        # difficulty level/question type
+        # is it unlocked
+        # is it's contents completed
+
+        pass
+
+
+
+class QuestionGroup(GroupDifficulty):
+
+    def __init__(self, directory, type) -> None:
+        super().__init__(directory)
+
+        self.type = type
+        self.completed = False
+
+
+class Question:
+    pass
 
 
 
