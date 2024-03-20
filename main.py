@@ -28,6 +28,7 @@ class QuestionTester:
 
     instance: "QuestionTester" = None
     account = None
+    directory_tree = None
 
     def __init__(self, gui) -> None:
 
@@ -94,7 +95,10 @@ class QuestionTester:
 
 
     def initialize_account(self, directory):
-        pass
+
+        QuestionTester.directory_tree = {
+            
+        }
 
 
 
@@ -127,10 +131,12 @@ QuestionGroup will inherit from GroupDifficulty, mainly the method that checks t
 
 class GroupDifficulty:
 
-    def __init__(self, directory, difficulty) -> None:
+    def __init__(self, directory, content, question_difficulty, name) -> None:
 
         self.directory = directory
-        self.difficulty = difficulty
+        self.content = content
+        self.question_difficulty = question_difficulty
+        self.name = name
         self.unlocked = False
         self.completed = False
         # directory path
@@ -138,21 +144,35 @@ class GroupDifficulty:
         # is it unlocked
         # is it's contents completed
 
+
+
+    def check_completion(self):
+        pass
+
+
+
+    def unlock_folder(self):
         pass
 
 
 
 class QuestionGroup(GroupDifficulty):
 
-    def __init__(self, directory, type) -> None:
-        super().__init__(directory)
+    def __init__(self, directory, content, question_type, name) -> None:
+        super().__init__(directory, content, name)
 
-        self.type = type
+        self.question_type = question_type
         self.completed = False
 
 
-class Question:
-    pass
+
+class Question(QuestionGroup):
+
+    def __init__(self, directory, name) -> None:
+        super().__init__(directory, name)
+        
+        self.directory = directory
+        self.completed = False
 
 
 
