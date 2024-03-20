@@ -7,15 +7,15 @@ import pathlib
 import binascii
 import mmap
 
-current = os.path.dirname(os.path.realpath(__file__))
-parent = os.path.dirname(current)
-sys.path.append(parent)
-import main
+current = os.path.dirname(os.path.realpath(__file__)) # get current directory
+parent = os.path.dirname(current) # go up one directory level
+sys.path.append(parent) # set current directory
+import question_tester
 
 
 
 
-class Gui(main.QuestionTester):
+class Gui(question_tester.QuestionTester):
 
     def __init__(self, parent) -> None:
         
@@ -131,7 +131,7 @@ class Gui(main.QuestionTester):
 
         else:
 
-            main.QuestionTester.account = account_directory
+            question_tester.QuestionTester.account = account_directory
             
             # load account data and change gui
 

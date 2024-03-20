@@ -1,3 +1,17 @@
+import os
+import sys
+
+current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics
+parent = os.path.dirname(current) # go up one directory level - Introduction
+parent = os.path.dirname(parent) # go up another directory level - user_code
+parent = os.path.dirname(parent) # go up another directory level - account_template
+parent = os.path.dirname(parent) # go up another directory level - accounts
+parent = os.path.dirname(parent) # go up another directory level - gui_code
+parent = os.path.dirname(parent) # go up another directory level - codehs_python_practice_problems
+sys.path.append(parent) # set current directory
+import question_tester
+
+
 '''
 
 question description goes here
@@ -21,7 +35,8 @@ def main_function(argument):
 
 
 
-# don't touch this stuff
+# don't touch this stuff, it'll break lots of otehr things if you change this code
+
 def main():
 
     quote_placeholder = '\"'

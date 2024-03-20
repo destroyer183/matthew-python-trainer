@@ -4,7 +4,26 @@ import os
 import shutil
 import binascii
 import mmap
+import enum
 from gui_code import main_gui
+from dict_tree_constructor import construct_dict_tree
+
+
+class DifficultyLevel(enum.Enum):
+    Level0 = 0
+    Level1 = 1
+    Level2 = 2
+    Level3 = 3
+
+class QuestionType(enum.Enum):
+    Basics = 'Basic'
+    Functions = 'Functions'
+    Dictionaries = 'Dictionaries'
+    Lists = 'Lists'
+    Loops = 'Loops'
+    Math = 'Math'
+    Strings = 'Strings'
+
 
 
 
@@ -96,9 +115,11 @@ class QuestionTester:
 
     def initialize_account(self, directory):
 
-        QuestionTester.directory_tree = {
-            
-        }
+        QuestionTester.directory_tree = construct_dict_tree(directory)
+
+        temp = directory.split('\\')
+
+        QuestionTester.account = f"{directory}\\{temp[-1]}"
 
 
 
@@ -118,20 +139,20 @@ class QuestionTester:
 
 
 
-'''
+'''"
 have a large dictionary that stores all the question data
 
 make every level and folder/group an object - each difficulty group, type of question, and question
 
-class names: Question, QuestionGroup, GroupDifficulty
+class names: Question, QuestionGroup, DifficultyGroup
 
-QuestionGroup will inherit from GroupDifficulty, mainly the method that checks the completion of the contents
+QuestionGroup will inherit from DifficultyGroup, mainly the method that checks the completion of the contents
 
 '''
 
-class GroupDifficulty:
+class DifficultyGroup:
 
-    def __init__(self, directory, content, question_difficulty, name) -> None:
+    def __init__(self, directory: str, question_difficulty: DifficultyLevel, name: str, content: dict) -> None:
 
         self.directory = directory
         self.content = content
@@ -156,9 +177,9 @@ class GroupDifficulty:
 
 
 
-class QuestionGroup(GroupDifficulty):
+class QuestionGroup(DifficultyGroup):
 
-    def __init__(self, directory, content, question_type, name) -> None:
+    def __init__(self, directory: str, question_type: QuestionType, name: str, content: dict) -> None:
         super().__init__(directory, content, name)
 
         self.question_type = question_type
@@ -168,7 +189,7 @@ class QuestionGroup(GroupDifficulty):
 
 class Question(QuestionGroup):
 
-    def __init__(self, directory, name) -> None:
+    def __init__(self, directory: str, name) -> None:
         super().__init__(directory, name)
         
         self.directory = directory
