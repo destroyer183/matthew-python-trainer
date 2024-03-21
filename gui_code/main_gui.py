@@ -109,6 +109,7 @@ class Gui(question_tester.QuestionTester):
 
             # place error text on screen
             self.login_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
+            return
 
         else:
             account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}"
@@ -120,7 +121,7 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                account_password = self.hex_to_string(line)
+                account_password = self.hex_to_string(line).strip()
                 break
 
         if account_password != password:
@@ -131,7 +132,42 @@ class Gui(question_tester.QuestionTester):
 
         else:
 
-            question_tester.QuestionTester.account = account_directory
+            with open(f"{account_directory}\\{username}", 'r+b') as f:
+
+                ff = mmap.mmap(f.fileno(), 0)
+
+                value = b'\n'
+
+                print(f"value: \"{value}\"")
+
+                index = ff.find(value)
+
+                ff.seek(index + 1)
+
+                item = ff.read_byte()
+
+                item = binascii.hexlify(bytes(item))
+
+                print(f"item value: {item}")
+
+                item = bytes(item)
+
+                print(f"index: {index}") # index 8, element 9
+
+                item = self.hex_to_string(item)
+
+                # item = self.hex_to_string(bytes(ff[index]))
+
+                print(f"item at index: \"{item}\"")
+
+
+
+
+
+
+                question_tester.QuestionTester.account = mmap.mmap(f.fileno(), 0)
+
+            self.initialize_account(account_directory)
             
             # load account data and change gui
 
@@ -237,6 +273,8 @@ class Gui(question_tester.QuestionTester):
         self.create_account_directory(current_directory, source_file, destination_folder, username)
 
         self.set_account_password(f"{current_directory}/{destination_folder}{username}/{username}", password)
+
+        self.login()
 
 
 

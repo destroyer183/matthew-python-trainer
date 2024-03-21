@@ -67,10 +67,18 @@ def main():
     print(f"\nTest case 1: {('Success!' * (output3 == answer3) + 'Failed.' * (output3 != answer3))}\
           \nYour output: {quote_placeholder * (type(output3) == str)}{output3}{quote_placeholder * (type(output3) == str)}\
           \nExpected output: {answer3}\n")
+    
+    x = 1
 
 
 
-    # have 5 separate cases stored in an encoded file, use these cases for verification that the question was solved legitimately
+    # have 5 separate answers stored in an encoded file, use these cases for verification that the question was solved legitimately
+    # run the function in this file with 5 cases
+    # put them all in a list in order
+    # iterate over them and encode them
+    # iterate over the file with the solutions, and compare each list item to the correct solution
+    # if all 5 cases are solved correctly, call a function in 'question_tester.py' that will change the save file to show that the answer was solved correctly
+
 
 
 

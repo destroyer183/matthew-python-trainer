@@ -6,7 +6,6 @@ import binascii
 import mmap
 import enum
 from gui_code import main_gui
-from dict_tree_constructor import construct_dict_tree
 
 
 class DifficultyLevel(enum.Enum):
@@ -27,7 +26,7 @@ class QuestionType(enum.Enum):
 
 
 
-chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>? '
+chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>? \n'
 
 char_values = {}
 
@@ -74,7 +73,17 @@ class QuestionTester:
 
 
 
-    def string_to_int(self, input = None):
+    @classmethod
+    def update_save_file(cls, question: str, correct_solution: bool):
+
+
+        # figure out how to assign the 'account' class variable to the account file
+        pass
+
+
+
+    @staticmethod
+    def string_to_int(input = None):
 
         if input is None:
             print('no value given\n\n')
@@ -89,7 +98,8 @@ class QuestionTester:
 
 
 
-    def hex_to_string(self, input = None):
+    @staticmethod
+    def hex_to_string(input: bytes = None):
 
         if input is None:
             print('no value given\n\n')
@@ -107,15 +117,19 @@ class QuestionTester:
             if len(value) == 1:
                 value = f"0{value}"
 
+            print(f"converted item value: {value}")
+
             output += list(char_values.keys())[list(char_values.values()).index(value)]
 
         return output
 
 
 
-    def initialize_account(self, directory):
+    def initialize_account(self, directory, question_data_index):
 
-        QuestionTester.directory_tree = construct_dict_tree(directory)
+        from dict_tree_constructor import construct_dict_tree
+
+        QuestionTester.directory_tree = construct_dict_tree(directory, question_data_index)
 
         temp = directory.split('\\')
 
@@ -189,15 +203,18 @@ class QuestionGroup(DifficultyGroup):
 
 class Question(QuestionGroup):
 
-    def __init__(self, directory: str, name) -> None:
+    def __init__(self, directory: str, name, save_file_index: int) -> None:
         super().__init__(directory, name)
         
         self.directory = directory
         self.completed = False
+        self.save_file_index = save_file_index
+
 
 
 
 def main():
+
 
     QuestionTester.instance = QuestionTester(tk.Tk())
 
