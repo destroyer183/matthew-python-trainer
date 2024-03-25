@@ -144,30 +144,18 @@ class Gui(question_tester.QuestionTester):
 
                 ff.seek(index + 1)
 
-                item = ff.read_byte()
+                item = ff.read(1)
 
-                item = binascii.hexlify(bytes(item))
+                print(f"item: {item}")
+                print(f"item type: {type(item)}")
 
-                print(f"item value: {item}")
+                item = self.hex_to_string(bytes(item))
 
-                item = bytes(item)
-
-                print(f"index: {index}") # index 8, element 9
-
-                item = self.hex_to_string(item)
-
-                # item = self.hex_to_string(bytes(ff[index]))
-
-                print(f"item at index: \"{item}\"")
-
-
-
-
-
+                print(f"item value: \"{item}\"")
 
                 question_tester.QuestionTester.account = mmap.mmap(f.fileno(), 0)
 
-            self.initialize_account(account_directory)
+            self.initialize_account(account_directory, index + 1)
             
             # load account data and change gui
 

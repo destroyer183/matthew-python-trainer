@@ -205,9 +205,19 @@ class Question(QuestionGroup):
 
     def __init__(self, directory: str, name, save_file_index: int) -> None:
         super().__init__(directory, name)
+
+        QuestionTester.account.seek(save_file_index)
+        temp = QuestionTester.read(1)
+
+        temp = QuestionTester.hex_to_string(bytes(temp))
+
+        if temp == ' ': self.completed = None
+        if temp == '0': self.completed = False
+        if temp == '1': self.completed = True
+
+
         
         self.directory = directory
-        self.completed = False
         self.save_file_index = save_file_index
 
 
