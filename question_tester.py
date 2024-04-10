@@ -191,23 +191,23 @@ class DifficultyGroup:
 
 
 
-class QuestionGroup(DifficultyGroup):
+class QuestionGroup():
 
-    def __init__(self, directory: str, question_type: QuestionType, name: str, content: dict) -> None:
-        super().__init__(directory, content, name)
+    def __init__(self, directory, question_type: QuestionType, name: str, content: dict) -> None:
 
+        self.directory = directory
         self.question_type = question_type
+        self.name = name
         self.completed = False
 
 
 
-class Question(QuestionGroup):
+class Question():
 
     def __init__(self, directory: str, name, save_file_index: int) -> None:
-        super().__init__(directory, name)
 
         QuestionTester.account.seek(save_file_index)
-        temp = QuestionTester.read(1)
+        temp = QuestionTester.account.read(1)
 
         temp = QuestionTester.hex_to_string(bytes(temp))
 
@@ -215,9 +215,13 @@ class Question(QuestionGroup):
         if temp == '0': self.completed = False
         if temp == '1': self.completed = True
 
+        print(f"save file index: {save_file_index}")
+        print(f"temp: \"{temp}\"")
+        print(f"self.completed: {self.completed}\n")
 
-        
+
         self.directory = directory
+        self.name = name
         self.save_file_index = save_file_index
 
 

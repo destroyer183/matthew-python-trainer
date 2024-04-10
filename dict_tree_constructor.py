@@ -3,7 +3,7 @@ from question_tester import DifficultyGroup, QuestionGroup, Question
 from question_tester import DifficultyLevel, QuestionType
 
 
-def construct_dict_tree(directory, question_data_index, completion_list: list):
+def construct_dict_tree(directory, question_data_index):
 
     index = question_data_index
 

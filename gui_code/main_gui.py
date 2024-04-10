@@ -15,6 +15,21 @@ import question_tester
 
 
 
+''' NOTES
+
+
+add in 'remember me' checkbox on the login page
+
+save a file called 'default' with the account name and password encoded inside
+
+whenever the GUI loads up, check this file and see if the data matches an account
+
+
+'''
+
+
+
+
 class Gui(question_tester.QuestionTester):
 
     def __init__(self, parent) -> None:
@@ -28,7 +43,7 @@ class Gui(question_tester.QuestionTester):
 
 
 
-    def login(self):
+    def login(self, username = 'username', password = 'password'):
         
         self.clear_gui()
 
@@ -49,7 +64,7 @@ class Gui(question_tester.QuestionTester):
         self.username_box.place(relx = 0.5, y = 140, anchor = CENTER)
 
         self.username_box.delete(1.0, tk.END)
-        self.username_box.insert(tk.END, 'username')
+        self.username_box.insert(tk.END, username)
 
         # password box
         self.password_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
@@ -57,7 +72,7 @@ class Gui(question_tester.QuestionTester):
         self.password_box.place(relx = 0.5, y = 215, anchor = CENTER)
 
         self.password_box.delete(1.0, tk.END)
-        self.password_box.insert(tk.END, 'password')
+        self.password_box.insert(tk.END, password)
 
         # login button
         self.submit_button = tk.Button(self.parent, text = 'Submit', anchor = 'center', command = lambda:self.find_account())
@@ -142,6 +157,8 @@ class Gui(question_tester.QuestionTester):
 
                 index = ff.find(value)
 
+                print(f"index: {index}")
+
                 ff.seek(index + 1)
 
                 item = ff.read(1)
@@ -158,9 +175,7 @@ class Gui(question_tester.QuestionTester):
             self.initialize_account(account_directory, index + 1)
             
             # load account data and change gui
-
-            pass
-
+ 
 
 
     def create_account(self):
@@ -262,7 +277,7 @@ class Gui(question_tester.QuestionTester):
 
         self.set_account_password(f"{current_directory}/{destination_folder}{username}/{username}", password)
 
-        self.login()
+        self.login(username, password)
 
 
 
@@ -270,10 +285,10 @@ class Gui(question_tester.QuestionTester):
 
         shutil.copytree(f"{directory}/{source_file}", f"{directory}/{destination}{username}")
 
-        old_file = pathlib.Path(f"{directory}/{destination}{username}/data_template")
-        new_file = pathlib.Path(f"{directory}/{destination}{username}/{username}")
+        # old_file = pathlib.Path(f"{directory}/{destination}{username}/data_template")
+        # new_file = pathlib.Path(f"{directory}/{destination}{username}/{username}")
 
-        os.rename(old_file, new_file)
+        # os.rename(old_file, new_file)
 
 
 
@@ -285,7 +300,25 @@ class Gui(question_tester.QuestionTester):
 
         password = binascii.unhexlify(password)
 
-        with open(account, 'r+b') as f:
-            f.write(password + b'\n')
+        with open(account, 'wb') as f:
+
+            f.write((password + b'\n'))
+
+            second_line = []
+
+            for i in range(108):
+                second_line.append(' ')
+
+            for item in second_line:
+
+                print('yes')
+
+                temp = ('').join(question_tester.QuestionTester.hex_to_string(item))
+
+                temp = binascii.unhexlify(temp)
+
+                print('yes')
+
+                f.write(temp)
 
 
