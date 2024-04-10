@@ -5,7 +5,7 @@ import shutil
 import binascii
 import mmap
 import enum
-from gui_code import main_gui
+from gui_code import login_gui
 
 
 class DifficultyLevel(enum.Enum):
@@ -50,13 +50,13 @@ class QuestionTester:
 
     def __init__(self, gui) -> None:
 
-        self.gui = main_gui.Gui(gui)
+        self.gui = login_gui.Gui(gui)
     
 
 
     def make_gui(self, type):
 
-        if   type == 'login'   : self.gui = main_gui.Gui(self.gui.parent)
+        if   type == 'login'   : self.gui = login_gui.Gui(self.gui.parent)
         elif type == 'overview': pass
         elif type == 'level1'  : pass
         elif type == 'level2'  : pass
@@ -135,6 +135,34 @@ class QuestionTester:
 
         QuestionTester.account = f"{directory}\\{temp[-1]}"
 
+        # iterate over all folders to see if they are completed or not
+        for level in QuestionTester.directory_tree.values():
+
+            if type(level) == str:
+                continue
+
+            for group in level.content.values():
+
+                group.check_completion()
+
+                print(f"{group.name} completion: {group.completed}")
+
+            level.check_completion()
+
+        # check if folders are unlocked
+        QuestionTester.directory_tree['Introduction'].unlocked = True
+
+        if QuestionTester.directory_tree['Introduction'].completed:
+            QuestionTester.directory_tree['Level-1'].unlocked = True
+
+        elif QuestionTester.directory_tree['Level-1'].completed:
+            QuestionTester.directory_tree['Level-2'].unlocked = True
+
+        elif QuestionTester.directory_tree['Level-2'].completed:
+            QuestionTester.directory_tree['Level-3'].unlocked = True
+
+
+
 
 
     def update_account(self):
@@ -182,7 +210,13 @@ class DifficultyGroup:
 
 
     def check_completion(self):
-        pass
+
+        for item in self.content.values():
+
+            if item.completed:
+                return
+            
+        self.completed = True
 
 
 
@@ -191,7 +225,7 @@ class DifficultyGroup:
 
 
 
-class QuestionGroup():
+class QuestionGroup(DifficultyGroup):
 
     def __init__(self, directory, question_type: QuestionType, name: str, content: dict) -> None:
 
@@ -199,10 +233,11 @@ class QuestionGroup():
         self.question_type = question_type
         self.name = name
         self.completed = False
+        self.content = content
 
 
 
-class Question():
+class Question(QuestionGroup):
 
     def __init__(self, directory: str, name, save_file_index: int) -> None:
 
@@ -219,10 +254,14 @@ class Question():
         print(f"temp: \"{temp}\"")
         print(f"self.completed: {self.completed}\n")
 
-
         self.directory = directory
         self.name = name
         self.save_file_index = save_file_index
+
+
+    def test_question(self):
+        # this function will test a question, and update the completion values of the question it is called on, and every folder above ite
+        pass
 
 
 
