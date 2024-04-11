@@ -22,8 +22,9 @@ import question_tester
 
 class Gui(login_gui.Gui):
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, parent) -> None:
+
+        self.parent = parent
 
 
 

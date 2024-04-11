@@ -16,13 +16,15 @@ import question_tester
 
 ''' NOTES
 
-
 add in 'remember me' checkbox on the login page
 
 save a file called 'default' with the account name and password encoded inside
 
 whenever the GUI loads up, check this file and see if the data matches an account
 
+after all of the question data, put a number that keeps track of the number of correct answers
+
+make a backup file hidden in the code storage
 
 '''
 
@@ -153,7 +155,7 @@ class Gui(question_tester.QuestionTester):
 
         else:
 
-            with open(f"{account_directory}\\{username}", 'r+b') as f:
+            with open(f"{account_directory}\\{username}", 'r+b') as f, open(f"{account_directory}\\user_code\\backup", 'r+b') as f2:
 
                 ff = mmap.mmap(f.fileno(), 0)
 
@@ -177,10 +179,9 @@ class Gui(question_tester.QuestionTester):
                 print(f"item value: \"{item}\"")
 
                 question_tester.QuestionTester.account = mmap.mmap(f.fileno(), 0)
+                question_tester.QuestionTester.backup = mmap.mmap(f2.fileno(), 0)
 
             self.initialize_account(account_directory, index + 1)
-            
-            # load account data and change gui
  
 
 
@@ -242,7 +243,16 @@ class Gui(question_tester.QuestionTester):
 
 
 
-    def verify_details(self, username, password, confirm_password):
+    def verify_details(self, username, password, confirm_password, exception = False):
+
+        if exception:
+            self.account_error_text = tk.Label(self.parent, text = 'Account verification error.', bg = 'dimgrey', fg = 'red')
+            self.account_error_text.configure(font=('Cascadia Code', 10))
+            self.account_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
+            return
+
+        try: self.account_error_text.place_forget()
+        except:pass
 
         try: self.create_account_error_text.place_forget()
         except:pass
@@ -281,7 +291,7 @@ class Gui(question_tester.QuestionTester):
 
         self.create_account_directory(current_directory, source_file, destination_folder, username)
 
-        self.set_account_password(f"{current_directory}/{destination_folder}{username}/{username}", password)
+        self.set_account_password(f"{current_directory}/{destination_folder}{username}/user_code/backup", f"{current_directory}/{destination_folder}{username}/{username}", password)
 
         self.login(username, password)
 
@@ -293,7 +303,7 @@ class Gui(question_tester.QuestionTester):
 
 
 
-    def set_account_password(self, account, password):
+    def set_account_password(self, backup, account, password):
 
         password = self.string_to_int(password)
 
@@ -301,13 +311,16 @@ class Gui(question_tester.QuestionTester):
 
         password = binascii.unhexlify(password)
 
-        with open(account, 'wb') as f:
+        with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
             first_line = password
             second_line = b'\n'
 
             f.write(first_line)
             f.write(second_line)
+
+            f2.write(first_line)
+            f2.write(second_line)
 
             third_line = []
 
@@ -321,6 +334,23 @@ class Gui(question_tester.QuestionTester):
                 temp = binascii.unhexlify(temp)
 
                 f.write(temp)
+                f2.write(temp)
+
+            fourth_line = 0
+            fourth_line = hex(fourth_line)[2:]
+
+            if len(fourth_line) == 1:
+                fourth_line = f"0{fourth_line}"
+
+            fourth_line = self.string_to_int(fourth_line)
+            fourth_line = ('').join(fourth_line)
+            fourth_line = binascii.unhexlify(fourth_line)
+
+            f.write(fourth_line)
+            f2.write(fourth_line)
+
+        
+
 
 
 

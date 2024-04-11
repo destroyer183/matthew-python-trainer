@@ -23,6 +23,14 @@ to write to file:
     unhexlify
     write
 
+encryption for completion counter:
+    take integer
+    convert to hexidecimal, always with 2 chars
+    convert each char to integer
+    unhexlify
+    write
+
+
 
 make subclasses for each type of problem (math, lists, strings, loops, dictionaries)
 use the subclasses to make guis for each type of problem

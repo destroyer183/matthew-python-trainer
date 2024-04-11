@@ -5,7 +5,7 @@ import shutil
 import binascii
 import mmap
 import enum
-from gui_code import login_gui
+from gui_code import login_gui, main_gui
 
 
 class DifficultyLevel(enum.Enum):
@@ -46,7 +46,9 @@ class QuestionTester:
 
     instance: "QuestionTester" = None
     account = None
+    backup = None
     directory_tree = None
+    completed = 0
 
     def __init__(self, gui) -> None:
 
@@ -56,11 +58,8 @@ class QuestionTester:
 
     def make_gui(self, type):
 
-        if   type == 'login'   : self.gui = login_gui.Gui(self.gui.parent)
-        elif type == 'overview': pass
-        elif type == 'level1'  : pass
-        elif type == 'level2'  : pass
-        elif type == 'level3'  : pass
+        if   type == 'login'    : self.gui = login_gui.Gui(self.gui.parent)
+        elif type == 'questions': self.gui = main_gui.Gui(self.gui.parent)
 
         self.gui.create_gui()
 
@@ -133,7 +132,7 @@ class QuestionTester:
 
         temp = directory.split('\\')
 
-        QuestionTester.account = f"{directory}\\{temp[-1]}"
+
 
         # iterate over all folders to see if they are completed or not
         for level in QuestionTester.directory_tree.values():
@@ -149,6 +148,8 @@ class QuestionTester:
 
             level.check_completion()
 
+
+
         # check if folders are unlocked
         QuestionTester.directory_tree['Introduction'].unlocked = True
 
@@ -161,7 +162,70 @@ class QuestionTester:
         elif QuestionTester.directory_tree['Level-2'].completed:
             QuestionTester.directory_tree['Level-3'].unlocked = True
 
+        
 
+        # check if saved completion data has been tampered with
+        redundancy_index = question_data_index + 108
+
+        QuestionTester.account.seek(redundancy_index)
+
+        char1 = QuestionTester.account.read(1)
+        char2 = QuestionTester.account.read(1)
+        
+        number = 0
+
+        char1 = self.hex_to_string(char1)
+        char2 = self.hex_to_string(char2)
+
+        hex_chars = [x for x in '0123456789abcdef']
+
+        number = (hex_chars.index(char1) * 16) + (hex_chars.index(char2))
+
+        if number != QuestionTester.completed:
+
+            print('error 1')
+
+            # put error text on screen that says 'Account verification error.'
+            self.verify_details('', '', '', exception = True)
+
+            # reset all account related variables
+            QuestionTester.account = None
+            QuestionTester.backup = None
+            QuestionTester.directory_tree = None
+            QuestionTester.completed = 0
+
+            # continue past code to avoid logging into account
+            return
+        
+        QuestionTester.account.seek(0)
+        QuestionTester.backup.seek(0)
+
+        account_data = QuestionTester.account.read()
+        backup_data = QuestionTester.backup.read()
+
+        # check to see if the main account file matches the backup file
+        if account_data != backup_data:
+
+            print('error 2')
+
+            # put error text on screen that says 'Account verification error.'
+            self.verify_details('', '', '', exception = True)
+
+            # reset all account related variables
+            QuestionTester.account = None
+            QuestionTester.backup = None
+            QuestionTester.directory_tree = None
+            QuestionTester.completed = 0
+
+            # continue past code to avoid logging into account
+            return
+        
+        
+
+        # run function that changes the gui and logs into the account
+        QuestionTester.instance.make_gui('questions')
+
+        print('account sucessfully logged into.')
 
 
 
@@ -175,13 +239,7 @@ class QuestionTester:
 
 
 
-
-    
-
-
-
-
-'''"
+'''
 have a large dictionary that stores all the question data
 
 make every level and folder/group an object - each difficulty group, type of question, and question
@@ -248,7 +306,7 @@ class Question(QuestionGroup):
 
         if temp == ' ': self.completed = None
         if temp == '0': self.completed = False
-        if temp == '1': self.completed = True
+        if temp == '1': self.completed = True; QuestionTester.completed += 1
 
         print(f"save file index: {save_file_index}")
         print(f"temp: \"{temp}\"")
