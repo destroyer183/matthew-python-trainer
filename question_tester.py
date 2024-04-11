@@ -4,8 +4,21 @@ import os
 import shutil
 import binascii
 import mmap
+import sys
 import enum
-from gui_code import login_gui, main_gui
+# from gui_code import login_gui
+
+# from gui_code import main_gui
+# import main_gui
+
+current = os.path.dirname(os.path.realpath(__file__)) # get current directory
+parent = current + '\\gui_code'
+print(f"directory: {parent}")
+# # parent = os.path.dirname(current) # go up one directory level
+sys.path.append(parent) # set current directory
+# # from gui_code import main_gui
+import login_gui
+# import main_gui
 
 
 class DifficultyLevel(enum.Enum):
@@ -56,12 +69,18 @@ class QuestionTester:
     
 
 
-    def make_gui(self, type):
+    def make_gui(self, gui_type):
 
-        if   type == 'login'    : self.gui = login_gui.Gui(self.gui.parent)
-        elif type == 'questions': self.gui = main_gui.Gui(self.gui.parent)
+        import main_gui
+
+        print(f"instance type: {type(QuestionTester.instance)}")
+
+        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent)
+        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent)
 
         self.gui.create_gui()
+
+        print(f"instance type: {type(QuestionTester.instance)}")
 
 
 
@@ -121,6 +140,12 @@ class QuestionTester:
             output += list(char_values.keys())[list(char_values.values()).index(value)]
 
         return output
+    
+
+
+    @staticmethod
+    def check_type():
+        print(f"\ninstance type: {type(QuestionTester.instance)}\n")
 
 
 
@@ -129,10 +154,6 @@ class QuestionTester:
         from dict_tree_constructor import construct_dict_tree
 
         QuestionTester.directory_tree = construct_dict_tree(directory, question_data_index)
-
-        temp = directory.split('\\')
-
-
 
         # iterate over all folders to see if they are completed or not
         for level in QuestionTester.directory_tree.values():
@@ -174,8 +195,8 @@ class QuestionTester:
         
         number = 0
 
-        char1 = self.hex_to_string(char1)
-        char2 = self.hex_to_string(char2)
+        char1 = QuestionTester.hex_to_string(char1)
+        char2 = QuestionTester.hex_to_string(char2)
 
         hex_chars = [x for x in '0123456789abcdef']
 
@@ -223,7 +244,8 @@ class QuestionTester:
         
 
         # run function that changes the gui and logs into the account
-        QuestionTester.instance.make_gui('questions')
+
+        # QuestionTester.make_gui('questions')
 
         print('account sucessfully logged into.')
 
@@ -325,7 +347,6 @@ class Question(QuestionGroup):
 
 
 def main():
-
 
     QuestionTester.instance = QuestionTester(tk.Tk())
 

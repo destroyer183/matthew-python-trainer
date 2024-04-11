@@ -20,7 +20,7 @@ import question_tester
 '''
 
 
-class Gui(login_gui.Gui):
+class Gui(question_tester.QuestionTester):
 
     def __init__(self, parent) -> None:
 
@@ -36,5 +36,21 @@ class Gui(login_gui.Gui):
 
         
     def create_gui(self):
-        # call a function here
-        pass
+
+        self.clear_gui()
+
+        self.parent.title('Python Practice')
+
+        self.parent.geometry('600x600')
+
+        self.parent.configure(background = 'dimgrey')
+
+
+
+
+
+
+
+
+
+

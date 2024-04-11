@@ -8,6 +8,7 @@ import mmap
 
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = os.path.dirname(current) # go up one directory level
+print(f"current: {parent}")
 sys.path.append(parent) # set current directory
 import question_tester
 
@@ -181,7 +182,11 @@ class Gui(question_tester.QuestionTester):
                 question_tester.QuestionTester.account = mmap.mmap(f.fileno(), 0)
                 question_tester.QuestionTester.backup = mmap.mmap(f2.fileno(), 0)
 
+            question_tester.QuestionTester.check_type()
+
             self.initialize_account(account_directory, index + 1)
+
+            question_tester.QuestionTester.instance.make_gui('questions')
  
 
 
