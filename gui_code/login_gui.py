@@ -10,7 +10,7 @@ current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = os.path.dirname(current) # go up one directory level
 print(f"current: {parent}")
 sys.path.append(parent) # set current directory
-# import question_tester
+import question_tester
 
 
 
@@ -31,11 +31,19 @@ make a backup file hidden in the code storage
 
 
 
-class Gui():
 
-    def __init__(self, parent) -> None:
+class Gui(question_tester.QuestionTester):
+
+    def __init__(self, parent, master) -> None:
         
         self.parent = parent
+        self.master = master
+
+
+
+    def accept_master(self, master_value):
+
+        self.master = master_value
 
 
 
@@ -117,8 +125,6 @@ class Gui():
 
     def find_account(self, username = None, password = None):
 
-        from question_tester import string_to_int, hex_to_string
-
         # get username and password
         if username is None: username = self.username_box.get(1.0, tk.END).strip()
         if password is None: password = self.password_box.get(1.0, tk.END).strip()
@@ -146,7 +152,7 @@ class Gui():
 
             for line in f:
 
-                account_password = hex_to_string(line).strip()
+                account_password = self.hex_to_string(line).strip()
                 break
 
         if account_password != password:
@@ -156,8 +162,6 @@ class Gui():
             self.login_error_text.place(relx = 0.5, y = 180, anchor = CENTER)
 
         else:
-
-            from question_tester import main_var
 
             with open(f"{account_directory}\\{username}", 'r+b') as f, open(f"{account_directory}\\user_code\\backup", 'r+b') as f2:
 
@@ -178,18 +182,16 @@ class Gui():
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = hex_to_string(bytes(item))
+                item = self.hex_to_string(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
-                main_var.account = mmap.mmap(f.fileno(), 0)
-                main_var.backup = mmap.mmap(f2.fileno(), 0)
+                self.master.account = mmap.mmap(f.fileno(), 0)
+                self.master.backup = mmap.mmap(f2.fileno(), 0)
 
-            main_var.instance.check_type()
+            self.master.instance.initialize_account(account_directory, index + 1, self.master)
 
-            main_var.instance.initialize_account(account_directory, index + 1)
-
-            main_var.instance.make_gui('questions')
+            self.master.instance.make_gui('questions')
  
 
 
@@ -312,10 +314,8 @@ class Gui():
 
 
     def set_account_password(self, backup, account, password):
-        
-        from question_tester import string_to_int, hex_to_string
 
-        password = string_to_int(password)
+        password = self.string_to_int(password)
 
         password = ('').join(password)
 
@@ -339,7 +339,7 @@ class Gui():
 
             for item in third_line:
 
-                temp = ('').join(string_to_int(item))
+                temp = ('').join(self.string_to_int(item))
 
                 temp = binascii.unhexlify(temp)
 
@@ -352,7 +352,7 @@ class Gui():
             if len(fourth_line) == 1:
                 fourth_line = f"0{fourth_line}"
 
-            fourth_line = string_to_int(fourth_line)
+            fourth_line = self.string_to_int(fourth_line)
             fourth_line = ('').join(fourth_line)
             fourth_line = binascii.unhexlify(fourth_line)
 
@@ -360,7 +360,3 @@ class Gui():
             f2.write(fourth_line)
 
         
-
-
-
-

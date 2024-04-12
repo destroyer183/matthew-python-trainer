@@ -9,6 +9,7 @@ import mmap
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = os.path.dirname(current) # go up one directory level
 sys.path.append(parent) # set current directory
+import question_tester
 
 
 
@@ -18,11 +19,12 @@ sys.path.append(parent) # set current directory
 '''
 
 
-class Gui():
+class Gui(question_tester.QuestionTester):
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, master) -> None:
 
         self.parent = parent
+        self.master = master
 
 
 
@@ -42,13 +44,3 @@ class Gui():
         self.parent.geometry('600x600')
 
         self.parent.configure(background = 'dimgrey')
-
-
-
-
-
-
-
-
-
-
