@@ -315,6 +315,21 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
+
+
+
+
+        '''
+
+        For the extra info at the end of the save file, instead of counting all correct answers,
+        sum the unhexlified digits of the characters of the password, and add the completion data of all or random questions to it.
+
+        '''
+
+
+
+
+
         password = self.string_to_int(password)
 
         password = ('').join(password)
