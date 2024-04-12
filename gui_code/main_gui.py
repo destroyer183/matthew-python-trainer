@@ -5,12 +5,10 @@ import sys
 import shutil
 import binascii
 import mmap
-import login_gui
 
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = os.path.dirname(current) # go up one directory level
 sys.path.append(parent) # set current directory
-import question_tester
 
 
 
@@ -20,7 +18,7 @@ import question_tester
 '''
 
 
-class Gui(question_tester.QuestionTester):
+class Gui():
 
     def __init__(self, parent) -> None:
 

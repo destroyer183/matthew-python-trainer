@@ -6,6 +6,7 @@ import binascii
 import mmap
 import sys
 import enum
+import importlib
 # from gui_code import login_gui
 
 # from gui_code import main_gui
@@ -17,8 +18,15 @@ print(f"directory: {parent}")
 # # parent = os.path.dirname(current) # go up one directory level
 sys.path.append(parent) # set current directory
 # # from gui_code import main_gui
-import login_gui
+login_gui = importlib.import_module('login_gui')
 # import main_gui
+
+
+''' order of imports
+
+question_tester imports login_gui
+
+'''
 
 
 class DifficultyLevel(enum.Enum):
@@ -38,7 +46,6 @@ class QuestionType(enum.Enum):
 
 
 
-
 chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>? \n'
 
 char_values = {}
@@ -55,6 +62,47 @@ for value, key in enumerate(chars):
 
 
 
+def string_to_int(input = None):
+
+    if input is None:
+        print('no value given\n\n')
+
+    output = []
+
+    for value in input:
+
+        output.append(char_values[value])
+
+    return output
+
+
+
+def hex_to_string(input: bytes = None):
+
+    if input is None:
+        print('no value given\n\n')
+
+    input = input.strip()
+
+    input = [x for x in input]
+
+    output = ''
+
+    for value in input:
+
+        value = hex(value)[2:]
+
+        if len(value) == 1:
+            value = f"0{value}"
+
+        print(f"converted item value: {value}")
+
+        output += list(char_values.keys())[list(char_values.values()).index(value)]
+
+    return output
+
+
+
 class QuestionTester:
 
     instance: "QuestionTester" = None
@@ -65,22 +113,23 @@ class QuestionTester:
 
     def __init__(self, gui) -> None:
 
-        self.gui = login_gui.Gui(gui)
+        QuestionTester.instance = self
+        QuestionTester.instance.gui = login_gui.Gui(gui)
     
 
 
     def make_gui(self, gui_type):
 
-        import main_gui
+        print(f"\nself: {main_var.instance}\n")
 
-        print(f"instance type: {type(QuestionTester.instance)}")
+        main_gui = importlib.import_module('main_gui')
 
-        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent)
-        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent)
+        if   gui_type == 'login'    : main_var.instance.gui = login_gui.Gui(main_var.instance.gui.parent)
+        elif gui_type == 'questions': main_var.instance.gui = main_gui.Gui(main_var.instance.gui.parent)
 
-        self.gui.create_gui()
+        main_var.instance.gui.create_gui()
 
-        print(f"instance type: {type(QuestionTester.instance)}")
+        # when QuestionTester is imported by login_gui, the class data is not passed, and so QuestionTester.instance has no value
 
 
 
@@ -88,7 +137,6 @@ class QuestionTester:
 
         for widget in self.parent.winfo_children():
             widget.destroy()
-
 
 
     @classmethod
@@ -100,52 +148,13 @@ class QuestionTester:
 
 
 
-    @staticmethod
-    def string_to_int(input = None):
-
-        if input is None:
-            print('no value given\n\n')
-
-        output = []
-
-        for value in input:
-
-            output.append(char_values[value])
-
-        return output
-
-
-
-    @staticmethod
-    def hex_to_string(input: bytes = None):
-
-        if input is None:
-            print('no value given\n\n')
-
-        input = input.strip()
-
-        input = [x for x in input]
-
-        output = ''
-
-        for value in input:
-
-            value = hex(value)[2:]
-
-            if len(value) == 1:
-                value = f"0{value}"
-
-            print(f"converted item value: {value}")
-
-            output += list(char_values.keys())[list(char_values.values()).index(value)]
-
-        return output
+    
     
 
 
     @staticmethod
     def check_type():
-        print(f"\ninstance type: {type(QuestionTester.instance)}\n")
+        print(f"\ninstance type: {type(main_var.instance)}\n")
 
 
 
@@ -153,10 +162,10 @@ class QuestionTester:
 
         from dict_tree_constructor import construct_dict_tree
 
-        QuestionTester.directory_tree = construct_dict_tree(directory, question_data_index)
+        main_var.instance.directory_tree = construct_dict_tree(directory, question_data_index)
 
         # iterate over all folders to see if they are completed or not
-        for level in QuestionTester.directory_tree.values():
+        for level in main_var.instance.directory_tree.values():
 
             if type(level) == str:
                 continue
@@ -172,37 +181,37 @@ class QuestionTester:
 
 
         # check if folders are unlocked
-        QuestionTester.directory_tree['Introduction'].unlocked = True
+        main_var.instance.directory_tree['Introduction'].unlocked = True
 
-        if QuestionTester.directory_tree['Introduction'].completed:
-            QuestionTester.directory_tree['Level-1'].unlocked = True
+        if main_var.instance.directory_tree['Introduction'].completed:
+            main_var.instance.directory_tree['Level-1'].unlocked = True
 
-        elif QuestionTester.directory_tree['Level-1'].completed:
-            QuestionTester.directory_tree['Level-2'].unlocked = True
+        elif main_var.instance.directory_tree['Level-1'].completed:
+            main_var.instance.directory_tree['Level-2'].unlocked = True
 
-        elif QuestionTester.directory_tree['Level-2'].completed:
-            QuestionTester.directory_tree['Level-3'].unlocked = True
+        elif main_var.instance.directory_tree['Level-2'].completed:
+            main_var.instance.directory_tree['Level-3'].unlocked = True
 
         
 
         # check if saved completion data has been tampered with
         redundancy_index = question_data_index + 108
 
-        QuestionTester.account.seek(redundancy_index)
+        main_var.instance.account.seek(redundancy_index)
 
-        char1 = QuestionTester.account.read(1)
-        char2 = QuestionTester.account.read(1)
+        char1 = main_var.instance.account.read(1)
+        char2 = main_var.instance.account.read(1)
         
         number = 0
 
-        char1 = QuestionTester.hex_to_string(char1)
-        char2 = QuestionTester.hex_to_string(char2)
+        char1 = hex_to_string(char1)
+        char2 = hex_to_string(char2)
 
         hex_chars = [x for x in '0123456789abcdef']
 
         number = (hex_chars.index(char1) * 16) + (hex_chars.index(char2))
 
-        if number != QuestionTester.completed:
+        if number != main_var.instance.completed:
 
             print('error 1')
 
@@ -210,19 +219,19 @@ class QuestionTester:
             self.verify_details('', '', '', exception = True)
 
             # reset all account related variables
-            QuestionTester.account = None
-            QuestionTester.backup = None
-            QuestionTester.directory_tree = None
-            QuestionTester.completed = 0
+            main_var.instance.account = None
+            main_var.instance.backup = None
+            main_var.instance.directory_tree = None
+            main_var.instance.completed = 0
 
             # continue past code to avoid logging into account
             return
         
-        QuestionTester.account.seek(0)
-        QuestionTester.backup.seek(0)
+        main_var.instance.account.seek(0)
+        main_var.instance.backup.seek(0)
 
-        account_data = QuestionTester.account.read()
-        backup_data = QuestionTester.backup.read()
+        account_data = main_var.instance.account.read()
+        backup_data = main_var.instance.backup.read()
 
         # check to see if the main account file matches the backup file
         if account_data != backup_data:
@@ -233,10 +242,10 @@ class QuestionTester:
             self.verify_details('', '', '', exception = True)
 
             # reset all account related variables
-            QuestionTester.account = None
-            QuestionTester.backup = None
-            QuestionTester.directory_tree = None
-            QuestionTester.completed = 0
+            main_var.instance.account = None
+            main_var.instance.backup = None
+            main_var.instance.directory_tree = None
+            main_var.instance.completed = 0
 
             # continue past code to avoid logging into account
             return
@@ -258,6 +267,7 @@ class QuestionTester:
 
     def read_account(self, type):
         pass
+
 
 
 
@@ -321,14 +331,14 @@ class Question(QuestionGroup):
 
     def __init__(self, directory: str, name, save_file_index: int) -> None:
 
-        QuestionTester.account.seek(save_file_index)
-        temp = QuestionTester.account.read(1)
+        main_var.account.seek(save_file_index)
+        temp = main_var.account.read(1)
 
-        temp = QuestionTester.hex_to_string(bytes(temp))
+        temp = hex_to_string(bytes(temp))
 
         if temp == ' ': self.completed = None
         if temp == '0': self.completed = False
-        if temp == '1': self.completed = True; QuestionTester.completed += 1
+        if temp == '1': self.completed = True; main_var.completed += 1
 
         print(f"save file index: {save_file_index}")
         print(f"temp: \"{temp}\"")
@@ -348,7 +358,7 @@ class Question(QuestionGroup):
 
 def main():
 
-    QuestionTester.instance = QuestionTester(tk.Tk())
+    # QuestionTester.instance = QuestionTester(tk.Tk())
 
     # override windows scaling
     if os.name == 'nt':
@@ -361,13 +371,27 @@ def main():
             success   = ctypes.windll.user32.SetProcessDPIAware()
         except:pass 
 
-    QuestionTester.instance.make_gui('login')
+    main_var.instance.make_gui('login')
 
     # run the gui
-    QuestionTester.instance.gui.parent.mainloop()
+    main_var.instance.gui.parent.mainloop()
 
 
+# login_gui = importlib.import_module('login_gui')
+
+
+
+# main_var = QuestionTester(tk.Tk())
 
 if __name__ == '__main__':
+
+    main_var = QuestionTester(tk.Tk())
+
+
+    # instance = ''
+
+    
+
+    # instance = QuestionTester(tk.Tk())
 
     main()
