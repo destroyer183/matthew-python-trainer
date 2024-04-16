@@ -20,15 +20,35 @@ store all login info and progress data in a file with no file type
 to write to file:
     take string
     convert to integers
+    iterate over every element and unhexify with int('string', 16)
+    join list of strings
+    unhexlify to convert to bytes
+    write
+
+to read from file:
+    take bytes
+    hexlify to convert to byte of numbers
+    take the portion [2:len(string) - 1] to remove extra quotes and byte prefix
+    split string into groups of two numbers
+    convert numbers back to strings
+    done
+
+encryption for verification bytes:
+    take integer
+    convert to hexidecimal
+    convert each char number to integer
     unhexlify
     write
 
-encryption for completion counter:
-    take integer
-    convert to hexidecimal, always with 2 chars
-    convert each char to integer
-    unhexlify
-    write
+
+to read encryption for verification bytes:
+    take byte
+    hexlify
+    take the portion [2:len(string) - 1] to remove extra quotes and byte prefix
+    convert each integer to a char (should return two numbers)
+    join numbers
+    unhexify
+    done
 
 
 

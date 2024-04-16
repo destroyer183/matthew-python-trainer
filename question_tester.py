@@ -40,7 +40,7 @@ class QuestionType(enum.Enum):
 
 
 
-chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>? \n'
+chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>?\n'
 
 char_values = {}
 
@@ -59,6 +59,7 @@ for value, key in enumerate(chars):
 class QuestionTester:
 
     instance: "QuestionTester" = None
+    account_directory = None
     account = None
     backup = None
     directory_tree = None
@@ -100,8 +101,13 @@ class QuestionTester:
     @staticmethod
     def string_to_int(input = None):
 
+        print(f"\nconverting string to int...")
+
         if input is None:
             print('no value given\n\n')
+            return
+        
+        print(f"input: {input}")
 
         output = []
 
@@ -109,25 +115,100 @@ class QuestionTester:
 
             output.append(char_values[value])
 
+        print(f"output: {output}\n")
+
         return output
+    
 
 
 
     @staticmethod
-    def hex_to_string(input: bytes = None):
+    def string_to_byte(input = None):
+
+        print(f"\nconverting string to byte...")
 
         if input is None:
             print('no value given\n\n')
+            return
+        
+        print(f"input: {input}")
 
-        input = input.strip()
-
-        input = [x for x in input]
-
-        output = ''
+        output = b''
 
         for value in input:
 
-            value = hex(value)[2:]
+            char_value = char_values[value]
+
+            hex_element = str(int(char_value, 16))
+
+            if len(hex_element) % 2 != 0:
+                hex_element = f"0{hex_element}"
+
+            print(f"string: \"{hex_element}\"")
+
+            output += binascii.unhexlify(hex_element)
+
+            print(f"value: {binascii.unhexlify(hex_element)}")
+
+            print(f"current output: {output}")
+
+        # output = ('').join(output)
+
+        print(f"output: {output}\n")
+
+        print(f"hexlified: {binascii.hexlify(output)}")
+
+        return output
+
+
+
+
+    @staticmethod
+    def byte_to_string(input: bytes = None):
+
+        print(f"\nconverting byte to string...")
+
+        if input is None:
+            print('no value given\n\n')
+            return
+        
+        print(f"input: {input}")
+
+        input = binascii.hexlify(input)
+
+        input = str(input).strip()
+
+        input = input[2:len(input) - 1]
+
+        temp_list = []
+
+        temp_str = ''
+
+        input = input.strip()
+
+        split_size = 2
+
+        for value in input:
+
+            temp_str += value
+
+            if len(temp_str) == split_size:
+
+                if temp_str == '0a':
+                    continue
+
+                temp_list.append(str(temp_str))
+                temp_str = ''
+
+                print(f"value: {str(temp_str)}, {temp_str}")
+
+        output = ''
+
+        print(f"temp_list: {temp_list}\n")
+
+        for value in temp_list:
+
+            value = hex(int(value))[2:]
 
             if len(value) == 1:
                 value = f"0{value}"
@@ -135,6 +216,8 @@ class QuestionTester:
             print(f"converted item value: {value}")
 
             output += list(char_values.keys())[list(char_values.values()).index(value)]
+
+        print(f"output: {output}\n")
 
         return output
     
@@ -183,21 +266,52 @@ class QuestionTester:
         
 
         # check if saved completion data has been tampered with
+        print(f"\nverifying file...")
         redundancy_index = question_data_index + 108
 
         QuestionTester.account.seek(redundancy_index)
 
-        char1 = QuestionTester.account.read(1)
-        char2 = QuestionTester.account.read(1)
+        chars = QuestionTester.account.read()
         
-        number = 0
+        print(f"verification chars: {chars}")
 
-        char1 = QuestionTester.hex_to_string(char1)
-        char2 = QuestionTester.hex_to_string(char2)
+        chars = str(binascii.hexlify(chars))
 
-        hex_chars = [x for x in '0123456789abcdef']
+        chars = chars[2:len(chars) - 1]
 
-        number = (hex_chars.index(char1) * 16) + (hex_chars.index(char2))
+        print(f"chars: {chars}")
+        split_size = 2
+        temp_list = []
+        temp_str = ''
+
+        for value in chars:
+            temp_str += str(value)
+            if len(temp_str) == split_size:
+                temp_list.append(temp_str)
+                temp_str = ''
+
+        output = ''
+
+        print(f"temp list: {temp_list}")
+
+        for value in temp_list:
+
+            output += list(char_values.keys())[list(char_values.values()).index(value)]
+
+        output = int(output, 16)
+
+        print(f"verification output: {output}")
+
+
+
+        number = output
+
+
+
+        # the next step is to count the full integer value of the password
+        # account directory is stored in a class variable, just read it and count the numbers like in the account file setup
+
+
 
         if number != QuestionTester.completed:
 
@@ -323,7 +437,7 @@ class Question(QuestionGroup):
         master.account.seek(save_file_index)
         temp = master.account.read(1)
 
-        temp = QuestionTester.hex_to_string(bytes(temp))
+        temp = QuestionTester.byte_to_string(bytes(temp))
 
         if temp == ' ': self.completed = None
         if temp == '0': self.completed = False

@@ -152,7 +152,7 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                account_password = self.hex_to_string(line).strip()
+                account_password = self.byte_to_string(line).strip()
                 break
 
         if account_password != password:
@@ -182,12 +182,13 @@ class Gui(question_tester.QuestionTester):
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = self.hex_to_string(bytes(item))
+                item = self.byte_to_string(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
                 self.master.account = mmap.mmap(f.fileno(), 0)
                 self.master.backup = mmap.mmap(f2.fileno(), 0)
+                self.master.account_directory = account_directory
 
             self.master.instance.initialize_account(account_directory, index + 1, self.master)
 
@@ -315,26 +316,9 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
+        passwrd = self.string_to_int(password)
 
-
-
-
-        '''
-
-        For the extra info at the end of the save file, instead of counting all correct answers,
-        sum the unhexlified digits of the characters of the password, and add the completion data of all or random questions to it.
-
-        '''
-
-
-
-
-
-        password = self.string_to_int(password)
-
-        password = ('').join(password)
-
-        password = binascii.unhexlify(password)
+        password = self.string_to_byte(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -354,15 +338,26 @@ class Gui(question_tester.QuestionTester):
 
             for item in third_line:
 
-                temp = ('').join(self.string_to_int(item))
-
-                temp = binascii.unhexlify(temp)
+                temp = self.string_to_byte(item)
 
                 f.write(temp)
                 f2.write(temp)
 
-            fourth_line = 0
+
+
+            temp = []
+
+            for element in passwrd:
+                temp.append(int(element, 16))
+                
+            sum = 0
+            for num in temp:
+                sum += num
+
+            fourth_line = 0 + sum
+            print(f"fourth line int: {fourth_line}")
             fourth_line = hex(fourth_line)[2:]
+            print(f"fourth line hex: {fourth_line}")
 
             if len(fourth_line) == 1:
                 fourth_line = f"0{fourth_line}"
@@ -370,6 +365,12 @@ class Gui(question_tester.QuestionTester):
             fourth_line = self.string_to_int(fourth_line)
             fourth_line = ('').join(fourth_line)
             fourth_line = binascii.unhexlify(fourth_line)
+
+            print(f"fourth line unhexlified: {fourth_line}")
+
+            print(f"fourth line hexlified: {binascii.hexlify(fourth_line)}")
+            # to convert back:
+            # 
 
             f.write(fourth_line)
             f2.write(fourth_line)
