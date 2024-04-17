@@ -71,6 +71,8 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.configure(background = 'dimgrey')
 
+        self.parent.bind("<Return>", self.locate_account)
+
         # header text prompting user to login
         self.login_header = tk.Label(self.parent, text = 'Login')
         self.login_header.configure(font=('Cascadia Code', 30), background = 'dimgrey', fg = 'white')
@@ -142,6 +144,11 @@ class Gui(question_tester.QuestionTester):
 
             try: self.confirm_password_box.configure(show = '\u2022')
             except:pass
+
+
+
+    def locate_account(self, placeholder):
+        self.find_account()
 
 
 
@@ -222,6 +229,8 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.configure(background = 'dimgrey')
 
+        self.parent.bind("<Return>", self.build_account)
+
         # header text prompting user to login
         self.login_header = tk.Label(self.parent, text = 'Create Account')
         self.login_header.configure(font=('Cascadia Code', 30), background = 'dimgrey', fg = 'white')
@@ -264,9 +273,9 @@ class Gui(question_tester.QuestionTester):
         self.show_password.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 50, anchor = CENTER)
 
         # create account button
-        self.create_account_button = tk.Button(self.parent, text = 'Create Account', anchor = 'center', command = lambda:self.make_account())
-        self.create_account_button.configure(font=('Cascadia Code', 20))
-        self.create_account_button.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 95, height = 35, anchor = CENTER)
+        self.make_account_button = tk.Button(self.parent, text = 'Create Account', anchor = 'center', command = lambda:self.make_account())
+        self.make_account_button.configure(font=('Cascadia Code', 20))
+        self.make_account_button.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 95, height = 35, anchor = CENTER)
 
         # promt for the user to create a new account if they don't have one yet
         self.new_account_prompt = tk.Label(self.parent, text = 'Already a user?', bg = 'dimgrey', fg = 'white')
@@ -336,13 +345,13 @@ class Gui(question_tester.QuestionTester):
                 self.create_account_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
                 return True
             
-            elif len(username) <= 4:
+            elif len(username) < 4:
 
                 self.create_account_error_text.configure(text = 'Username is too short.')
                 self.create_account_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
                 return True
 
-            elif len(password) <= 4:
+            elif len(password) < 4:
 
                 self.create_account_error_text.configure(font=('Cascadia Code', 10), text = 'Password is too short.')
                 self.create_account_error_text.place(x = GuiAnchor.PasswordX.value + 290, y = 180, anchor = CENTER)
@@ -357,15 +366,20 @@ class Gui(question_tester.QuestionTester):
         return False
 
 
-        
+
+    def build_account(self, placeholder):
+        self.make_account()
+
+
+
     def make_account(self, username = None, password = None, confirm_password = None):
 
         # disable stuff
-        self.username_box .configure(state = DISABLED)
-        self.password_box .configure(state = DISABLED)
-        self.submit_button.configure(state = DISABLED)
+        self.username_box.configure(state = DISABLED)
+        self.password_box.configure(state = DISABLED)
+        self.make_account_button.configure(state = DISABLED)
         self.show_password.configure(state = DISABLED)
-        self.login_button .configure(state = DISABLED)
+        self.login_button.configure(state = DISABLED)
 
 
 
