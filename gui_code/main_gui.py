@@ -41,6 +41,17 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.title('Python Practice')
 
-        self.parent.geometry('600x600')
+        self.parent.geometry('500x500')
 
         self.parent.configure(background = 'dimgrey')
+
+        # button to log out of account
+        self.account_settings = tk.Button(self.parent, text = 'Settings', anchor = 'center', command = lambda:self.account_settings())
+
+
+
+    
+
+
+    def account_settings(self):
+        pass

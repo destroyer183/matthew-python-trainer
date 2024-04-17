@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+import enum
 import os
 import sys
 import shutil
@@ -29,6 +30,13 @@ make a backup file hidden in the code storage
 
 '''
 
+class GuiAnchor(enum.Enum):
+    UsernameX = 25
+    UsernameY = 140
+    PasswordX = 25
+    PasswordY = 215
+    ConfirmX  = 25
+    ConfirmY  = 290
 
 
 
@@ -38,12 +46,6 @@ class Gui(question_tester.QuestionTester):
         
         self.parent = parent
         self.master = master
-
-
-
-    def accept_master(self, master_value):
-
-        self.master = master_value
 
 
 
@@ -65,7 +67,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.title('Python Practice')
 
-        self.parent.geometry('400x400')
+        self.parent.geometry('500x425')
 
         self.parent.configure(background = 'dimgrey')
 
@@ -74,76 +76,94 @@ class Gui(question_tester.QuestionTester):
         self.login_header.configure(font=('Cascadia Code', 30), background = 'dimgrey', fg = 'white')
         self.login_header.place(relx = 0.5, y = 60, anchor = CENTER)
 
-        # username box
-        self.username_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
-        self.username_box.configure(font=('Cascadia Code', 20))
-        self.username_box.place(relx = 0.5, y = 140, anchor = CENTER)
+        # username label
+        self.username_label = tk.Label(self.parent, text = 'Username:', background = 'dimgrey', fg = 'white')
+        self.username_label.configure(font=('Cascadia Code', 22))
+        self.username_label.place(x = GuiAnchor.UsernameX.value, y = GuiAnchor.UsernameY.value - 2, anchor = 'w')
 
-        self.username_box.delete(1.0, tk.END)
-        self.username_box.insert(tk.END, username)
+        # username box
+        self.username_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True)
+        self.username_box.configure(font=('Cascadia Code', 20))
+        self.username_box.place(x = GuiAnchor.UsernameX.value + 290, y = GuiAnchor.UsernameY.value, anchor = CENTER)
+
+        # password label
+        self.password_label = tk.Label(self.parent, text = 'Password:', background = 'dimgrey', fg = 'white')
+        self.password_label.configure(font=('Cascadia Code', 22))
+        self.password_label.place(x = GuiAnchor.PasswordX.value, y = GuiAnchor.PasswordY.value - 2, anchor = 'w')
 
         # password box
-        self.password_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
+        self.password_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True, show = '\u2022')
         self.password_box.configure(font=('Cascadia Code', 20))
-        self.password_box.place(relx = 0.5, y = 215, anchor = CENTER)
+        self.password_box.place(x = GuiAnchor.PasswordX.value + 290, y = GuiAnchor.PasswordY.value, anchor = CENTER)
 
-        self.password_box.delete(1.0, tk.END)
-        self.password_box.insert(tk.END, password)
+        # show password checkbox
+        self.show_password_state = False
+        self.show_password = tk.Checkbutton(self.parent, text = 'Show Password', bg = 'dimgrey', fg = 'white', command = lambda:self.show_password_toggle())
+        self.show_password.configure(font=('Cascadia Code', 12), activebackground = 'dimgrey', activeforeground = 'white', selectcolor = 'dimgrey')
+        self.show_password.place(relx = 0.5, y = GuiAnchor.PasswordY.value + 50, anchor = CENTER)
 
         # login button
         self.submit_button = tk.Button(self.parent, text = 'Submit', anchor = 'center', command = lambda:self.find_account())
         self.submit_button.configure(font=('Cascadia Code', 20))
-        self.submit_button.place(relx = 0.5, y = 280, height = 35, anchor = CENTER)
+        self.submit_button.place(relx = 0.5, y = GuiAnchor.PasswordY.value + 95, height = 35, anchor = CENTER)
 
         # promt for the user to create a new account if they don't have one yet
         self.new_account_prompt = tk.Label(self.parent, text = 'Not a user?', bg = 'dimgrey', fg = 'white')
         self.new_account_prompt.configure(font=('Cascadia Code', 10))
-        self.new_account_prompt.place(relx = 0.5, y = 325, anchor = CENTER)
+        self.new_account_prompt.place(relx = 0.5, y = GuiAnchor.PasswordY.value + 140, anchor = CENTER)
 
         # button to switch the gui to create a new account
-        self.new_account_button = tk.Button(self.parent, text = 'Create account', anchor = 'center', command = lambda:self.create_account())
-        self.new_account_button.configure(font=('Cascadia Code', 10))
-        self.new_account_button.place(relx = 0.5, y = 350, height = 25, anchor = CENTER)
+        self.create_account_button = tk.Button(self.parent, text = 'Create account', anchor = 'center', command = lambda:self.create_account())
+        self.create_account_button.configure(font=('Cascadia Code', 10))
+        self.create_account_button.place(relx = 0.5, y = GuiAnchor.PasswordY.value + 165, height = 25, anchor = CENTER)
 
-        
-
-
-
-        
-        # self.create_account()
-
-
-
-
-
-
-
+    
 
         self.parent.resizable(False, False)
 
 
 
-    def find_account(self, username = None, password = None):
+    def show_password_toggle(self):
 
-        # get username and password
-        if username is None: username = self.username_box.get(1.0, tk.END).strip()
-        if password is None: password = self.password_box.get(1.0, tk.END).strip()
+        self.show_password_state = not self.show_password_state
 
-        try: self.login_error_text.place_forget()
-        except:pass
+        print(f"checkbox state: {self.show_password_state == True}")
 
-        self.login_error_text = tk.Label(self.parent, text = 'Account does not exist.', bg = 'dimgrey', fg = 'red')
-        self.login_error_text.configure(font=('Cascadia Code', 10))
+        if self.show_password_state:
 
-        # check if the username exists
-        if username not in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+            self.password_box.configure(show = '')
 
-            # place error text on screen
-            self.login_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
-            return
+            try: self.confirm_password_box.configure(show = '')
+            except:pass
 
         else:
+
+            self.password_box.configure(show = '\u2022')
+
+            try: self.confirm_password_box.configure(show = '\u2022')
+            except:pass
+
+
+
+    def find_account(self, username = None, password = None):
+
+        # disable stuff
+        self.username_box.configure(state = DISABLED)
+        self.password_box.configure(state = DISABLED)
+        self.show_password.configure(state = DISABLED)
+        self.submit_button.configure(state = DISABLED)
+        self.create_account_button.configure(state = DISABLED)
+
+
+
+        # get username and password
+        if username is None: username = self.username_box.get().strip()
+        if password is None: password = self.password_box.get().strip()
+
+        if not self.verify_details('login', username, password):
             account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}"
+
+        else:return
 
         
 
@@ -152,16 +172,12 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                account_password = self.byte_to_string(line).strip()
+                self.account_password = self.byte_to_string(line).strip()
                 break
 
-        if account_password != password:
+        
 
-            # place error text on screen
-            self.login_error_text.configure(font=('Cascadia Code', 10), text = 'Password is incorrect.')
-            self.login_error_text.place(relx = 0.5, y = 180, anchor = CENTER)
-
-        else:
+        if not self.verify_details('login', username, password):
 
             with open(f"{account_directory}\\{username}", 'r+b') as f, open(f"{account_directory}\\user_code\\backup", 'r+b') as f2:
 
@@ -190,7 +206,7 @@ class Gui(question_tester.QuestionTester):
                 self.master.backup = mmap.mmap(f2.fileno(), 0)
                 self.master.account_directory = account_directory
 
-            self.master.instance.initialize_account(account_directory, index + 1, self.master, account_password)
+            self.master.instance.initialize_account(account_directory, index + 1, self.master, self.account_password)
 
             self.master.instance.make_gui('questions')
  
@@ -202,7 +218,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.title('Python Practice')
 
-        self.parent.geometry('400x450')
+        self.parent.geometry('500x500')
 
         self.parent.configure(background = 'dimgrey')
 
@@ -211,56 +227,60 @@ class Gui(question_tester.QuestionTester):
         self.login_header.configure(font=('Cascadia Code', 30), background = 'dimgrey', fg = 'white')
         self.login_header.place(relx = 0.5, y = 60, anchor = CENTER)
 
-        # username box
-        self.username_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
-        self.username_box.configure(font=('Cascadia Code', 20))
-        self.username_box.place(relx = 0.5, y = 140, anchor = CENTER)
+        # username label
+        self.username_label = tk.Label(self.parent, text = 'Username:', background = 'dimgrey', fg = 'white')
+        self.username_label.configure(font=('Cascadia Code', 22))
+        self.username_label.place(x = GuiAnchor.UsernameX.value, y = GuiAnchor.UsernameY.value - 2, anchor = 'w')
 
-        self.username_box.delete(1.0, tk.END)
-        self.username_box.insert(tk.END, 'username')
+        # username box
+        self.username_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True)
+        self.username_box.configure(font=('Cascadia Code', 20))
+        self.username_box.place(x = GuiAnchor.UsernameX.value + 290, y = GuiAnchor.UsernameY.value, anchor = CENTER)
+
+        # password label
+        self.password_label = tk.Label(self.parent, text = 'Password:', background = 'dimgrey', fg = 'white')
+        self.password_label.configure(font=('Cascadia Code', 22))
+        self.password_label.place(x = GuiAnchor.PasswordX.value, y = GuiAnchor.PasswordY.value - 2, anchor = 'w')
 
         # password box
-        self.password_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
+        self.password_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True, show = '\u2022')
         self.password_box.configure(font=('Cascadia Code', 20))
-        self.password_box.place(relx = 0.5, y = 215, anchor = CENTER)
+        self.password_box.place(x = GuiAnchor.PasswordX.value + 290, y = GuiAnchor.PasswordY.value, anchor = CENTER)
 
-        self.password_box.delete(1.0, tk.END)
-        self.password_box.insert(tk.END, 'password')
+        # confirm password label
+        self.confirm_password_label = tk.Label(self.parent, text = ' Confirm:', background = 'dimgrey', fg = 'white')
+        self.confirm_password_label.configure(font=('Cascadia Code', 22))
+        self.confirm_password_label.place(x = GuiAnchor.ConfirmX.value, y = GuiAnchor.ConfirmY.value - 2, anchor = 'w')
 
         # confirm password box
-        self.confirm_password_box = tk.Text(self.parent, height = 1, width = 16, bg = 'light grey', fg = 'black')
+        self.confirm_password_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True, show = '\u2022')
         self.confirm_password_box.configure(font=('Cascadia Code', 20))
-        self.confirm_password_box.place(relx = 0.5, y = 290, anchor = CENTER)
+        self.confirm_password_box.place(x = GuiAnchor.ConfirmX.value + 290, y = GuiAnchor.ConfirmY.value, anchor = CENTER)
 
-        self.confirm_password_box.delete(1.0, tk.END)
-        self.confirm_password_box.insert(tk.END, 'confirm password')
+        # show password checkbox
+        self.show_password_state = False
+        self.show_password = tk.Checkbutton(self.parent, text = 'Show Password', bg = 'dimgrey', fg = 'white', command = lambda:self.show_password_toggle())
+        self.show_password.configure(font=('Cascadia Code', 12), activebackground = 'dimgrey', activeforeground = 'white', selectcolor = 'dimgrey', state = ACTIVE)
+        self.show_password.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 50, anchor = CENTER)
 
-        # 'create account' button
+        # create account button
         self.create_account_button = tk.Button(self.parent, text = 'Create Account', anchor = 'center', command = lambda:self.make_account())
         self.create_account_button.configure(font=('Cascadia Code', 20))
-        self.create_account_button.place(relx = 0.5, y = 355, height = 35, anchor = CENTER)
-
+        self.create_account_button.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 95, height = 35, anchor = CENTER)
 
         # promt for the user to create a new account if they don't have one yet
         self.new_account_prompt = tk.Label(self.parent, text = 'Already a user?', bg = 'dimgrey', fg = 'white')
         self.new_account_prompt.configure(font=('Cascadia Code', 10))
-        self.new_account_prompt.place(relx = 0.5, y = 400, anchor = CENTER)
+        self.new_account_prompt.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 140, anchor = CENTER)
 
-        # button to switch the gui to create a new account
-        self.new_account_button = tk.Button(self.parent, text = 'Login', anchor = 'center', command = lambda:self.login())
-        self.new_account_button.configure(font=('Cascadia Code', 10))
-        self.new_account_button.place(relx = 0.5, y = 425, height = 25, anchor = CENTER)
-
-
+        # button to switch the gui to login to an account
+        self.login_button = tk.Button(self.parent, text = 'Login', anchor = 'center', command = lambda:self.login())
+        self.login_button.configure(font=('Cascadia Code', 10))
+        self.login_button.place(relx = 0.5, y = GuiAnchor.ConfirmY.value + 165, height = 25, anchor = CENTER)
 
 
-    def verify_details(self, username, password, confirm_password, exception = False):
 
-        if exception:
-            self.account_error_text = tk.Label(self.parent, text = 'Account verification error.', bg = 'dimgrey', fg = 'red')
-            self.account_error_text.configure(font=('Cascadia Code', 10))
-            self.account_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
-            return
+    def verify_details(self, type, username, password, confirm_password = None):
 
         try: self.account_error_text.place_forget()
         except:pass
@@ -268,32 +288,92 @@ class Gui(question_tester.QuestionTester):
         try: self.create_account_error_text.place_forget()
         except:pass
 
-        self.create_account_error_text = tk.Label(self.parent, text = 'Username taken.', bg = 'dimgrey', fg = 'red')
-        self.create_account_error_text.configure(font=('Cascadia Code', 10))
+        try: self.login_error_text.place_forget()
+        except:pass
 
-        if username in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
-
-            # place error text on screen
-            self.create_account_error_text.place(relx = 0.5, y = 105, anchor = CENTER)
+        if type == 'exception':
+            self.account_error_text = tk.Label(self.parent, text = 'Account verification error.', bg = 'dimgrey', fg = 'red')
+            self.account_error_text.configure(font=('Cascadia Code', 10))
+            self.account_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
             return True
 
 
 
-        elif password != confirm_password:
+        if type == 'login':
 
-            self.create_account_error_text.configure(text = 'Passwords do not match.')
-            self.create_account_error_text.place(relx = 0.5, y = 255, anchor = CENTER)
-            return True
+            self.login_error_text = tk.Label(self.parent, bg = 'dimgrey', fg = 'red')
+            self.login_error_text.configure(font=('Cascadia Code', 10))
+
+            if username not in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+
+                # place error text on screen
+                self.login_error_text.configure(font=('Cascadia Code', 10), text = 'Account does not exist.')
+                self.login_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
+                return True
+
+            try:
+                
+                if self.account_password != password:
+
+                    # place error text on screen
+                    self.login_error_text.configure(font=('Cascadia Code', 10), text = 'Password is incorrect.')
+                    self.login_error_text.place(x = GuiAnchor.PasswordX.value + 290, y = 180, anchor = CENTER)
+                    return True
+
+            except:pass
+
+
+
+        if type == 'create account':    
+        
+            self.create_account_error_text = tk.Label(self.parent, bg = 'dimgrey', fg = 'red')
+            self.create_account_error_text.configure(font=('Cascadia Code', 10))
+
+            if username in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+
+                # place error text on screen
+                self.create_account_error_text.configure(text = 'Username is taken.')
+                self.create_account_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
+                return True
+            
+            elif len(username) <= 4:
+
+                self.create_account_error_text.configure(text = 'Username is too short.')
+                self.create_account_error_text.place(x = GuiAnchor.UsernameX.value + 290, y = 105, anchor = CENTER)
+                return True
+
+            elif len(password) <= 4:
+
+                self.create_account_error_text.configure(font=('Cascadia Code', 10), text = 'Password is too short.')
+                self.create_account_error_text.place(x = GuiAnchor.PasswordX.value + 290, y = 180, anchor = CENTER)
+                return True
+
+            elif password != confirm_password:
+
+                self.create_account_error_text.configure(text = 'Passwords do not match.')
+                self.create_account_error_text.place(x = GuiAnchor.PasswordX.value + 290, y = 255, anchor = CENTER)
+                return True
+            
+        return False
 
 
         
     def make_account(self, username = None, password = None, confirm_password = None):
 
-        if username is None: username = self.username_box.get(1.0, tk.END).strip()
-        if password is None: password = self.password_box.get(1.0, tk.END).strip()
-        if confirm_password is None: confirm_password = self.confirm_password_box.get(1.0, tk.END).strip()
+        # disable stuff
+        self.username_box .configure(state = DISABLED)
+        self.password_box .configure(state = DISABLED)
+        self.submit_button.configure(state = DISABLED)
+        self.show_password.configure(state = DISABLED)
+        self.login_button .configure(state = DISABLED)
 
-        if self.verify_details(username, password, confirm_password): return
+
+
+        if username is None: username = self.username_box.get().strip()
+        if password is None: password = self.password_box.get().strip()
+        if confirm_password is None: confirm_password = self.confirm_password_box.get().strip()
+
+        if self.verify_details('create account', username, password, confirm_password): return
 
         current_directory = os.getcwd().replace('\\', '/')
         source_file = 'gui_code/accounts/account_template'

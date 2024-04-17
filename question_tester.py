@@ -323,7 +323,7 @@ class QuestionTester:
             print('error 1')
 
             # put error text on screen that says 'Account verification error.'
-            self.verify_details('', '', '', exception = True)
+            self.verify_details('exception', '', '')
 
             # reset all account related variables
             QuestionTester.account = None
@@ -346,7 +346,7 @@ class QuestionTester:
             print('error 2')
 
             # put error text on screen that says 'Account verification error.'
-            self.verify_details('', '', '', exception = True)
+            self.verify_details('exception', '', '')
 
             # reset all account related variables
             QuestionTester.account = None
@@ -411,7 +411,7 @@ class DifficultyGroup:
 
         for item in self.content.values():
 
-            if item.completed:
+            if not item.completed:
                 return
             
         self.completed = True
