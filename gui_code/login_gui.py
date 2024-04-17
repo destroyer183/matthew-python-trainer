@@ -61,7 +61,7 @@ class Gui(question_tester.QuestionTester):
 
 
 
-    def login(self, username = 'username', password = 'password'):
+    def login(self, username = '', password = ''):
         
         self.clear_gui()
 
@@ -88,6 +88,8 @@ class Gui(question_tester.QuestionTester):
         self.username_box.configure(font=('Cascadia Code', 20))
         self.username_box.place(x = GuiAnchor.UsernameX.value + 290, y = GuiAnchor.UsernameY.value, anchor = CENTER)
 
+        self.username_box.insert(0, username)
+
         # password label
         self.password_label = tk.Label(self.parent, text = 'Password:', background = 'dimgrey', fg = 'white')
         self.password_label.configure(font=('Cascadia Code', 22))
@@ -97,6 +99,8 @@ class Gui(question_tester.QuestionTester):
         self.password_box = tk.Entry(self.parent, width = 16, bg = 'light grey', fg = 'black', takefocus = True, show = '\u2022')
         self.password_box.configure(font=('Cascadia Code', 20))
         self.password_box.place(x = GuiAnchor.PasswordX.value + 290, y = GuiAnchor.PasswordY.value, anchor = CENTER)
+
+        self.password_box.insert(0, password)
 
         # show password checkbox
         self.show_password_state = False
