@@ -190,7 +190,7 @@ class Gui(question_tester.QuestionTester):
                 self.master.backup = mmap.mmap(f2.fileno(), 0)
                 self.master.account_directory = account_directory
 
-            self.master.instance.initialize_account(account_directory, index + 1, self.master)
+            self.master.instance.initialize_account(account_directory, index + 1, self.master, account_password)
 
             self.master.instance.make_gui('questions')
  

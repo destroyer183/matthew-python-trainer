@@ -229,7 +229,7 @@ class QuestionTester:
 
 
 
-    def initialize_account(self, directory, question_data_index, master):
+    def initialize_account(self, directory, question_data_index, master, account_password):
 
         from dict_tree_constructor import construct_dict_tree
 
@@ -302,18 +302,23 @@ class QuestionTester:
 
         print(f"verification output: {output}")
 
-
-
-        number = output
-
-
+        verification_number = output
 
         # the next step is to count the full integer value of the password
         # account directory is stored in a class variable, just read it and count the numbers like in the account file setup
 
+        account_password = self.string_to_int(account_password)
 
+        temp = []
 
-        if number != QuestionTester.completed:
+        for element in account_password:
+            temp.append(int(element, 16))
+            
+        password_sum = 0
+        for num in temp:
+            password_sum += num
+
+        if verification_number != QuestionTester.completed + password_sum:
 
             print('error 1')
 
