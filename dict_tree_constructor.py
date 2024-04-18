@@ -11,8 +11,6 @@ def construct_dict_tree(directory, question_data_index, master):
 
     directory_tree = {
 
-        "directory": directory,
-
         "Introduction": DifficultyGroup(f"{directory}\\Introduction", DifficultyLevel.Level0, 'Introduction', {
 
             "Basics": QuestionGroup(f"{directory}\\Introduction\\Basics", QuestionType.Basics, 'Basics', {

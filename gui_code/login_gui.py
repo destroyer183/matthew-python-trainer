@@ -127,6 +127,8 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.resizable(False, False)
 
+        self.find_account('username', 'password')
+
 
 
     def show_password_toggle(self):

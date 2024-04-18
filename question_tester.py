@@ -152,8 +152,6 @@ class QuestionTester:
 
             print(f"current output: {output}")
 
-        # output = ('').join(output)
-
         print(f"output: {output}\n")
 
         print(f"hexlified: {binascii.hexlify(output)}")
@@ -400,19 +398,26 @@ class DifficultyGroup:
         self.name = name
         self.unlocked = False
         self.completed = False
-        # directory path
-        # difficulty level/question type
-        # is it unlocked
-        # is it's contents completed
+        self.completion_count = 0
+        self.completion_total = len(content.values())
 
 
 
     def check_completion(self):
 
+        completion_data = [x.completed for x in self.content.values()]
+
+        if True not in completion_data and False not in completion_data:
+            return
+
         for item in self.content.values():
 
             if not item.completed:
+                self.completed = False
                 return
+            
+            self.completion_count += 1
+
             
         self.completed = True
 
@@ -430,8 +435,10 @@ class QuestionGroup(DifficultyGroup):
         self.directory = directory
         self.question_type = question_type
         self.name = name
-        self.completed = False
+        self.completed = None
         self.content = content
+        self.completion_count = 0
+        self.completion_total = len(content.values())
 
 
 
