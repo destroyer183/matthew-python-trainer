@@ -247,6 +247,8 @@ class QuestionTester:
 
             level.check_completion()
 
+            print(f"{level.name} completion: {level.completed}\n")
+
 
 
         # check if folders are unlocked
@@ -397,7 +399,7 @@ class DifficultyGroup:
         self.question_difficulty = question_difficulty
         self.name = name
         self.unlocked = False
-        self.completed = False
+        self.completed = None
         self.completion_count = 0
         self.completion_total = len(content.values())
 
