@@ -167,24 +167,28 @@ class ButtonList():
             center_x = 50
 
             # add name of button/folder
-            temp['info'] = tk.Button(self.gui.parent, text = item.name, bg = 'ivory4', bd = 0, fg = 'white', activebackground = 'ivory4', activeforeground = 'white')
-            temp['info'].configure(font=('Cascadia Code', 18), command = lambda:self.change_directory(temp['info'].cget('text')))
+            # temp['info'] = tk.Label(self.gui.parent, text = item.name, bg = 'ivory4', fg = 'white')
+            # temp['info'].configure(font=('Cascadia Code', 18))
+            temp['info'] = self.gui.canvas.create_text(center_x + 25, self.current_y, anchor = tk.W, fill = 'ivory4', activefill = 'white', disabledfill = 'white', font = ('Cascadia_Code 18'))
 
             # try/except to add completion data, format: 50% completed (8/16)
-            try: temp['info'].configure(text = f"{item.name}\t{round((item.completion_count / item.completion_total) * 100)}% completed ({item.completion_count}/{item.completion_total})")
-            except:pass
+            # try: temp['info'].configure(text = f"{item.name}\t{round((item.completion_count / item.completion_total) * 100)}% completed ({item.completion_count}/{item.completion_total})")
+            # except:pass
 
             self.gui.parent.update()
-            print(f"label width: {temp['info'].winfo_reqwidth()}")
-            print(f"label height: {temp['info'].winfo_reqheight()}")
+            info_dimensions = self.gui.canvas.coords(temp['info'])
+            info_width = info_dimensions[2] - info_dimensions[0]
+            info_height = info_dimensions[3] - info_dimensions[1]
+            # print(f"label width: {temp['info'].winfo_reqwidth()}")
+            # print(f"label height: {temp['info'].winfo_reqheight()}")
 
-            temp['info'].place(x = center_x + 25, y = self.current_y, height = temp['info'].winfo_reqheight() + 10, anchor = 'w')
+            temp['info'].place(x = center_x + 25, y = self.current_y, height = info_height + 10, anchor = 'w')
 
 
 
             # create bg
-            bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 0.5
-            bg_radius = (temp['info'].winfo_reqheight() + 10) / 2
+            bg_circle_radius = (info_height + 10) / 2 - 0.5
+            bg_radius = (info_height + 10) / 2
 
             temp['bg circle 1'] = self.gui.canvas.create_oval(
                 center_x - bg_circle_radius - 1, self.current_y - bg_circle_radius - 1, 
@@ -194,23 +198,37 @@ class ButtonList():
 
             temp['bg rect'] = self.gui.canvas.create_rectangle(
                 center_x, self.current_y - bg_radius, 
-                center_x + 25 + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
+                center_x + 25 + info_width, self.current_y + bg_radius, 
                 fill = 'ivory4', outline = ''
                 )
 
             temp['bg circle 2'] = self.gui.canvas.create_oval(
-                center_x + 26 + temp['info'].winfo_reqwidth() - bg_circle_radius, self.current_y - bg_circle_radius - 1, 
-                center_x + 26 + temp['info'].winfo_reqwidth() + bg_circle_radius, self.current_y + bg_circle_radius - 1, 
+                center_x + 26 + info_width - bg_circle_radius, self.current_y - bg_circle_radius - 1, 
+                center_x + 26 + info_width + bg_circle_radius, self.current_y + bg_circle_radius - 1, 
                 fill = 'ivory4', outline = ''
                 )
+            
+
+
+            # bind click detection for button
+            temp['button'] = self.gui.canvas.create_rectangle(
+                center_x - bg_circle_radius, self.current_y - bg_circle_radius,
+                center_x + 25 + info_width + bg_circle_radius, self.current_y + bg_circle_radius,
+                fill = '', outline = ''
+            )
+            self.gui.canvas.tag_bind(temp['button'], '<1>', lambda:self.change_directory(item.name))
+            
 
 
 
             # creeate coloured circle
             radius = 9.5
             fill_color = ('green2' * (item.completed is True)) + ('red' * (item.completed is False)) + ('slate gray' * (item.completed is None))
-            temp['circle'] = self.gui.canvas.create_oval(center_x - radius - 1, self.current_y - radius - 1, center_x + radius - 1, self.current_y + radius - 1, fill = fill_color, outline = '')
-        
+            temp['circle'] = self.gui.canvas.create_oval(
+                center_x - radius - 1, self.current_y - radius - 1, center_x + radius - 1, self.current_y + radius - 1, 
+                fill = fill_color, outline = ''
+                )
+
 
 
             # add button data to dictionary
@@ -224,6 +242,10 @@ class ButtonList():
         for item in ButtonList.displayed_buttons.values():
 
             try:
+                largest_dimensions = self.gui.canvas.coords(largest_button['info'])
+                largest_width = largest_dimensions[2] - largest_dimensions[0]
+                largest_height = largest_dimensions[3] - largest_dimensions[1]
+
                 if largest_button['info'].winfo_reqwidth() < item['info'].winfo_reqwidth():
                     largest_button = item
 
@@ -268,11 +290,11 @@ class ButtonList():
             try: 
                 # create a new button with just the completion data as text
                 # place it on the screen and anchor it on the right side to place it at the same spot as the largest button
-                item['info2'] = tk.Button(self.gui.parent, text = text_data[1], anchor = 'e', bg = 'ivory4', bd = 0, fg = 'white', activebackground = 'ivory4', activeforeground = 'white')
+                item['info2'] = tk.Label(self.gui.parent, text = text_data[1], anchor = 'e', bg = 'ivory4', fg = 'white')
                 item['info2'].configure(font=('Cascadia Code', 18))
                 item['info2'].place(
                     x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
-                    width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()) - 6,
+                    width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()),
                     height = item['info'].winfo_reqheight() + 10
                     )
             except:pass
