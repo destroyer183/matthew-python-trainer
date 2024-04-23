@@ -137,12 +137,19 @@ class ButtonList():
 
         self.gui = gui
         self.directory = self.gui.master.directory_tree
+
+        self.gui.parent.bind('<Button-1>', self.change_directory)
         
         self.initial_y = 50
         self.current_y = self.initial_y
 
+        # Gui.current_directory = ['Introduction']
+
         for subdirectory in Gui.current_directory:
             self.directory = self.directory[subdirectory].content
+
+        print(f"\ndirectory path: {Gui.current_directory}\n")
+        print(f"\ncurrent directory: {self.directory}\n")
 
         self.items = [x for x in self.directory.values()]
 
@@ -155,40 +162,53 @@ class ButtonList():
             self.gui.canvas.delete(button['bg circle 2'])
             try: button['info2'].place_forget()
             except:pass
+                
+        ButtonList.displayed_buttons = {}
 
         for item in self.items:
 
+            # create variable for x offset
+            if len(ButtonList.displayed_buttons) > 4:
+
+                # change x offset to make another row of buttons
+                center_x = self.gui.canvas.coords([x for x in ButtonList.displayed_buttons.values()][4]['bg circle 2'])[2] + 75
+
+                # check if y offset should be reset
+                if len(ButtonList.displayed_buttons) < 6:
+
+                    # reset y offset
+                    self.current_y = self.initial_y
+
+            else:
+
+                # default x offset
+                center_x = 50
+
+            # incrament y offset
             self.current_y += GuiSpacing.YOffset.value
 
             # create dictionary for button
             temp = {}
 
-            # create variable for location of coloured circle as a reference
-            center_x = 50
-
             # add name of button/folder
-            # temp['info'] = tk.Label(self.gui.parent, text = item.name, bg = 'ivory4', fg = 'white')
-            # temp['info'].configure(font=('Cascadia Code', 18))
-            temp['info'] = self.gui.canvas.create_text(center_x + 25, self.current_y, anchor = tk.W, fill = 'ivory4', activefill = 'white', disabledfill = 'white', font = ('Cascadia_Code 18'))
+            temp['info'] = tk.Label(self.gui.parent, text = item.name, bg = 'ivory4', fg = 'white')
+            temp['info'].configure(font=('Cascadia Code', 18))
 
             # try/except to add completion data, format: 50% completed (8/16)
-            # try: temp['info'].configure(text = f"{item.name}\t{round((item.completion_count / item.completion_total) * 100)}% completed ({item.completion_count}/{item.completion_total})")
-            # except:pass
+            try: temp['info'].configure(text = f"{item.name}    {round((item.completion_count / item.completion_total) * 100)}% completed ({item.completion_count}/{item.completion_total})")
+            except:pass
 
             self.gui.parent.update()
-            info_dimensions = self.gui.canvas.coords(temp['info'])
-            info_width = info_dimensions[2] - info_dimensions[0]
-            info_height = info_dimensions[3] - info_dimensions[1]
-            # print(f"label width: {temp['info'].winfo_reqwidth()}")
-            # print(f"label height: {temp['info'].winfo_reqheight()}")
+            print(f"label width: {temp['info'].winfo_reqwidth()}")
+            print(f"label height: {temp['info'].winfo_reqheight()}")
 
-            temp['info'].place(x = center_x + 25, y = self.current_y, height = info_height + 10, anchor = 'w')
+            temp['info'].place(x = center_x + 25, y = self.current_y, height = temp['info'].winfo_reqheight() + 10, anchor = 'w')
 
 
 
             # create bg
-            bg_circle_radius = (info_height + 10) / 2 - 0.5
-            bg_radius = (info_height + 10) / 2
+            bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 0.5
+            bg_radius = (temp['info'].winfo_reqheight() + 10) / 2
 
             temp['bg circle 1'] = self.gui.canvas.create_oval(
                 center_x - bg_circle_radius - 1, self.current_y - bg_circle_radius - 1, 
@@ -198,26 +218,15 @@ class ButtonList():
 
             temp['bg rect'] = self.gui.canvas.create_rectangle(
                 center_x, self.current_y - bg_radius, 
-                center_x + 25 + info_width, self.current_y + bg_radius, 
+                center_x + 25 + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
                 fill = 'ivory4', outline = ''
                 )
 
             temp['bg circle 2'] = self.gui.canvas.create_oval(
-                center_x + 26 + info_width - bg_circle_radius, self.current_y - bg_circle_radius - 1, 
-                center_x + 26 + info_width + bg_circle_radius, self.current_y + bg_circle_radius - 1, 
+                center_x + 26 + temp['info'].winfo_reqwidth() - bg_circle_radius, self.current_y - bg_circle_radius - 1, 
+                center_x + 26 + temp['info'].winfo_reqwidth() + bg_circle_radius, self.current_y + bg_circle_radius - 1, 
                 fill = 'ivory4', outline = ''
                 )
-            
-
-
-            # bind click detection for button
-            temp['button'] = self.gui.canvas.create_rectangle(
-                center_x - bg_circle_radius, self.current_y - bg_circle_radius,
-                center_x + 25 + info_width + bg_circle_radius, self.current_y + bg_circle_radius,
-                fill = '', outline = ''
-            )
-            self.gui.canvas.tag_bind(temp['button'], '<1>', lambda:self.change_directory(item.name))
-            
 
 
 
@@ -225,16 +234,36 @@ class ButtonList():
             radius = 9.5
             fill_color = ('green2' * (item.completed is True)) + ('red' * (item.completed is False)) + ('slate gray' * (item.completed is None))
             temp['circle'] = self.gui.canvas.create_oval(
-                center_x - radius - 1, self.current_y - radius - 1, center_x + radius - 1, self.current_y + radius - 1, 
+                center_x - radius - 1, self.current_y - radius - 1, 
+                center_x + radius - 1, self.current_y + radius - 1, 
                 fill = fill_color, outline = ''
                 )
-
+        
 
 
             # add button data to dictionary
             ButtonList.displayed_buttons[item.name] = temp
 
 
+
+        # add 'back' button
+        if type([x for x in self.directory.values()][0]) != question_tester.DifficultyGroup:
+
+            self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
+            self.gui.back_button.configure(font=('Cascadia Code', 23))
+            self.gui.back_button.place(x = 10, y = 15, width = 110, height = 50)
+
+        else:
+
+            # remove button when you can't go back a directory
+            try: self.gui.back_button.place_forget()
+            except:pass
+        
+
+
+        # skip the rest of the function if the buttons being displayed are for questions and not directories
+        if type([x for x in self.directory.values()][0]) == question_tester.Question:
+            return
         
         # take all the buttons, find the largest, and fit every other button to be the same length.
         largest_button = {}
@@ -242,11 +271,8 @@ class ButtonList():
         for item in ButtonList.displayed_buttons.values():
 
             try:
-                largest_dimensions = self.gui.canvas.coords(largest_button['info'])
-                largest_width = largest_dimensions[2] - largest_dimensions[0]
-                largest_height = largest_dimensions[3] - largest_dimensions[1]
-
                 if largest_button['info'].winfo_reqwidth() < item['info'].winfo_reqwidth():
+                    other_buttons.append(largest_button)
                     largest_button = item
 
                 else:
@@ -255,6 +281,8 @@ class ButtonList():
             except:
                 largest_button = item
 
+        print(f"other buttons: {other_buttons}")
+        print(f"largest button: {largest_button}")
         
         for item in other_buttons:
 
@@ -264,7 +292,7 @@ class ButtonList():
 
                 # split the text into two variables with the '\t'
                 text_data = item['info'].cget('text')
-                text_data = text_data.split('\t')
+                text_data = text_data.split('   ')
 
                 print(f"text data: {text_data}")
 
@@ -288,24 +316,63 @@ class ButtonList():
             self.gui.parent.update()
 
             try: 
-                # create a new button with just the completion data as text
+                # create a new label with just the completion data as text
                 # place it on the screen and anchor it on the right side to place it at the same spot as the largest button
+                
                 item['info2'] = tk.Label(self.gui.parent, text = text_data[1], anchor = 'e', bg = 'ivory4', fg = 'white')
                 item['info2'].configure(font=('Cascadia Code', 18))
-                item['info2'].place(
-                    x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
-                    width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()),
-                    height = item['info'].winfo_reqheight() + 10
-                    )
+
+                button_length = largest_button['info'].cget('text')
+                button_length = button_length.split('   ')
+                button_length = button_length[1]
+
+                if len(button_length) > 19:
+                    item['info2'].place(
+                        x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
+                        width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()) - 14,
+                        height = item['info'].winfo_reqheight() + 10
+                        )
+
+
+                else:
+                    item['info2'].place(
+                        x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
+                        width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()),
+                        height = item['info'].winfo_reqheight() + 10
+                        )
+
             except:pass
 
 
         
-    def change_directory(self, new_directory):
+    def change_directory(self, event):
+
+        # bind mouse clicks to this function
+        mouse_x = self.gui.parent.winfo_pointerx() - self.gui.parent.winfo_rootx()
+        mouse_y = self.gui.parent.winfo_pointery() - self.gui.parent.winfo_rooty()
+
+        print(f"mouse coordinates: {mouse_x}, {mouse_y}")
+
+        # loop over every button
+        for key, button in ButtonList.displayed_buttons.items():
+
+            print(f"button: {button}")
+
+            # get the coords of the main background rect
+            rect_coords = self.gui.canvas.coords(button['bg rect'])
+
+            # check if the mouse coords match it
+            if (rect_coords[0] <= mouse_x <= rect_coords[2]) and (rect_coords[1] <= mouse_y <= rect_coords[3]):
+
+                # if the mouse coords are contained within the rect, take the text of the info and pass it to a new ButtonList instance
+                new_directory = key
+                break
+
+        # exit function if nothing has changed
+        try: print(f"new directory: {new_directory}")
+        except:return
 
         # update current directory
-        temp = self.directory[new_directory]
-
         Gui.current_directory.append(new_directory)
 
         if type(self.directory) == question_tester.Question:
@@ -313,6 +380,13 @@ class ButtonList():
             return
         
         # change display
+        self.gui.current_buttons = ButtonList(self.gui)
+
+
+    def back_directory(self):
+
+        Gui.current_directory.pop()
+
         self.gui.current_buttons = ButtonList(self.gui)
         
 
