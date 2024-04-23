@@ -465,6 +465,27 @@ class Question(QuestionGroup):
         self.name = name
         self.save_file_index = save_file_index
 
+        temp = True
+        try:
+            with open(f"{self.directory}\\description.txt", 'r') as file:
+
+                for line in file:
+
+                    if temp:    
+                        self.title = line.strip()
+                        temp = not temp
+
+                    else: 
+                        self.description = line.strip()
+
+        except:
+            self.title = 'Empty'
+            self.description = 'empty'
+
+        print(f"title: \'{self.title}\'")
+        print(f"description: \'{self.description}\'")
+
+
 
     def test_question(self):
         # this function will test a question, and update the completion values of the question it is called on, and every folder above ite
