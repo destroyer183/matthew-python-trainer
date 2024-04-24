@@ -392,7 +392,21 @@ class ButtonList():
         self.gui.question_title = tk.Label(self.gui.parent, text = question.title, bg = 'ivory4', fg = 'white')
         self.gui.question_title.configure(font=('Cascadia Code', 30))
         self.gui.parent.update()
-        self.gui.question_title.place(relx = 0.5, y = 100, width = self.gui.question_title.winfo_reqwidth() + 10, height = self.gui.question_title.winfo_reqheight() + 10, anchor = CENTER)
+        self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = 100, width = self.gui.question_title.winfo_reqwidth() + 10, height = self.gui.question_title.winfo_reqheight(), anchor = 'w')
+
+        bg_circle_radius = (self.gui.question_title.winfo_reqwidth() - 10) / 2 - 1
+
+        self.gui.circle1 = self.gui.canvas.create_oval(
+            self.gui.question_title.winfo_x() - bg_circle_radius, self.gui.question_title.winfo_y() - bg_circle_radius, 
+            self.gui.question_title.winfo_x() + bg_circle_radius, self.gui.question_title.winfo_y() + bg_circle_radius, 
+            fill = 'ivory4', outline = ''
+            )
+
+        self.gui.circle2 = self.gui.canvas.create_oval(
+            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() - bg_circle_radius, self.gui.question_title.winfo_y() - bg_circle_radius, 
+            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() + bg_circle_radius, self.gui.question_title.winfo_y() + bg_circle_radius, 
+            fill = 'ivory4', outline = ''
+            )
 
 
 
