@@ -55,7 +55,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.title('Python Practice')
 
-        self.parent.geometry('650x600')
+        self.parent.geometry('700x550')
         self.parent.update()
 
         self.parent.configure(background = 'dimgrey')
@@ -68,64 +68,16 @@ class Gui(question_tester.QuestionTester):
         self.settings_button.configure(font=('Cascadia Code', 23))
         self.settings_button.place(x = self.parent.winfo_width() - 10, y = 15, width = 160, height = 50, anchor = 'ne')
 
-        print(f"gui width: {self.parent.winfo_width()}")
-
-
-
-        # for each level, display:
-            # a grey, green, or red dot to represent the completion status of the level
-            # the name of the level
-            # text that says '3/9 groups completed'
-
 
 
         self.current_buttons = ButtonList(self)
 
-        
-
-        self.level_buttons = []
-
-        for index, level in enumerate(self.master.directory_tree.values()):
-
-            # maybe make a class that can create all necessary buttons for a given directory input?
-            # have a class variable store the current directory location by putting the dictionary element names in an array in order
-            
-
-            # make a transparent button fully overlap all the text and info so that it is all clickable
-            pass
-
-
-
-
-
-
         self.parent.resizable(False, False)
 
-    
 
 
     def account_settings(self):
         pass
-
-
-
-    def level_gui(self):
-        # gui to display the content of a level
-        pass
-
-
-
-    def group_gui(self):
-        # gui to display the content of a group
-        pass
-
-
-
-    def question_gui(self):
-        # gui to display the details of a question
-        pass
-
-
 
 
 
@@ -165,27 +117,24 @@ class ButtonList():
                 
         ButtonList.displayed_buttons = {}
 
-        for item in self.items:
+        # create variable for x offset
+        if len(self.items) > 5:
 
-            # create variable for x offset
-            if len(ButtonList.displayed_buttons) > 4:
+            # change variable to make function display the buttons in two rows
+            two_rows = True
 
-                # change x offset to make another row of buttons
-                center_x = self.gui.canvas.coords([x for x in ButtonList.displayed_buttons.values()][4]['bg circle 2'])[2] + 75
+        else:
 
-                # check if y offset should be reset
-                if len(ButtonList.displayed_buttons) < 6:
+            # change variable to show only one row
+            two_rows = False
 
-                    # reset y offset
-                    self.current_y = self.initial_y
+        for index, item in enumerate(self.items):
 
-            else:
-
-                # default x offset
-                center_x = 50
+            print(f"two_rows: {two_rows}")
 
             # incrament y offset
-            self.current_y += GuiSpacing.YOffset.value
+            if two_rows is False or index % 2 == 0:
+                self.current_y += GuiSpacing.YOffset.value
 
             # create dictionary for button
             temp = {}
@@ -202,40 +151,55 @@ class ButtonList():
             print(f"label width: {temp['info'].winfo_reqwidth()}")
             print(f"label height: {temp['info'].winfo_reqheight()}")
 
-            temp['info'].place(x = center_x + 25, y = self.current_y, height = temp['info'].winfo_reqheight() + 10, anchor = 'w')
+            # place button normally if there is only one row
+            if two_rows is False:
+                temp['info'].place(x = self.gui.parent.winfo_width() / 2 - temp['info'].winfo_reqwidth() / 2 + 12, y = self.current_y, height = temp['info'].winfo_reqheight() + 9, anchor = 'w')
 
+            # place button on either the left side or the right side depending on how many buttons have already been displayed
+            else:
+                
+                # place button on right side
+                if index % 2 == 1:
+                    temp['info'].place(x = self.gui.parent.winfo_width() / 4 * 3 - temp['info'].winfo_reqwidth() / 2 + 12, y = self.current_y, height = temp['info'].winfo_reqheight() + 9, anchor = 'w')
 
+                # place button on left side
+                else:
+                    temp['info'].place(x = self.gui.parent.winfo_width() / 4 - temp['info'].winfo_reqwidth() / 2 + 12, y = self.current_y, height = temp['info'].winfo_reqheight() + 9, anchor = 'w')
+
+            self.gui.parent.update()
+            print(f"label x: {temp['info'].winfo_x()}")
+            print(f"label y: {temp['info'].winfo_y()}")
 
             # create bg
-            bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 0.5
-            bg_radius = (temp['info'].winfo_reqheight() + 10) / 2
+            bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 1
+            bg_radius = (temp['info'].winfo_reqheight() + 9) / 2
 
-            temp['bg circle 1'] = self.gui.canvas.create_oval(
-                center_x - bg_circle_radius - 1, self.current_y - bg_circle_radius - 1, 
-                center_x + bg_circle_radius - 1, self.current_y + bg_circle_radius - 1, 
+            temp['bg rect'] = self.gui.canvas.create_rectangle(
+                temp['info'].winfo_x() - 25, self.current_y - bg_radius, 
+                temp['info'].winfo_x() + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
                 fill = 'ivory4', outline = ''
                 )
 
-            temp['bg rect'] = self.gui.canvas.create_rectangle(
-                center_x, self.current_y - bg_radius, 
-                center_x + 25 + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
+            temp['bg circle 1'] = self.gui.canvas.create_oval(
+                temp['info'].winfo_x() - 25 - bg_circle_radius, self.current_y - bg_circle_radius, 
+                temp['info'].winfo_x() - 25 + bg_circle_radius, self.current_y + bg_circle_radius, 
                 fill = 'ivory4', outline = ''
                 )
 
             temp['bg circle 2'] = self.gui.canvas.create_oval(
-                center_x + 26 + temp['info'].winfo_reqwidth() - bg_circle_radius, self.current_y - bg_circle_radius - 1, 
-                center_x + 26 + temp['info'].winfo_reqwidth() + bg_circle_radius, self.current_y + bg_circle_radius - 1, 
+                temp['info'].winfo_x() + temp['info'].winfo_reqwidth() - bg_circle_radius, self.current_y - bg_circle_radius, 
+                temp['info'].winfo_x() + temp['info'].winfo_reqwidth() + bg_circle_radius, self.current_y + bg_circle_radius, 
                 fill = 'ivory4', outline = ''
                 )
 
 
 
             # creeate coloured circle
-            radius = 9.5
+            radius = 9
             fill_color = ('green2' * (item.completed is True)) + ('red' * (item.completed is False)) + ('slate gray' * (item.completed is None))
             temp['circle'] = self.gui.canvas.create_oval(
-                center_x - radius - 1, self.current_y - radius - 1, 
-                center_x + radius - 1, self.current_y + radius - 1, 
+                temp['info'].winfo_x() - 25 - radius, self.current_y - radius, 
+                temp['info'].winfo_x() - 25 + radius, self.current_y + radius, 
                 fill = fill_color, outline = ''
                 )
         
@@ -299,19 +263,29 @@ class ButtonList():
                 # place the text normally again with just the name of the button
                 item['info'].configure(text = text_data[0])
 
+                previous = item['info'].place_info()
+
+                item['info'].place(x = largest_button['info'].winfo_x(), y = previous['y'], height = previous['height'], anchor = previous['anchor'])
+
                 print(f"info text: {item['info'].cget('text')}")
 
-            # get the coords of the background shapes of the largest buttons
+            # get the coords of the background shapes of the largest button and the current other button
             current_rect_coords = self.gui.canvas.coords(item['bg rect'])
-            current_circle_coords = self.gui.canvas.coords(item['bg circle 2'])
+            current_circle1_coords = self.gui.canvas.coords(item['bg circle 1'])
+            current_circle2_coords = self.gui.canvas.coords(item['bg circle 2'])
+            current_color_circle_coords = self.gui.canvas.coords(item['circle'])
             big_rect_coords = self.gui.canvas.coords(largest_button['bg rect'])
-            big_circle_coords = self.gui.canvas.coords(largest_button['bg circle 2'])
+            big_circle1_coords = self.gui.canvas.coords(largest_button['bg circle 1'])
+            big_circle2_coords = self.gui.canvas.coords(largest_button['bg circle 2'])
+            big_color_circle_coords = self.gui.canvas.coords(largest_button['circle'])
 
             print(f"current rect coords: {current_rect_coords}")
 
             # update the size of the background rectangle and second background circle
             self.gui.canvas.coords(item['bg rect'], [big_rect_coords[0], current_rect_coords[1], big_rect_coords[2], current_rect_coords[3]])
-            self.gui.canvas.coords(item['bg circle 2'], [big_circle_coords[0], current_circle_coords[1], big_circle_coords[2], current_circle_coords[3]])
+            self.gui.canvas.coords(item['bg circle 1'], [big_circle1_coords[0], current_circle1_coords[1], big_circle1_coords[2], current_circle1_coords[3]])
+            self.gui.canvas.coords(item['bg circle 2'], [big_circle2_coords[0], current_circle2_coords[1], big_circle2_coords[2], current_circle2_coords[3]])
+            self.gui.canvas.coords(item['circle'], [big_color_circle_coords[0], current_color_circle_coords[1], big_color_circle_coords[2], current_color_circle_coords[3]])
 
             self.gui.parent.update()
 
@@ -375,8 +349,8 @@ class ButtonList():
         # update current directory
         Gui.current_directory.append(new_directory)
 
-        if type(self.directory) == question_tester.Question:
-            # call function to display question data
+        if type(self.directory[Gui.current_directory[-1]]) == question_tester.Question:
+            self.question_display()
             return
         
         # change display
@@ -388,9 +362,37 @@ class ButtonList():
         Gui.current_directory.pop()
 
         self.gui.current_buttons = ButtonList(self.gui)
+
+
+
+    # function to display the information of a question
+    def question_display(self):
+
+        # add 'back' button
+        self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
+        self.gui.back_button.configure(font=('Cascadia Code', 23))
+        self.gui.back_button.place(x = 10, y = 15, width = 110, height = 50)
         
 
+        # remove all previous buttons
+        for button in ButtonList.displayed_buttons.values():
+            button['info'].place_forget()
+            self.gui.canvas.delete(button['circle'])
+            self.gui.canvas.delete(button['bg circle 1'])
+            self.gui.canvas.delete(button['bg rect'])
+            self.gui.canvas.delete(button['bg circle 2'])
+            try: button['info2'].place_forget()
+            except:pass
+                
+        ButtonList.displayed_buttons = {}
 
+        question = self.directory[Gui.current_directory[-1]]
+
+
+        self.gui.question_title = tk.Label(self.gui.parent, text = question.title, bg = 'ivory4', fg = 'white')
+        self.gui.question_title.configure(font=('Cascadia Code', 30))
+        self.gui.parent.update()
+        self.gui.question_title.place(relx = 0.5, y = 100, width = self.gui.question_title.winfo_reqwidth() + 10, height = self.gui.question_title.winfo_reqheight() + 10, anchor = CENTER)
 
 
 

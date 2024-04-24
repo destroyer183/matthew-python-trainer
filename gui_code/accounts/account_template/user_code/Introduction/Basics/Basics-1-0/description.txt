@@ -1,2 +1,2 @@
 Sum
-test description
+Write a function that takes in two numbers and returns the sum of those two numbers.
