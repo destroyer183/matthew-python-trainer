@@ -15,9 +15,13 @@ import importlib
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = current + '\\gui_code'
 print(f"directory: {parent}")
-# # parent = os.path.dirname(current) # go up one directory level
+
+# back_button = tk.PhotoImage(file = f"{parent}\\assets\\back button.png")
+# settings_button = tk.PhotoImage(file = f"{parent}\\assets\\settings.png")
+
+# parent = os.path.dirname(current) # go up one directory level
 sys.path.append(parent) # set current directory
-# # from gui_code import main_gui
+# from gui_code import main_gui
 login_gui = importlib.import_module('login_gui')
 # main_gui = importlib.import_module('main_gui')
 

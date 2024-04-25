@@ -61,6 +61,27 @@ class Gui(question_tester.QuestionTester):
 
 
 
+    def disable_gui(self):
+
+        for widget in self.parent.winfo_children():
+            try: widget.configure(disabledforeground = 'gray65')
+            except:pass
+            try: widget.configure(state = DISABLED)
+            except:pass
+
+        self.parent.update()
+
+
+
+    def enable_gui(self):
+
+        for widget in self.parent.winfo_children():
+            try: widget.configure(state = NORMAL)
+            except:pass
+
+
+
+
     def login(self, username = '', password = ''):
         
         self.clear_gui()
@@ -161,13 +182,7 @@ class Gui(question_tester.QuestionTester):
     def find_account(self, username = None, password = None):
 
         # disable stuff
-        self.username_box.configure(state = DISABLED)
-        self.password_box.configure(state = DISABLED)
-        self.show_password.configure(state = DISABLED)
-        self.submit_button.configure(state = DISABLED)
-        self.create_account_button.configure(state = DISABLED)
-
-
+        self.disable_gui()
 
         # get username and password
         if username is None: username = self.username_box.get().strip()
@@ -176,7 +191,9 @@ class Gui(question_tester.QuestionTester):
         if not self.verify_details('login', username, password):
             account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}"
 
-        else:return
+        else:
+            self.enable_gui()
+            return
 
         
 
@@ -222,6 +239,9 @@ class Gui(question_tester.QuestionTester):
             self.master.instance.initialize_account(account_directory, index + 1, self.master, self.account_password)
 
             self.master.instance.make_gui('questions')
+
+        else:
+            self.enable_gui()
  
 
 
@@ -381,11 +401,7 @@ class Gui(question_tester.QuestionTester):
     def make_account(self, username = None, password = None, confirm_password = None):
 
         # disable stuff
-        self.username_box.configure(state = DISABLED)
-        self.password_box.configure(state = DISABLED)
-        self.make_account_button.configure(state = DISABLED)
-        self.show_password.configure(state = DISABLED)
-        self.login_button.configure(state = DISABLED)
+        self.disable_gui() 
 
 
 
@@ -393,7 +409,9 @@ class Gui(question_tester.QuestionTester):
         if password is None: password = self.password_box.get().strip()
         if confirm_password is None: confirm_password = self.confirm_password_box.get().strip()
 
-        if self.verify_details('create account', username, password, confirm_password): return
+        if self.verify_details('create account', username, password, confirm_password): 
+            self.enable_gui()
+            return
 
         current_directory = os.getcwd().replace('\\', '/')
         source_file = 'gui_code/accounts/account_template'

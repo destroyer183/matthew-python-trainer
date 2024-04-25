@@ -63,10 +63,12 @@ class Gui(question_tester.QuestionTester):
         self.canvas = tk.Canvas(self.parent, width = self.parent.winfo_width(), height = self.parent.winfo_height(), background = 'dimgrey', highlightthickness = 0)
         self.canvas.pack(fill = BOTH)
 
+        self.settings_image = tk.PhotoImage(file = f"{question_tester.parent}\\assets/back button.png")
+
         # button to access account settings (log out, clear save data, etc.)
-        self.settings_button = tk.Button(self.parent, text = 'Settings', anchor = 'center', command = lambda:self.account_settings())
-        self.settings_button.configure(font=('Cascadia Code', 23))
-        self.settings_button.place(x = self.parent.winfo_width() - 10, y = 15, width = 160, height = 50, anchor = 'ne')
+        self.settings_button = tk.Button(self.parent, image = self.settings_image, anchor = 'center', command = lambda:self.account_settings())
+        self.settings_button.configure(font=('Cascadia Code', 20), bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
+        self.settings_button.place(x = self.parent.winfo_width() - 10, y = 15, width = 145, height = 45, anchor = 'ne')
 
 
 
@@ -214,8 +216,8 @@ class ButtonList():
         if type([x for x in self.directory.values()][0]) != question_tester.DifficultyGroup:
 
             self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
-            self.gui.back_button.configure(font=('Cascadia Code', 23))
-            self.gui.back_button.place(x = 10, y = 15, width = 110, height = 50)
+            self.gui.back_button.configure(font=('Cascadia Code', 20))
+            self.gui.back_button.place(x = 10, y = 15, width = 95, height = 45)
 
         else:
 
@@ -359,6 +361,14 @@ class ButtonList():
 
     def back_directory(self):
 
+        try:
+            self.gui.question_title.place_forget()
+            self.gui.question_description.place_forget()
+            self.gui.canvas.delete(self.gui.rect)
+            self.gui.canvas.delete(self.gui.circle1)
+            self.gui.canvas.delete(self.gui.circle2)
+        except:pass
+
         Gui.current_directory.pop()
 
         self.gui.current_buttons = ButtonList(self.gui)
@@ -370,8 +380,8 @@ class ButtonList():
 
         # add 'back' button
         self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
-        self.gui.back_button.configure(font=('Cascadia Code', 23))
-        self.gui.back_button.place(x = 10, y = 15, width = 110, height = 50)
+        self.gui.back_button.configure(font=('Cascadia Code', 20))
+        self.gui.back_button.place(x = 10, y = 15, width = 95, height = 45)
         
 
         # remove all previous buttons
@@ -388,25 +398,43 @@ class ButtonList():
 
         question = self.directory[Gui.current_directory[-1]]
 
+        header_y = 100
 
-        self.gui.question_title = tk.Label(self.gui.parent, text = question.title, bg = 'ivory4', fg = 'white')
-        self.gui.question_title.configure(font=('Cascadia Code', 30))
+        self.gui.question_title = tk.Label(self.gui.parent, text = question.title, anchor = 'center', bg = 'ivory4', fg = 'white')
+        self.gui.question_title.configure(font=('Cascadia Code', 20))
         self.gui.parent.update()
-        self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = 100, width = self.gui.question_title.winfo_reqwidth() + 10, height = self.gui.question_title.winfo_reqheight(), anchor = 'w')
+        self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = header_y, height = self.gui.question_title.winfo_reqheight() + 4, anchor = 'w')
 
-        bg_circle_radius = (self.gui.question_title.winfo_reqwidth() - 10) / 2 - 1
+        bg_circle_radius = (self.gui.question_title.winfo_reqheight() + 5) / 2 - 1
+        bg_rect_height = (self.gui.question_title.winfo_reqheight() + 4) / 2
+
+        self.gui.parent.update()
+
+        self.gui.rect = self.gui.canvas.create_rectangle(
+            self.gui.question_title.winfo_x(), header_y - bg_rect_height,
+            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth(), header_y + bg_rect_height,
+            fill = 'ivory4', outline = ''
+        )
 
         self.gui.circle1 = self.gui.canvas.create_oval(
-            self.gui.question_title.winfo_x() - bg_circle_radius, self.gui.question_title.winfo_y() - bg_circle_radius, 
-            self.gui.question_title.winfo_x() + bg_circle_radius, self.gui.question_title.winfo_y() + bg_circle_radius, 
+            self.gui.question_title.winfo_x() - bg_circle_radius - 1, header_y - bg_circle_radius - 1, 
+            self.gui.question_title.winfo_x() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
             fill = 'ivory4', outline = ''
             )
 
         self.gui.circle2 = self.gui.canvas.create_oval(
-            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() - bg_circle_radius, self.gui.question_title.winfo_y() - bg_circle_radius, 
-            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() + bg_circle_radius, self.gui.question_title.winfo_y() + bg_circle_radius, 
+            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() - bg_circle_radius  -1, header_y - bg_circle_radius - 1, 
+            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
             fill = 'ivory4', outline = ''
             )
+        
+
+
+        self.gui.question_description = tk.Label(self.gui.parent, text = question.description, anchor = 'center', wraplength = 550, justify = CENTER, bg = 'ivory4', fg = 'white')
+        self.gui.question_description.configure(font=('Cascadia Code', 18))
+        self.gui.parent.update()
+        self.gui.question_description.place(relx = 0.5, y = 150, width = 550, anchor = 'n')
+
 
 
 

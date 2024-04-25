@@ -1,2 +1,2 @@
-Sum
-test description
+Hours to Seconds
+Write a function that takes in a number that represents hours and converts it to seconds. The function should return the number of seconds.
