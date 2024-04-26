@@ -6,6 +6,8 @@ import enum
 import shutil
 import binascii
 import mmap
+from PIL import Image, ImageTk
+import math
 
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
 parent = os.path.dirname(current) # go up one directory level
@@ -63,12 +65,15 @@ class Gui(question_tester.QuestionTester):
         self.canvas = tk.Canvas(self.parent, width = self.parent.winfo_width(), height = self.parent.winfo_height(), background = 'dimgrey', highlightthickness = 0)
         self.canvas.pack(fill = BOTH)
 
-        self.settings_image = tk.PhotoImage(file = f"{question_tester.parent}\\assets/back button.png")
+        self.settings_image = Image.open(f"{question_tester.parent}\\assets\\settings.png")
+        self.settings_image = self.settings_image.resize((40, 40))
+        self.settings_image = ImageTk.PhotoImage(self.settings_image)
+
 
         # button to access account settings (log out, clear save data, etc.)
         self.settings_button = tk.Button(self.parent, image = self.settings_image, anchor = 'center', command = lambda:self.account_settings())
-        self.settings_button.configure(font=('Cascadia Code', 20), bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
-        self.settings_button.place(x = self.parent.winfo_width() - 10, y = 15, width = 145, height = 45, anchor = 'ne')
+        self.settings_button.configure(bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
+        self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
 
 
 
@@ -176,23 +181,25 @@ class ButtonList():
             bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 1
             bg_radius = (temp['info'].winfo_reqheight() + 9) / 2
 
+            print(f"bg circle radius: {bg_circle_radius}\n\n\n\n\n\n\n\n\n\n\n\n\n")
+
             temp['bg rect'] = self.gui.canvas.create_rectangle(
                 temp['info'].winfo_x() - 25, self.current_y - bg_radius, 
                 temp['info'].winfo_x() + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
                 fill = 'ivory4', outline = ''
-                )
+            )
 
             temp['bg circle 1'] = self.gui.canvas.create_oval(
                 temp['info'].winfo_x() - 25 - bg_circle_radius, self.current_y - bg_circle_radius, 
                 temp['info'].winfo_x() - 25 + bg_circle_radius, self.current_y + bg_circle_radius, 
                 fill = 'ivory4', outline = ''
-                )
+            )
 
             temp['bg circle 2'] = self.gui.canvas.create_oval(
                 temp['info'].winfo_x() + temp['info'].winfo_reqwidth() - bg_circle_radius, self.current_y - bg_circle_radius, 
                 temp['info'].winfo_x() + temp['info'].winfo_reqwidth() + bg_circle_radius, self.current_y + bg_circle_radius, 
                 fill = 'ivory4', outline = ''
-                )
+            )
 
 
 
@@ -203,7 +210,7 @@ class ButtonList():
                 temp['info'].winfo_x() - 25 - radius, self.current_y - radius, 
                 temp['info'].winfo_x() - 25 + radius, self.current_y + radius, 
                 fill = fill_color, outline = ''
-                )
+            )
         
 
 
@@ -212,19 +219,16 @@ class ButtonList():
 
 
 
+        try: 
+            self.make_back_button('delete')
+            self.make_back_button()
+        except: self.make_back_button()
+
         # add 'back' button
-        if type([x for x in self.directory.values()][0]) != question_tester.DifficultyGroup:
+        if type([x for x in self.directory.values()][0]) == question_tester.DifficultyGroup:
+            
+            self.make_back_button('delete')
 
-            self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
-            self.gui.back_button.configure(font=('Cascadia Code', 20))
-            self.gui.back_button.place(x = 10, y = 15, width = 95, height = 45)
-
-        else:
-
-            # remove button when you can't go back a directory
-            try: self.gui.back_button.place_forget()
-            except:pass
-        
 
 
         # skip the rest of the function if the buttons being displayed are for questions and not directories
@@ -307,7 +311,7 @@ class ButtonList():
                         x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
                         width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()) - 14,
                         height = item['info'].winfo_reqheight() + 10
-                        )
+                    )
 
 
                 else:
@@ -315,7 +319,7 @@ class ButtonList():
                         x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
                         width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()),
                         height = item['info'].winfo_reqheight() + 10
-                        )
+                    )
 
             except:pass
 
@@ -361,12 +365,18 @@ class ButtonList():
 
     def back_directory(self):
 
+        self.make_back_button('delete')
+        
         try:
             self.gui.question_title.place_forget()
+            for item in self.header_container.values():
+                self.gui.canvas.delete(item)
+        except:pass
+
+        try:
             self.gui.question_description.place_forget()
-            self.gui.canvas.delete(self.gui.rect)
-            self.gui.canvas.delete(self.gui.circle1)
-            self.gui.canvas.delete(self.gui.circle2)
+            for item in self.description_container.values():
+                self.gui.canvas.delete(item)
         except:pass
 
         Gui.current_directory.pop()
@@ -375,14 +385,27 @@ class ButtonList():
 
 
 
+    def make_back_button(self, config = 'add'):
+
+        if config == 'add':
+
+            self.back_image = Image.open(f"{question_tester.parent}\\assets\\back button.png")
+            self.back_image = self.back_image.resize((40, 40))
+            self.back_image = ImageTk.PhotoImage(self.back_image)
+
+            self.gui.back_button = tk.Button(self.gui.parent, image = self.back_image, anchor = 'center', command = lambda:self.back_directory())
+            self.gui.back_button.configure(bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
+            self.gui.back_button.place(x = 5, y = 8, width = 40, height = 40)
+
+        elif config == 'delete':
+
+            self.gui.back_button.place_forget()
+
+
+
+
     # function to display the information of a question
     def question_display(self):
-
-        # add 'back' button
-        self.gui.back_button = tk.Button(self.gui.parent, text = 'Back', anchor = 'center', command = lambda:self.back_directory())
-        self.gui.back_button.configure(font=('Cascadia Code', 20))
-        self.gui.back_button.place(x = 10, y = 15, width = 95, height = 45)
-        
 
         # remove all previous buttons
         for button in ButtonList.displayed_buttons.values():
@@ -398,42 +421,143 @@ class ButtonList():
 
         question = self.directory[Gui.current_directory[-1]]
 
-        header_y = 100
+        header_y = 75
 
         self.gui.question_title = tk.Label(self.gui.parent, text = question.title, anchor = 'center', bg = 'ivory4', fg = 'white')
-        self.gui.question_title.configure(font=('Cascadia Code', 20))
+        self.gui.question_title.configure(font=('Cascadia Code', 25))
         self.gui.parent.update()
         self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = header_y, height = self.gui.question_title.winfo_reqheight() + 4, anchor = 'w')
 
         bg_circle_radius = (self.gui.question_title.winfo_reqheight() + 5) / 2 - 1
         bg_rect_height = (self.gui.question_title.winfo_reqheight() + 4) / 2
 
+        print(f"bg circle radius: {bg_circle_radius}")
+
+
         self.gui.parent.update()
 
-        self.gui.rect = self.gui.canvas.create_rectangle(
+        self.header_container = {}
+
+        self.header_container['bg rect'] = self.gui.canvas.create_rectangle(
             self.gui.question_title.winfo_x(), header_y - bg_rect_height,
             self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth(), header_y + bg_rect_height,
             fill = 'ivory4', outline = ''
         )
 
-        self.gui.circle1 = self.gui.canvas.create_oval(
+        self.header_container['left circle'] = self.gui.canvas.create_oval(
             self.gui.question_title.winfo_x() - bg_circle_radius - 1, header_y - bg_circle_radius - 1, 
             self.gui.question_title.winfo_x() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
             fill = 'ivory4', outline = ''
-            )
+        )
 
-        self.gui.circle2 = self.gui.canvas.create_oval(
+        self.header_container['right circle'] = self.gui.canvas.create_oval(
             self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() - bg_circle_radius  -1, header_y - bg_circle_radius - 1, 
             self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
             fill = 'ivory4', outline = ''
-            )
+        )
         
-
+        description_y = 150
 
         self.gui.question_description = tk.Label(self.gui.parent, text = question.description, anchor = 'center', wraplength = 550, justify = CENTER, bg = 'ivory4', fg = 'white')
-        self.gui.question_description.configure(font=('Cascadia Code', 18))
+        self.gui.question_description.configure(font=('Cascadia Code', 14))
         self.gui.parent.update()
-        self.gui.question_description.place(relx = 0.5, y = 150, width = 550, anchor = 'n')
+        self.gui.question_description.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_description.winfo_reqwidth() / 2, y = description_y)
+
+        self.gui.parent.update()
+
+
+
+        self.description_container = {}
+
+        # main bg rect
+        self.description_container['bg rect'] = self.gui.canvas.create_rectangle(
+            self.gui.question_description.winfo_x(), description_y,
+            self.gui.question_description.winfo_x() + self.gui.question_description.winfo_reqwidth(), description_y + self.gui.question_description.winfo_reqheight(),
+            fill = 'ivory4', outline = ''
+        )
+
+        # odd integer works
+        # even number with decimal works
+        circle_radius = 15
+
+        x_offset = circle_radius * math.cos(math.radians(45))
+        y_offset = circle_radius * math.sin(math.radians(45))
+
+        text_x = self.gui.question_description.winfo_x()
+        text_y = self.gui.question_description.winfo_y()
+        text_width = self.gui.question_description.winfo_reqwidth()
+        text_height = self.gui.question_description.winfo_reqheight()
+
+        # offset the circle behind the text as much as possible
+        # take the radius of the circle, and treat it as the hypotenuse of a triangle to find the x and y offsets
+
+        # nw circle
+        self.description_container['nw circle'] = self.gui.canvas.create_oval(
+            text_x - circle_radius + x_offset - 1, text_y - circle_radius + y_offset - 1,
+            text_x + circle_radius + x_offset - 1, text_y + circle_radius + y_offset - 1,
+            fill = 'ivory4', outline = ''
+        )
+
+        # ne circle
+        self.description_container['ne circle'] = self.gui.canvas.create_oval(
+            text_x + text_width - circle_radius - x_offset, text_y - circle_radius + y_offset - 1,
+            text_x + text_width + circle_radius - x_offset, text_y + circle_radius + y_offset - 1,
+            fill = 'ivory4', outline = ''
+        )
+
+        # sw circle
+        self.description_container['sw circle'] = self.gui.canvas.create_oval(
+            text_x - circle_radius + x_offset - 1, text_y + text_height - circle_radius - y_offset,
+            text_x + circle_radius + x_offset - 1, text_y + text_height + circle_radius - y_offset,
+            fill = 'ivory4', outline = ''
+        )
+
+        # se circle
+        self.description_container['se circle'] = self.gui.canvas.create_oval(
+            text_x + text_width - circle_radius - x_offset, text_y + text_height - circle_radius - y_offset,
+            text_x + text_width + circle_radius - x_offset, text_y + text_height + circle_radius - y_offset,
+            fill = 'ivory4', outline = ''
+        )
+
+        nw_coords = self.gui.canvas.coords(self.description_container['nw circle'])
+        se_coords = self.gui.canvas.coords(self.description_container['se circle'])
+
+        # vertical rect
+        self.description_container['vertical rect'] = self.gui.canvas.create_rectangle(
+            nw_coords[2] - circle_radius, nw_coords[1],
+            se_coords[0] + circle_radius, se_coords[3] + 1,
+            fill = 'ivory4', outline = ''
+        )
+
+        # horizontal rect
+        self.description_container['horizontal rect'] = self.gui.canvas.create_rectangle(
+            nw_coords[0], nw_coords[3] - circle_radius,
+            se_coords[2] + 1, se_coords[1] + circle_radius,
+            fill = 'ivory4', outline = ''
+        )
+
+
+
+        # button to begin
+        self.gui.begin_button = tk.Button(self.gui.parent, text = 'begin', command = lambda:self.begin_question(question))
+        self.gui.begin_button.place(x = 500, y = 500)
+
+
+
+
+    def begin_question(self, question):
+
+
+        # large problem with spaces
+
+        command = f"code \'{question.directory}\\main.py\'"
+
+        return_code = os.system(command)
+
+        # navigate to the directory
+        # run 'code main.py' in the directory - this will open up the correct file in vscode
+
+
 
 
 
