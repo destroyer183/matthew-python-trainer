@@ -542,7 +542,6 @@ class ButtonList():
 
 
 
-
     def begin_question(self, question):
 
         command = f"code \"{question.directory}\\main.py\""
