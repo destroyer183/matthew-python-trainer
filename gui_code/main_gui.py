@@ -181,8 +181,6 @@ class ButtonList():
             bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 1
             bg_radius = (temp['info'].winfo_reqheight() + 9) / 2
 
-            print(f"bg circle radius: {bg_circle_radius}\n\n\n\n\n\n\n\n\n\n\n\n\n")
-
             temp['bg rect'] = self.gui.canvas.create_rectangle(
                 temp['info'].winfo_x() - 25, self.current_y - bg_radius, 
                 temp['info'].winfo_x() + temp['info'].winfo_reqwidth(), self.current_y + bg_radius, 
@@ -547,15 +545,13 @@ class ButtonList():
 
     def begin_question(self, question):
 
-
-        # large problem with spaces
-
-        command = f"code \'{question.directory}\\main.py\'"
+        command = f"code \"{question.directory}\\main.py\""
 
         return_code = os.system(command)
 
         # navigate to the directory
         # run 'code main.py' in the directory - this will open up the correct file in vscode
+        print(f"return code: {return_code}")
 
 
 

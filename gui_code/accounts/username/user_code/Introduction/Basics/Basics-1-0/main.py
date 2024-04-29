@@ -35,7 +35,7 @@ def main_function(argument):
 
 
 
-# don't touch this stuff, it'll break lots of otehr things if you change this code
+# don't touch this stuff, it'll break lots of other things if you change this code
 
 def main():
 
