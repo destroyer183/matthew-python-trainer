@@ -15,7 +15,6 @@ import question_tester
 
 
 
-
 ''' NOTES
 
 add in 'remember me' checkbox on the login page
@@ -40,7 +39,7 @@ class GuiAnchor(enum.Enum):
 
 
 
-class Gui(question_tester.QuestionTester):
+class Gui():
 
     def __init__(self, parent, master) -> None:
         
@@ -148,7 +147,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.resizable(False, False)
 
-        self.find_account('username', 'password')
+        # self.find_account('username', 'password')
 
 
 
@@ -202,7 +201,7 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                self.account_password = self.byte_to_string(line).strip()
+                self.account_password = self.master.byte_to_string(line).strip()
                 break
 
         
@@ -228,7 +227,7 @@ class Gui(question_tester.QuestionTester):
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = self.byte_to_string(bytes(item))
+                item = self.master.byte_to_string(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
@@ -434,9 +433,9 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        passwrd = self.string_to_int(password)
+        passwrd = self.master.string_to_int(password)
 
-        password = self.string_to_byte(password)
+        password = self.master.string_to_byte(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -456,7 +455,7 @@ class Gui(question_tester.QuestionTester):
 
             for item in third_line:
 
-                temp = self.string_to_byte(item)
+                temp = self.master.string_to_byte(item)
 
                 f.write(temp)
                 f2.write(temp)
@@ -480,7 +479,7 @@ class Gui(question_tester.QuestionTester):
             if len(fourth_line) == 1:
                 fourth_line = f"0{fourth_line}"
 
-            fourth_line = self.string_to_int(fourth_line)
+            fourth_line = self.master.string_to_int(fourth_line)
             fourth_line = ('').join(fourth_line)
             fourth_line = binascii.unhexlify(fourth_line)
 

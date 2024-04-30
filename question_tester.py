@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import *
+from fastapi import FastAPI
+import threading
 import os
 import shutil
 import binascii
@@ -26,6 +28,9 @@ login_gui = importlib.import_module('login_gui')
 # main_gui = importlib.import_module('main_gui')
 
 
+
+
+
 class DifficultyLevel(enum.Enum):
     Level0 = 0
     Level1 = 1
@@ -41,6 +46,37 @@ class QuestionType(enum.Enum):
     Math = 'Math'
     Strings = 'Strings'
 
+
+
+app = FastAPI()
+
+@app.get('/')
+async def root():
+    
+    # use threading here to start up the gui separately
+    thread = threading.Thread(target=thread_function)
+    thread.start()
+
+    return {'Hello': 'World'}
+
+
+
+@app.get('/items/{item_id}')
+def read_item(item_id: int, q: str):
+
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n', 'data: ', {'item_id': item_id, 'q': q}, '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+
+
+    # call function in QuestionTester class and pass it the directory of the file to test
+
+
+    return {'item_id': item_id, 'q': q}
+
+
+
+def thread_function():
+    
+    main()
 
 
 
@@ -518,7 +554,7 @@ def main():
     QuestionTester.instance.make_gui('login')
 
     # run the gui
-    QuestionTester.instance.gui.parent.mainloop()
+    return QuestionTester.instance.gui.parent.mainloop()
 
 
 
