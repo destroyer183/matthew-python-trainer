@@ -1,8 +1,10 @@
 import os
 import sys
+import urllib.request
 
-current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics
-parent = os.path.dirname(current) # go up one directory level - Introduction
+current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics-1-0
+parent = os.path.dirname(current) # go up one directory level - Basics
+parent = os.path.dirname(parent) # go up another directory level - Introduction
 parent = os.path.dirname(parent) # go up another directory level - user_code
 parent = os.path.dirname(parent) # go up another directory level - account_template
 parent = os.path.dirname(parent) # go up another directory level - accounts
@@ -19,15 +21,13 @@ question description goes here
 '''
 
 
-def main_function(argument):
+def main_function(**kwargs):
+    
+    # these are your 
+    num1 = kwargs['variable 1']
+    num2 = kwargs['variable 2']
 
-    return argument
-
-
-
-
-
-
+    return num1 + num2
 
 
 
@@ -35,7 +35,13 @@ def main_function(argument):
 
 
 
-# don't touch this stuff, it'll break lots of otehr things if you change this code
+
+
+
+
+
+
+# don't touch this stuff, it'll break lots of other things if you change this code
 
 def main():
 
@@ -43,6 +49,7 @@ def main():
 
     # have 3 test cases
     input1 = 'something1'
+
     output1 = main_function(input1)
     answer1 = 'something3'
 
@@ -68,7 +75,6 @@ def main():
           \nYour output: {quote_placeholder * (type(output3) == str)}{output3}{quote_placeholder * (type(output3) == str)}\
           \nExpected output: {answer3}\n")
     
-    x = 1
 
 
 
@@ -79,6 +85,26 @@ def main():
     # iterate over the file with the solutions, and compare each list item to the correct solution
     # if all 5 cases are solved correctly, call a function in 'question_tester.py' that will change the save file to show that the answer was solved correctly
 
+    directory = os.path.dirname(os.path.realpath(__file__))
+
+    directory = directory.split('\\')
+
+    account_name = directory[-5]
+    level        = directory[-3]
+    group        = directory[-2]
+    question     = directory[-1]
+
+    url = f'http://127.0.0.1:8000/items/{account_name}?level={level}&group={group}&question={question}'
+
+    print(f"directory: {directory}")
+
+    url = url.replace(' ', '%20')
+
+    print(f"url: {url}")
+
+    output = urllib.request.urlopen(url)
+
+    print(f"output: {output}")
 
 
 

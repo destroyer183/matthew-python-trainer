@@ -39,7 +39,7 @@ class GuiAnchor(enum.Enum):
 
 
 
-class Gui():
+class Gui(question_tester.QuestionTester):
 
     def __init__(self, parent, master) -> None:
         
@@ -201,7 +201,7 @@ class Gui():
 
             for line in f:
 
-                self.account_password = self.master.byte_to_string(line).strip()
+                self.account_password = self.byte_to_string(line).strip()
                 break
 
         
@@ -227,7 +227,7 @@ class Gui():
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = self.master.byte_to_string(bytes(item))
+                item = self.byte_to_string(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
@@ -427,15 +427,21 @@ class Gui():
 
     def create_account_directory(self, directory, source_file, destination, username):
 
-        shutil.copytree(f"{directory}/{source_file}", f"{directory}/{destination}{username}")
+        full_directory = f"{directory}/{destination}{username}"
+
+        shutil.copytree(f"{directory}/{source_file}", f"{full_directory}")
+
+        full_directory = full_directory.replace('/', '\\')
+
+        os.system(f"attrib +h \"{full_directory}\"")
 
 
 
     def set_account_password(self, backup, account, password):
 
-        passwrd = self.master.string_to_int(password)
+        passwrd = self.string_to_int(password)
 
-        password = self.master.string_to_byte(password)
+        password = self.string_to_byte(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -455,7 +461,7 @@ class Gui():
 
             for item in third_line:
 
-                temp = self.master.string_to_byte(item)
+                temp = self.string_to_byte(item)
 
                 f.write(temp)
                 f2.write(temp)
@@ -479,15 +485,13 @@ class Gui():
             if len(fourth_line) == 1:
                 fourth_line = f"0{fourth_line}"
 
-            fourth_line = self.master.string_to_int(fourth_line)
+            fourth_line = self.string_to_int(fourth_line)
             fourth_line = ('').join(fourth_line)
             fourth_line = binascii.unhexlify(fourth_line)
 
             print(f"fourth line unhexlified: {fourth_line}")
 
             print(f"fourth line hexlified: {binascii.hexlify(fourth_line)}")
-            # to convert back:
-            # 
 
             f.write(fourth_line)
             f2.write(fourth_line)

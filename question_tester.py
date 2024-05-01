@@ -9,6 +9,8 @@ import mmap
 import sys
 import enum
 import importlib
+import uvicorn
+import signal
 # from gui_code import login_gui
 
 # from gui_code import main_gui
@@ -26,8 +28,6 @@ sys.path.append(parent) # set current directory
 # from gui_code import main_gui
 login_gui = importlib.import_module('login_gui')
 # main_gui = importlib.import_module('main_gui')
-
-
 
 
 
@@ -52,31 +52,40 @@ app = FastAPI()
 
 @app.get('/')
 async def root():
-    
-    # use threading here to start up the gui separately
-    thread = threading.Thread(target=thread_function)
-    thread.start()
 
     return {'Hello': 'World'}
 
 
 
 @app.get('/items/{item_id}')
-def read_item(item_id: int, q: str):
+def read_item(account_name: str, level: str, group: str, question: str):
 
-    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n', 'data: ', {'item_id': item_id, 'q': q}, '\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+    if QuestionTester.account is None:
+        print('\nError handling request: account has not been initialized.\n')
+        return
+
+    if QuestionTester.account_directory.split('\\')[-1] != account_name:
+        print('\nError handling request: account name invalid.\n')
+        return
+
+    input = {'account_name': account_name, 'level': level, 'group': group, 'question': question}
+
+
+    print(f"\ndata: {input}\n")
+
 
 
     # call function in QuestionTester class and pass it the directory of the file to test
 
 
-    return {'item_id': item_id, 'q': q}
+
+    return input
 
 
 
 def thread_function():
     
-    main()
+    QuestionTester.instance.gui.parent.mainloop()
 
 
 
@@ -538,8 +547,6 @@ def main():
 
     QuestionTester.instance = QuestionTester(tk.Tk())
 
-    # QuestionTester.instance.gui.accept_master(QuestionTester)
-
     # override windows scaling
     if os.name == 'nt':
         try:
@@ -553,11 +560,21 @@ def main():
 
     QuestionTester.instance.make_gui('login')
 
+
+
     # run the gui
-    return QuestionTester.instance.gui.parent.mainloop()
+    QuestionTester.instance.gui.parent.mainloop()
+
+    # kill the uvicorn server if the gui gets closed
+    os.kill(os.getpid(), signal.SIGTERM)
 
 
 
 if __name__ == '__main__':
 
-    main()
+    # use threading to run the gui main function separately
+    main_thread = threading.Thread(target=main)
+    main_thread.start()
+
+    # start the FastAPI server with uvicorn
+    uvicorn.run('question_tester:app', reload = True)

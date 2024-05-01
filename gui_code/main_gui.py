@@ -537,8 +537,9 @@ class ButtonList():
 
 
         # button to begin
-        self.gui.begin_button = tk.Button(self.gui.parent, text = 'begin', command = lambda:self.begin_question(question))
-        self.gui.begin_button.place(x = 500, y = 500)
+        self.gui.begin_button = tk.Button(self.gui.parent, text = 'Begin', command = lambda:self.begin_question(question))
+        self.gui.begin_button.configure(font=('Cascadia Code', 20))
+        self.gui.begin_button.place(relx = 0.5, y = 500, height = 35, anchor = CENTER)
 
 
 
