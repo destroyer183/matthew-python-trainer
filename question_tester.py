@@ -76,6 +76,14 @@ def read_item(account_name: str, level: str, group: str, question: str):
 
 
     # call function in QuestionTester class and pass it the directory of the file to test
+    question_directory = QuestionTester.directory_tree[level]
+    question_directory = question_directory.content[group]
+    question_directory = question_directory.content[question]
+
+    question_directory.test_question()
+
+
+
 
 
 
@@ -495,7 +503,7 @@ class QuestionGroup(DifficultyGroup):
 
 class Question(QuestionGroup):
 
-    def __init__(self, directory: str, name, save_file_index: int, master) -> None:
+    def __init__(self, directory: str, name: str, save_file_index: int, master) -> None:
 
         master.account.seek(save_file_index)
         temp = master.account.read(1)
@@ -514,18 +522,18 @@ class Question(QuestionGroup):
         self.name = name
         self.save_file_index = save_file_index
 
-        temp = True
+        temp = []
         try:
             with open(f"{self.directory}\\description.txt", 'r') as file:
 
                 for line in file:
 
-                    if temp:    
-                        self.title = line.strip()
-                        temp = not temp
+                    line = line.strip()
 
-                    else: 
-                        self.description = line.strip()
+                    temp.append(line)
+
+            self.title = temp[0]
+            self.description = temp[1]
 
         except:
             self.title = 'Empty'
@@ -534,12 +542,45 @@ class Question(QuestionGroup):
         print(f"title: \'{self.title}\'")
         print(f"description: \'{self.description}\'")
 
+        self.answers = []
+        try:
+            with open(f"{self.directory}\\answers.txt", 'r') as file:
+
+                for line in file:
+
+                    line = line.strip()
+
+                    self.answers.append(line)
+        except:pass
+
 
 
     def test_question(self):
-        # this function will test a question, and update the completion values of the question it is called on, and every folder above ite
-        pass
 
+        # get test cases, and put them in a tuple within a tuple within an array
+
+        # get answers, and put them in a tuple that is in the tuple that contains the test cases
+
+        # iterate over the array, calling the main function within the question file, and store each output in another array
+
+        # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
+        # add the outputs to the tuples that contain the expected answers, and also add a boolean that represents whether or not the answer was correct
+        # format for this array will look like this:
+        # evaluation_data = [((argument_1, argument_2, argument_3), (expected_answer, output, is_answer_correct)), ((arg_1, arg_2, arg_3), (expected_ans, output, is_correct))]
+
+        # pass all information to a function in 'main_gui.py' that will display the test case results
+
+        # call function in 'QuestionTester' to update the save file if 'self.completed' is 'None' or if the user passed the question
+        # if the user passed the question, then iterate over the directories above the question and update their data
+
+        # 
+
+
+
+
+
+        # this function will test a question, and update the completion values of the question it is called on, and every folder above it
+        pass
 
 
 

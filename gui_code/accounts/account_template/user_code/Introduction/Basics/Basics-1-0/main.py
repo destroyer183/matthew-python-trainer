@@ -16,16 +16,16 @@ import question_tester
 
 '''
 
-question description goes here
+Write a function that takes in two numbers and returns the sum of those two numbers.
 
 '''
 
-
-def main_function(**kwargs):
+def main_function(*variables):
     
-    # these are your 
-    num1 = kwargs['variable 1']
-    num2 = kwargs['variable 2']
+    return sum(variables[0], variables[1])
+
+
+def sum(num1, num2):
 
     return num1 + num2
 
@@ -85,6 +85,12 @@ def main():
     # iterate over the file with the solutions, and compare each list item to the correct solution
     # if all 5 cases are solved correctly, call a function in 'question_tester.py' that will change the save file to show that the answer was solved correctly
 
+
+
+
+
+
+
     directory = os.path.dirname(os.path.realpath(__file__))
 
     directory = directory.split('\\')
@@ -105,10 +111,6 @@ def main():
     output = urllib.request.urlopen(url)
 
     print(f"output: {output}")
-
-
-
-    pass
 
 
 
