@@ -11,6 +11,7 @@ import enum
 import importlib
 import uvicorn
 import signal
+import json
 # from gui_code import login_gui
 
 # from gui_code import main_gui
@@ -522,6 +523,10 @@ class Question(QuestionGroup):
         self.name = name
         self.save_file_index = save_file_index
 
+
+        # make a separate class function to extract the test cases and answers
+
+
         temp = []
         try:
             with open(f"{self.directory}\\description.txt", 'r') as file:
@@ -542,16 +547,42 @@ class Question(QuestionGroup):
         print(f"title: \'{self.title}\'")
         print(f"description: \'{self.description}\'")
 
-        self.answers = []
-        try:
-            with open(f"{self.directory}\\answers.txt", 'r') as file:
 
-                for line in file:
 
-                    line = line.strip()
 
-                    self.answers.append(line)
-        except:pass
+
+    def extract_test_cases(self):
+
+        # get test cases
+        self.test_cases = []
+
+        with open(f"{self.directory}\\test_cases.txt", 'r') as file:
+
+            for line in file:
+
+                line = line.strip()
+
+                self.test_cases.append(line)
+
+        
+        # split each element into a tuple
+
+        
+
+        # use a hex value of '00' to split the string instead of commas
+
+        # efficiently storing data in files: https://www.geeksforgeeks.org/how-to-read-dictionary-from-file-in-python/
+
+
+        # check for data type in this order
+        # {} enclose dictionaries
+        # [] enclose lists
+        # "" enclose strings
+        # 'T' and 'F' will represent boolean, and they won't be enclosed in anything
+        # . represents float
+        # anything else is an integer
+
+
 
 
 
