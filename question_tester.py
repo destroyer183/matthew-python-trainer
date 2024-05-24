@@ -555,6 +555,7 @@ class Question(QuestionGroup):
 
         # get test cases
         self.test_cases = []
+        temp = []
 
         with open(f"{self.directory}\\test_cases.txt", 'r') as file:
 
@@ -562,7 +563,7 @@ class Question(QuestionGroup):
 
                 line = line.strip()
 
-                self.test_cases.append(line)
+                temp.append(line)
 
         
         # split each element into a tuple
