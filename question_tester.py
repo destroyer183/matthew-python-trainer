@@ -523,67 +523,25 @@ class Question(QuestionGroup):
         self.name = name
         self.save_file_index = save_file_index
 
+        self.extract_question_data()
 
-        # make a separate class function to extract the test cases and answers
 
 
-        temp = []
+    def extract_question_data(self):
+
         try:
-            with open(f"{self.directory}\\description.txt", 'r') as file:
-
-                for line in file:
-
-                    line = line.strip()
-
-                    temp.append(line)
-
-            self.title = temp[0]
-            self.description = temp[1]
-
+            f = open(f"{self.directory}\\data.json")
         except:
-            self.title = 'Empty'
-            self.description = 'empty'
+            self.question_data = {}
+            return
 
-        print(f"title: \'{self.title}\'")
-        print(f"description: \'{self.description}\'")
+        data = json.load(f)
 
+        for test_case in data['test cases']:
 
+            test_case['input'] = tuple(test_case['input'])
 
-
-
-    def extract_test_cases(self):
-
-        # get test cases
-        self.test_cases = []
-        temp = []
-
-        with open(f"{self.directory}\\test_cases.txt", 'r') as file:
-
-            for line in file:
-
-                line = line.strip()
-
-                temp.append(line)
-
-        
-        # split each element into a tuple
-
-        
-
-        # use a hex value of '00' to split the string instead of commas
-
-        # efficiently storing data in files: https://www.geeksforgeeks.org/how-to-read-dictionary-from-file-in-python/
-
-
-        # check for data type in this order
-        # {} enclose dictionaries
-        # [] enclose lists
-        # "" enclose strings
-        # 'T' and 'F' will represent boolean, and they won't be enclosed in anything
-        # . represents float
-        # anything else is an integer
-
-
+        self.question_data = data
 
 
 
@@ -594,6 +552,8 @@ class Question(QuestionGroup):
         # get answers, and put them in a tuple that is in the tuple that contains the test cases
 
         # iterate over the array, calling the main function within the question file, and store each output in another array
+
+        # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
 
         # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
         # add the outputs to the tuples that contain the expected answers, and also add a boolean that represents whether or not the answer was correct

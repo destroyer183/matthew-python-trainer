@@ -16,14 +16,18 @@ import question_tester
 
 '''
 
-question description goes here
+Write a function that takes in two numbers and returns the sum of those two numbers.
 
 '''
 
+def main_function(*variables):
+    
+    return sum(variables[0], variables[1])
 
-def main_function(argument):
 
-    return argument
+def sum(num1, num2):
+
+    return num1 + num2
 
 
 
@@ -45,6 +49,7 @@ def main():
 
     # have 3 test cases
     input1 = 'something1'
+
     output1 = main_function(input1)
     answer1 = 'something3'
 
@@ -70,7 +75,6 @@ def main():
           \nYour output: {quote_placeholder * (type(output3) == str)}{output3}{quote_placeholder * (type(output3) == str)}\
           \nExpected output: {answer3}\n")
     
-    x = 1
 
 
 
@@ -80,6 +84,12 @@ def main():
     # iterate over them and encode them
     # iterate over the file with the solutions, and compare each list item to the correct solution
     # if all 5 cases are solved correctly, call a function in 'question_tester.py' that will change the save file to show that the answer was solved correctly
+
+
+
+
+
+
 
     directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -101,10 +111,6 @@ def main():
     output = urllib.request.urlopen(url)
 
     print(f"output: {output}")
-
-
-
-    pass
 
 
 

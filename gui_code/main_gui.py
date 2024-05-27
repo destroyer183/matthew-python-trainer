@@ -421,7 +421,7 @@ class ButtonList():
 
         header_y = 75
 
-        self.gui.question_title = tk.Label(self.gui.parent, text = question.title, anchor = 'center', bg = 'ivory4', fg = 'white')
+        self.gui.question_title = tk.Label(self.gui.parent, text = question.question_data['title'], anchor = 'center', bg = 'ivory4', fg = 'white')
         self.gui.question_title.configure(font=('Cascadia Code', 25))
         self.gui.parent.update()
         self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = header_y, height = self.gui.question_title.winfo_reqheight() + 4, anchor = 'w')
@@ -456,7 +456,7 @@ class ButtonList():
         
         description_y = 150
 
-        self.gui.question_description = tk.Label(self.gui.parent, text = question.description, anchor = 'center', wraplength = 550, justify = CENTER, bg = 'ivory4', fg = 'white')
+        self.gui.question_description = tk.Label(self.gui.parent, text = question.question_data['description'], anchor = 'center', wraplength = 550, justify = CENTER, bg = 'ivory4', fg = 'white')
         self.gui.question_description.configure(font=('Cascadia Code', 14))
         self.gui.parent.update()
         self.gui.question_description.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_description.winfo_reqwidth() / 2, y = description_y)

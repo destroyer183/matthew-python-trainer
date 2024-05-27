@@ -1,27 +1,26 @@
 import json
 
-temp = []
-formatted = []
+def function(*args):
 
-with open('testing.txt', 'r') as f:
+    for item in args:
+        print(f"item: {item}")
 
-    for line in f:
+f = open('testing.json')
 
-        line = line.strip()
+data = json.load(f)
 
-        temp.append(line)
+print(f"old data: {data}\n")
+
+for test_case in data['test cases']:
+
+    
+    test_case['input'] = tuple(test_case['input'])
+
+    function(*test_case['input'])
+
+    print(f"new test case: {test_case['input']}\n")
 
 
-
-for data in temp:
-
-    print(f"old data: {data}\ntype: {type(data)}\n")
-
-    data = json.loads(data)
-
-    formatted.append(data)
+print(f"new data: {data}\n")
 
 
-for data in formatted:
-
-    print(f"new data: {data}")

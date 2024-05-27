@@ -1,2 +1,0 @@
-{"hello": 34, "new": "idk", "bool": True}
-[1, 2, False, "hello"]
