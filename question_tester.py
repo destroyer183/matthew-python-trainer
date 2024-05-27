@@ -547,27 +547,33 @@ class Question(QuestionGroup):
 
     def test_question(self):
 
-        # get test cases, and put them in a tuple within a tuple within an array
+        # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
 
-        # get answers, and put them in a tuple that is in the tuple that contains the test cases
-
-        # iterate over the array, calling the main function within the question file, and store each output in another array
-
+        # iterate over the array of test cases, calling the main function within the question file, and store each output in another array
         # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
 
         # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
-        # add the outputs to the tuples that contain the expected answers, and also add a boolean that represents whether or not the answer was correct
-        # format for this array will look like this:
-        # evaluation_data = [((argument_1, argument_2, argument_3), (expected_answer, output, is_answer_correct)), ((arg_1, arg_2, arg_3), (expected_ans, output, is_correct))]
+        # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
+        # format for this dictionary will look like this:
+        # evaluation_data = [
+        #   {
+        #       "input": (argument_1, argument_2, argument_3), 
+        #       "answer": expected_answer, 
+        #       "output": 'code output',
+        #       "correct": 'bool'
+        #   }, 
+        #   {
+        #       "input": (argument_1, argument_2, argument_3), 
+        #       "answer": expected_answer, 
+        #       "output": 'code output', 
+        #       "correct": 'bool'
+        #   }
+        # ]
 
         # pass all information to a function in 'main_gui.py' that will display the test case results
 
         # call function in 'QuestionTester' to update the save file if 'self.completed' is 'None' or if the user passed the question
         # if the user passed the question, then iterate over the directories above the question and update their data
-
-        # 
-
-
 
 
 
