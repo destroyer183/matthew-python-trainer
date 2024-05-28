@@ -1,2 +1,0 @@
-Percentage
-Write a function that takes in a number and a percentage and returns the percentage of that number.

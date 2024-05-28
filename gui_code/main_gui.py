@@ -65,7 +65,7 @@ class Gui(question_tester.QuestionTester):
         self.canvas = tk.Canvas(self.parent, width = self.parent.winfo_width(), height = self.parent.winfo_height(), background = 'dimgrey', highlightthickness = 0)
         self.canvas.pack(fill = BOTH)
 
-        self.settings_image = Image.open(f"{question_tester.parent}\\assets\\settings.png")
+        self.settings_image = Image.open(f"{question_tester.subdirectory}\\assets\\settings.png")
         self.settings_image = self.settings_image.resize((40, 40))
         self.settings_image = ImageTk.PhotoImage(self.settings_image)
 
@@ -363,6 +363,8 @@ class ButtonList():
 
     def back_directory(self):
 
+        self.gui.master.print_data()
+
         self.make_back_button('delete')
         
         try:
@@ -387,7 +389,7 @@ class ButtonList():
 
         if config == 'add':
 
-            self.back_image = Image.open(f"{question_tester.parent}\\assets\\back button.png")
+            self.back_image = Image.open(f"{question_tester.subdirectory}\\assets\\back button.png")
             self.back_image = self.back_image.resize((40, 40))
             self.back_image = ImageTk.PhotoImage(self.back_image)
 

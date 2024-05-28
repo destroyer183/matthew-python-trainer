@@ -2,16 +2,16 @@ import os
 import sys
 import urllib.request
 
-current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics-1-0
-parent = os.path.dirname(current) # go up one directory level - Basics
-parent = os.path.dirname(parent) # go up another directory level - Introduction
-parent = os.path.dirname(parent) # go up another directory level - user_code
-parent = os.path.dirname(parent) # go up another directory level - account_template
-parent = os.path.dirname(parent) # go up another directory level - accounts
-parent = os.path.dirname(parent) # go up another directory level - gui_code
-parent = os.path.dirname(parent) # go up another directory level - codehs_python_practice_problems
-sys.path.append(parent) # set current directory
-import question_tester
+# current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics-1-0
+# parent = os.path.dirname(current) # go up one directory level - Basics
+# parent = os.path.dirname(parent) # go up another directory level - Introduction
+# parent = os.path.dirname(parent) # go up another directory level - user_code
+# parent = os.path.dirname(parent) # go up another directory level - account_template
+# parent = os.path.dirname(parent) # go up another directory level - accounts
+# parent = os.path.dirname(parent) # go up another directory level - gui_code
+# parent = os.path.dirname(parent) # go up another directory level - codehs_python_practice_problems
+# sys.path.append(parent) # set current directory
+# import question_tester
 
 
 '''

@@ -1,2 +1,0 @@
-Divisible By Value
-Write a function that takes in two integers. The function will check if the first integer is divisible by the second integer and return a boolean.

@@ -1,2 +1,0 @@
-Divisible By 10?
-Write a function that takes in a number and checks if the number is divisible by 10. The function should return a boolean.

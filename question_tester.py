@@ -18,19 +18,17 @@ import json
 # import main_gui
 
 current = os.path.dirname(os.path.realpath(__file__)) # get current directory
-parent = current + '\\gui_code'
-print(f"directory: {parent}")
+subdirectory = current + '\\gui_code'
+print(f"directory: {subdirectory}")
 
 # back_button = tk.PhotoImage(file = f"{parent}\\assets\\back button.png")
 # settings_button = tk.PhotoImage(file = f"{parent}\\assets\\settings.png")
 
 # parent = os.path.dirname(current) # go up one directory level
-sys.path.append(parent) # set current directory
+sys.path.append(subdirectory) # set current directory
 # from gui_code import main_gui
 login_gui = importlib.import_module('login_gui')
 # main_gui = importlib.import_module('main_gui')
-
-
 
 class DifficultyLevel(enum.Enum):
     Level0 = 0
@@ -54,25 +52,41 @@ app = FastAPI()
 @app.get('/')
 async def root():
 
+    print('Hello World!')
+
     return {'Hello': 'World'}
 
+app.user_input = {}
+
+@app.get('/items/{account_name}')
+def read_item(account_name: str, level: str, group: str, question: str): 
+    # global input, test_variable
+
+    # print(f"test variable: {test_variable}")
+    # test_variable = True
+
+    # test()
 
 
-@app.get('/items/{item_id}')
-def read_item(account_name: str, level: str, group: str, question: str):
+    # thread = threading.Thread(target=verify_request)
+    # thread.start()
 
-    if QuestionTester.account is None:
-        print('\nError handling request: account has not been initialized.\n')
+
+    if app.master.account is None:
+        print('test')
+        # app.master.print_data()
+        print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
         return
 
-    if QuestionTester.account_directory.split('\\')[-1] != account_name:
+    if app.master.account_directory.split('\\')[-1] != account_name:
         print('\nError handling request: account name invalid.\n')
         return
 
-    input = {'account_name': account_name, 'level': level, 'group': group, 'question': question}
 
 
-    print(f"\ndata: {input}\n")
+    app.user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question}
+
+    print(f"\ndata: {app.user_input}\n")
 
 
 
@@ -85,16 +99,25 @@ def read_item(account_name: str, level: str, group: str, question: str):
 
 
 
+    return app.user_input
 
 
 
-    return input
+def verify_request():
 
+    # test()
 
+    # QuestionTester.print_data()
 
-def thread_function():
+    if QuestionTester.account is None:
+        print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
+        return 1
+
+    if QuestionTester.account_directory.split('\\')[-1] != None:
+        print('\nError handling request: account name invalid.\n')
+        return 1
     
-    QuestionTester.instance.gui.parent.mainloop()
+    return 0
 
 
 
@@ -129,6 +152,19 @@ class QuestionTester:
     
 
 
+    @staticmethod
+    def print_data():
+        
+        print(f"\nQuestionTester: {QuestionTester}")
+        print(f"\ninstance: {QuestionTester.instance}")
+        print(f"\naccount directory: {QuestionTester.account_directory}")
+        print(f"\naccount: {QuestionTester.account}")
+        print(f"\nbackup: {QuestionTester.backup}")
+        print(f"\ndirectory tree: {QuestionTester.directory_tree}")
+        print(f"\ncompleted: {QuestionTester.completed}")
+
+
+
     def make_gui(self, gui_type):
 
         main_gui = importlib.import_module('main_gui')
@@ -150,8 +186,10 @@ class QuestionTester:
     @classmethod
     def update_save_file(cls, question: str, correct_solution: bool):
 
+        # make sure to update both the main save file and the backup save file
 
         # figure out how to assign the 'account' class variable to the account file
+
         pass
 
 
@@ -181,7 +219,7 @@ class QuestionTester:
 
 
     @staticmethod
-    def string_to_byte(input = None):
+    def string_to_byte(input: str = None):
 
         print(f"\nconverting string to byte...")
 
@@ -547,13 +585,40 @@ class Question(QuestionGroup):
 
     def test_question(self):
 
+        # import the main function from the code that is being tested
+        sys.path.append(self.directory)
+        import main
+
         # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
 
         # iterate over the array of test cases, calling the main function within the question file, and store each output in another array
         # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
+        for test_case in self.question_data['test cases']:
+
+            test_case['output'] = main.main_function(*test_case['input'])
+
+            test_case['correct'] = (test_case['output'] == test_case['answer'])
+
+
 
         # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
         # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
+        passed_question = True
+
+        for test_case in self.question_data['test cases']:
+
+            if not test_case['correct']:
+
+                passed_question = False
+
+
+        if passed_question:
+            print('you passed the question.')
+
+        else:
+            print('you did not pass the question.')
+
+
         # format for this dictionary will look like this:
         # evaluation_data = [
         #   {
@@ -599,7 +664,7 @@ def main():
 
     QuestionTester.instance.make_gui('login')
 
-
+    app.master = QuestionTester
 
     # run the gui
     QuestionTester.instance.gui.parent.mainloop()

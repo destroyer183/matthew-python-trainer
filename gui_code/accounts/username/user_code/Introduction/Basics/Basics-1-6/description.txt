@@ -1,2 +1,0 @@
-Area of a Triangle
-Write a function that takes two numbers that represent the base and the height of a triangle and returns the area of the triangle.

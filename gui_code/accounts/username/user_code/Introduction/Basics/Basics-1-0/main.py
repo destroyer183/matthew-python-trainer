@@ -2,16 +2,16 @@ import os
 import sys
 import urllib.request
 
-current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics-1-0
-parent = os.path.dirname(current) # go up one directory level - Basics
-parent = os.path.dirname(parent) # go up another directory level - Introduction
-parent = os.path.dirname(parent) # go up another directory level - user_code
-parent = os.path.dirname(parent) # go up another directory level - account_template
-parent = os.path.dirname(parent) # go up another directory level - accounts
-parent = os.path.dirname(parent) # go up another directory level - gui_code
-parent = os.path.dirname(parent) # go up another directory level - codehs_python_practice_problems
-sys.path.append(parent) # set current directory
-import question_tester
+# current = os.path.dirname(os.path.realpath(__file__)) # get current directory - Basics-1-0
+# parent = os.path.dirname(current) # go up one directory level - Basics
+# parent = os.path.dirname(parent) # go up another directory level - Introduction
+# parent = os.path.dirname(parent) # go up another directory level - user_code
+# parent = os.path.dirname(parent) # go up another directory level - account_template
+# parent = os.path.dirname(parent) # go up another directory level - accounts
+# parent = os.path.dirname(parent) # go up another directory level - gui_code
+# parent = os.path.dirname(parent) # go up another directory level - codehs_python_practice_problems
+# sys.path.append(parent) # set current directory
+# import question_tester
 
 
 '''
@@ -45,6 +45,7 @@ def sum(num1, num2):
 
 def main():
 
+    '''
     quote_placeholder = '\"'
 
     # have 3 test cases
@@ -75,7 +76,7 @@ def main():
           \nYour output: {quote_placeholder * (type(output3) == str)}{output3}{quote_placeholder * (type(output3) == str)}\
           \nExpected output: {answer3}\n")
     
-
+    '''
 
 
     # have 5 separate answers stored in an encoded file, use these cases for verification that the question was solved legitimately
@@ -102,15 +103,15 @@ def main():
 
     url = f'http://127.0.0.1:8000/items/{account_name}?level={level}&group={group}&question={question}'
 
-    print(f"directory: {directory}")
+    print(f"directory: {directory}\n")
 
     url = url.replace(' ', '%20')
 
-    print(f"url: {url}")
+    print(f"url: {url}\n")
 
     output = urllib.request.urlopen(url)
 
-    print(f"output: {output}")
+    print(f"output: {output}\n")
 
 
 
