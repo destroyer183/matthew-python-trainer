@@ -47,19 +47,25 @@ class QuestionType(enum.Enum):
 
 
 
+'''
+
+USE 'BEAUTIFUL SOUP' TO GET THE HTML DATA
+
+'''
+
+
+
 app = FastAPI()
 
 @app.get('/')
 async def root():
-
     print('Hello World!')
-
     return {'Hello': 'World'}
 
 app.user_input = {}
 
 @app.get('/items/{account_name}')
-def read_item(account_name: str, level: str, group: str, question: str): 
+async def read_item(account_name: str, level: str, group: str, question: str): 
     # global input, test_variable
 
     # print(f"test variable: {test_variable}")
@@ -67,14 +73,12 @@ def read_item(account_name: str, level: str, group: str, question: str):
 
     # test()
 
-
     # thread = threading.Thread(target=verify_request)
     # thread.start()
 
 
-    if app.master.account is None:
-        print('test')
-        # app.master.print_data()
+    if QuestionTester.account is None:
+        QuestionTester.print_data()
         print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
         return
 
@@ -100,24 +104,6 @@ def read_item(account_name: str, level: str, group: str, question: str):
 
 
     return app.user_input
-
-
-
-def verify_request():
-
-    # test()
-
-    # QuestionTester.print_data()
-
-    if QuestionTester.account is None:
-        print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
-        return 1
-
-    if QuestionTester.account_directory.split('\\')[-1] != None:
-        print('\nError handling request: account name invalid.\n')
-        return 1
-    
-    return 0
 
 
 
@@ -456,7 +442,7 @@ class QuestionTester:
         
 
         # run function that changes the gui and logs into the account
-
+        
         # QuestionTester.make_gui('questions')
 
         print('account sucessfully logged into.')
@@ -663,8 +649,6 @@ def main():
         except:pass 
 
     QuestionTester.instance.make_gui('login')
-
-    app.master = QuestionTester
 
     # run the gui
     QuestionTester.instance.gui.parent.mainloop()
