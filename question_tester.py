@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import *
 from fastapi import FastAPI
-import threading
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import shutil
 import binascii
@@ -9,7 +10,6 @@ import mmap
 import sys
 import enum
 import importlib
-import uvicorn
 import signal
 import json
 # from gui_code import login_gui
@@ -57,12 +57,25 @@ USE 'BEAUTIFUL SOUP' TO GET THE HTML DATA
 
 app = FastAPI()
 
+origins = [
+    'http://localhost:722',
+    'localhost:722',
+    '0.0.0.0:722',
+]
+
+app.add_middleware(GZipMiddleware)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
+
 @app.get('/')
 async def root():
     print('Hello World!')
     return {'Hello': 'World'}
-
-app.user_input = {}
 
 @app.get('/items/{account_name}')
 async def read_item(account_name: str, level: str, group: str, question: str): 
@@ -82,15 +95,15 @@ async def read_item(account_name: str, level: str, group: str, question: str):
         print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
         return
 
-    if app.master.account_directory.split('\\')[-1] != account_name:
+    if QuestionTester.account_directory.split('\\')[-1] != account_name:
         print('\nError handling request: account name invalid.\n')
         return
 
 
 
-    app.user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question}
+    user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question}
 
-    print(f"\ndata: {app.user_input}\n")
+    print(f"\ndata: {user_input}\n")
 
 
 
@@ -99,11 +112,11 @@ async def read_item(account_name: str, level: str, group: str, question: str):
     question_directory = question_directory.content[group]
     question_directory = question_directory.content[question]
 
-    question_directory.test_question()
+    output = question_directory.test_question()
 
 
 
-    return app.user_input
+    return output
 
 
 
@@ -599,10 +612,13 @@ class Question(QuestionGroup):
 
 
         if passed_question:
-            print('you passed the question.')
+            result = '\nYou passed the question.\n'
 
         else:
-            print('you did not pass the question.')
+            result = '\nYou did not pass the question.\n'
+        
+        print(result)
+        return result
 
 
         # format for this dictionary will look like this:
@@ -661,8 +677,12 @@ def main():
 if __name__ == '__main__':
 
     # use threading to run the gui main function separately
+    import threading
+
     main_thread = threading.Thread(target=main)
     main_thread.start()
 
     # start the FastAPI server with uvicorn
-    uvicorn.run('question_tester:app', reload = True)
+    import uvicorn
+
+    uvicorn.run(app)

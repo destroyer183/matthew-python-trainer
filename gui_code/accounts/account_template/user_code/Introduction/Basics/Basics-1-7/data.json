@@ -1,34 +1,26 @@
 {
-    "title": "Sum",
-    "description": "Write a function that takes in two numbers and returns the sum of those two numbers.",
+    "title": "Divisible By Value",
+    "description": "Write a function that takes in two integers. The function will check if the first integer is divisible by the second integer and return a boolean.",
     "test cases": [
         {
-            "input": [1, 3],
-            "answer": 4
+            "input": [10, 5],
+            "answer": true
         },
         {
-            "input": [4, 2],
-            "answer": 6
+            "input": [200, 30],
+            "answer": false
         },
         {
-            "input": [1, -1],
-            "answer": 0
+            "input": [0.5, 2],
+            "answer": false
         },
         {
-            "input": [-2, -3],
-            "answer": -5
+            "input": [3, 6],
+            "answer": false
         },
         {
-            "input": [0.5, 1.5],
-            "answer": 2.0
-        },
-        {
-            "input": [0.5, 1],
-            "answer": 1.5
-        },
-        {
-            "input": [0.5, -0.5],
-            "answer": 0
+            "input": [12, 4],
+            "answer": true
         }
     ]
 }
