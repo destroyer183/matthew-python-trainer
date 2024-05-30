@@ -1,0 +1,34 @@
+{
+    "title": "Percentage",
+    "description": "Write a function that takes in a number and a percentage and returns the percentage of that number.",
+    "test cases": [
+        {
+            "input": [10, 50],
+            "answer": 5.0
+        },
+        {
+            "input": [10, 30],
+            "answer": 3.0
+        },
+        {
+            "input": [10, 20],
+            "answer": 2.0
+        },
+        {
+            "input": [5, 10],
+            "answer": 0.5
+        },
+        {
+            "input": [5, 30],
+            "answer": 1.5
+        },
+        {
+            "input": [5, 20],
+            "answer": 1.0
+        },
+        {
+            "input": [7, 25],
+            "answer": 1.75
+        }
+    ]
+}

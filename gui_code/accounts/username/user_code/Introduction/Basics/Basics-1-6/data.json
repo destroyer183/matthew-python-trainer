@@ -1,0 +1,38 @@
+{
+    "title": "Area of a Triangle",
+    "description": "Write a function that takes two numbers that represent the base and the height of a triangle and returns the area of the triangle.",
+    "test cases": [
+        {
+            "input": [1, 5],
+            "answer": 2.5
+        },
+        {
+            "input": [10, 30],
+            "answer": 150.0
+        },
+        {
+            "input": [1, 2],
+            "answer": 1.0
+        },
+        {
+            "input": [5, 10],
+            "answer": 25.0
+        },
+        {
+            "input": [5, 3],
+            "answer": 7.5
+        },
+        {
+            "input": [5, 0.5],
+            "answer": 1.25
+        },
+        {
+            "input": [7, 25],
+            "answer": 87.5
+        },
+        {
+            "input": [3, 14],
+            "answer": 21.0
+        }
+    ]
+}

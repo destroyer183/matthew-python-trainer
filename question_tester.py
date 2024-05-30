@@ -79,20 +79,10 @@ async def root():
 
 @app.get('/items/{account_name}')
 async def read_item(account_name: str, level: str, group: str, question: str): 
-    # global input, test_variable
-
-    # print(f"test variable: {test_variable}")
-    # test_variable = True
-
-    # test()
-
-    # thread = threading.Thread(target=verify_request)
-    # thread.start()
-
 
     if QuestionTester.account is None:
         QuestionTester.print_data()
-        print(f"\nError handling request: account has not been initialized.\nQuestionTester.account: {QuestionTester.account}\nDirectory: {QuestionTester.directory_tree}\n")
+        print(f"\nError handling request: account has not been initialized.\n")
         return
 
     if QuestionTester.account_directory.split('\\')[-1] != account_name:
@@ -149,19 +139,6 @@ class QuestionTester:
 
         self.gui = login_gui.Gui(gui, QuestionTester)
     
-
-
-    @staticmethod
-    def print_data():
-        
-        print(f"\nQuestionTester: {QuestionTester}")
-        print(f"\ninstance: {QuestionTester.instance}")
-        print(f"\naccount directory: {QuestionTester.account_directory}")
-        print(f"\naccount: {QuestionTester.account}")
-        print(f"\nbackup: {QuestionTester.backup}")
-        print(f"\ndirectory tree: {QuestionTester.directory_tree}")
-        print(f"\ncompleted: {QuestionTester.completed}")
-
 
 
     def make_gui(self, gui_type):
@@ -426,7 +403,7 @@ class QuestionTester:
             QuestionTester.directory_tree = None
             QuestionTester.completed = 0
 
-            # continue past code to avoid logging into account
+            # skip the rest of the code to avoid logging into account
             return
         
         QuestionTester.account.seek(0)
@@ -449,7 +426,7 @@ class QuestionTester:
             QuestionTester.directory_tree = None
             QuestionTester.completed = 0
 
-            # continue past code to avoid logging into account
+            # sip the rest of the code to avoid logging into account
             return
         
         

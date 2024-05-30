@@ -57,7 +57,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.title('Python Practice')
 
-        self.parent.geometry('700x550')
+        self.parent.geometry('750x600')
         self.parent.update()
 
         self.parent.configure(background = 'dimgrey')
@@ -73,7 +73,7 @@ class Gui(question_tester.QuestionTester):
         # button to access account settings (log out, clear save data, etc.)
         self.settings_button = tk.Button(self.parent, image = self.settings_image, anchor = 'center', command = lambda:self.account_settings())
         self.settings_button.configure(bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
-        self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
+        self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8 + 75 + 19, width = 40, height = 40, anchor = 'ne')
 
 
 
@@ -91,6 +91,7 @@ class Gui(question_tester.QuestionTester):
 class ButtonList():
 
     displayed_buttons = {}
+    header = {}
 
     def __init__(self, gui) -> None:
 
@@ -99,10 +100,8 @@ class ButtonList():
 
         self.gui.parent.bind('<Button-1>', self.change_directory)
         
-        self.initial_y = 50
+        self.initial_y = 100
         self.current_y = self.initial_y
-
-        # Gui.current_directory = ['Introduction']
 
         for subdirectory in Gui.current_directory:
             self.directory = self.directory[subdirectory].content
@@ -123,6 +122,14 @@ class ButtonList():
             except:pass
                 
         ButtonList.displayed_buttons = {}
+
+
+
+
+        self.create_header()
+
+
+
 
         # create variable for x offset
         if len(self.items) > 5:
@@ -217,12 +224,13 @@ class ButtonList():
 
 
 
+        # add 'back' button
         try: 
             self.make_back_button('delete')
             self.make_back_button()
         except: self.make_back_button()
 
-        # add 'back' button
+        # remove 'back' button if the user is on the uppermost folder
         if type([x for x in self.directory.values()][0]) == question_tester.DifficultyGroup:
             
             self.make_back_button('delete')
@@ -233,6 +241,12 @@ class ButtonList():
         if type([x for x in self.directory.values()][0]) == question_tester.Question:
             return
         
+        self.align_buttons()
+
+
+
+    def align_buttons(self):
+
         # take all the buttons, find the largest, and fit every other button to be the same length.
         largest_button = {}
         other_buttons = []
@@ -322,6 +336,30 @@ class ButtonList():
             except:pass
 
 
+
+    def create_header(self, is_question = False):
+
+
+        try: header_text = Gui.current_directory[-1]
+        except: header_text = 'Overview'
+
+        # load header text - load differently when displaying for a question
+        if is_question:
+            question = self.directory[Gui.current_directory[-1]]
+            header_text = question.question_data['title']
+
+        try:
+            self.gui.question_title.place_forget()
+            self.gui.canvas.delete(self.gui.header_bg)
+        except: pass
+
+        self.gui.header_bg = self.gui.canvas.create_rectangle(-20, -20, self.gui.parent.winfo_width() + 40, 75 + 20, fill = 'gray30', outline = 'black', width = 5)
+
+        self.gui.question_title = tk.Label(self.gui.parent, text = header_text, anchor = 'center', bg = 'gray30', fg = 'white')
+        self.gui.question_title.configure(font=('Cascadia Code', 30))
+        self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = 45, height = self.gui.question_title.winfo_reqheight() + 4, anchor = 'w')
+
+
         
     def change_directory(self, event):
 
@@ -361,9 +399,8 @@ class ButtonList():
         self.gui.current_buttons = ButtonList(self.gui)
 
 
-    def back_directory(self):
 
-        self.gui.master.print_data()
+    def back_directory(self):
 
         self.make_back_button('delete')
         
@@ -395,7 +432,7 @@ class ButtonList():
 
             self.gui.back_button = tk.Button(self.gui.parent, image = self.back_image, anchor = 'center', command = lambda:self.back_directory())
             self.gui.back_button.configure(bg = 'dimgrey', bd = 0, activebackground = 'dimgrey', activeforeground = 'dimgrey')
-            self.gui.back_button.place(x = 5, y = 8, width = 40, height = 40)
+            self.gui.back_button.place(x = 5, y = 8 + 75 + 19, width = 40, height = 40)
 
         elif config == 'delete':
 
@@ -406,6 +443,28 @@ class ButtonList():
 
     # function to display the information of a question
     def question_display(self):
+
+
+
+
+
+
+        '''
+        
+        use a permanent header at the top like in the unit 2 summative - Done
+
+        put subcategories below that for the description, test cases, and other stuff - maybe put this at the bottom with the button to begin
+
+        instead of putting the description inside a colored box, just put it right on the background, and make it scrollable
+
+        enlarge the window - Done
+        
+        '''
+
+
+
+
+
 
         # remove all previous buttons
         for button in ButtonList.displayed_buttons.values():
@@ -421,45 +480,12 @@ class ButtonList():
 
         question = self.directory[Gui.current_directory[-1]]
 
-        header_y = 75
-
-        self.gui.question_title = tk.Label(self.gui.parent, text = question.question_data['title'], anchor = 'center', bg = 'ivory4', fg = 'white')
-        self.gui.question_title.configure(font=('Cascadia Code', 25))
-        self.gui.parent.update()
-        self.gui.question_title.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_title.winfo_reqwidth() / 2, y = header_y, height = self.gui.question_title.winfo_reqheight() + 4, anchor = 'w')
-
-        bg_circle_radius = (self.gui.question_title.winfo_reqheight() + 5) / 2 - 1
-        bg_rect_height = (self.gui.question_title.winfo_reqheight() + 4) / 2
-
-        print(f"bg circle radius: {bg_circle_radius}")
-
-
-        self.gui.parent.update()
-
-        self.header_container = {}
-
-        self.header_container['bg rect'] = self.gui.canvas.create_rectangle(
-            self.gui.question_title.winfo_x(), header_y - bg_rect_height,
-            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth(), header_y + bg_rect_height,
-            fill = 'ivory4', outline = ''
-        )
-
-        self.header_container['left circle'] = self.gui.canvas.create_oval(
-            self.gui.question_title.winfo_x() - bg_circle_radius - 1, header_y - bg_circle_radius - 1, 
-            self.gui.question_title.winfo_x() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
-            fill = 'ivory4', outline = ''
-        )
-
-        self.header_container['right circle'] = self.gui.canvas.create_oval(
-            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() - bg_circle_radius  -1, header_y - bg_circle_radius - 1, 
-            self.gui.question_title.winfo_x() + self.gui.question_title.winfo_reqwidth() + bg_circle_radius - 1, header_y + bg_circle_radius - 1, 
-            fill = 'ivory4', outline = ''
-        )
+        self.create_header(True)
         
         description_y = 150
 
         self.gui.question_description = tk.Label(self.gui.parent, text = question.question_data['description'], anchor = 'center', wraplength = 550, justify = CENTER, bg = 'ivory4', fg = 'white')
-        self.gui.question_description.configure(font=('Cascadia Code', 14))
+        self.gui.question_description.configure(font=('Cascadia Code', 18))
         self.gui.parent.update()
         self.gui.question_description.place(x = self.gui.parent.winfo_width() / 2 - self.gui.question_description.winfo_reqwidth() / 2, y = description_y)
 
@@ -549,17 +575,26 @@ class ButtonList():
 
     def begin_question(self, question):
 
-        command = f"code \"{question.directory}\\main.py\""
+        # set command to open directory in vscode
+        command = f"code \"{question.directory}\""
 
+        # run command 
         return_code = os.system(command)
 
-        # navigate to the directory
-        # run 'code main.py' in the directory - this will open up the correct file in vscode
+        # print out the return code
+        print(f"return code: {return_code}")
+
+        # set command to open python file in new vscode window
+        command = f"code \"{question.directory}\\main.py\""
+
+        # run command
+        return_code = os.system(command)
+
+        # print out the return code
         print(f"return code: {return_code}")
 
 
 
-        # figure out how to call a function inside an already running gui with a separate file
 
 
 
