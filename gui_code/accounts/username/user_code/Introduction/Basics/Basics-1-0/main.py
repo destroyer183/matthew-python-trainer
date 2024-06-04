@@ -1,16 +1,9 @@
-import os
-import urllib.request
 
 
-'''
-
-Write a function that takes in two numbers and returns the sum of those two numbers.
-
-'''
-
+# leave this alone, it will break stuff if you change it
 def main_function(*variables):
-    
-    return sum(variables[0], variables[1])
+    return sum(*variables)
+
 
 
 def sum(num1, num2):
@@ -40,6 +33,21 @@ def main():
     request_question_test()
 
 
+
+
+
+
+
+import os
+import urllib.request
+from bs4 import BeautifulSoup
+import requests
+import json
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    test_output: list
+
 # don't touch this stuff, it'll break lots of other things if you change this code
 def request_question_test():
 
@@ -52,17 +60,50 @@ def request_question_test():
     group        = directory[-2]
     question     = directory[-1]
 
-    url = f'http://127.0.0.1:8000/items/{account_name}?level={level}&group={group}&question={question}'
+    # url = f"http://127.0.0.1:8000/get_tests/{account_name}?level={level}&group={group}&question={question}"
+    url = f"http://127.0.0.1:8000/get_tests/{account_name}"
 
-    print(f"directory: {directory}")
+    params = {'level': level, 'group': group, 'question': question}
 
-    url = url.replace(' ', '%20')
+    response = requests.post(url, params=params)
 
-    print(f"url: {url}")
+    data = response.json()
+
+    print(f"data: {data}\ntype: {type(data)}")
+
+    test_outputs = []
+
+    for test_case in data:
+
+        test_outputs.append(main_function(*test_case))
+
+    Item.test_output = test_outputs
+
+    url = f"http://127.0.0.1:8000/give_outputs/{account_name}?level={level}&group={group}&question={question}&outputs={Item}"
+
+    url = url.replace(' ', '')
 
     output = urllib.request.urlopen(url)
 
-    print(f"output: {output}")
+    soup = BeautifulSoup(output, 'html.parser')
+
+    print(f"output: {soup}\ntype: {type(soup)}")
+
+    # soup = BeautifulSoup(response.text, 'html.parser')
+
+    # print(f"soup: {soup}, type: {type(soup)}")
+
+    # print(f"output: {response.text}\ntype: {type(response.text)}")
+
+    # print(f"directory: {directory}")
+
+
+    # print(f"url: {url}")
+
+
+
+    
+
 
 
 

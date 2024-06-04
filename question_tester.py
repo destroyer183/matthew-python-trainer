@@ -3,6 +3,9 @@ from tkinter import *
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 import os
 import shutil
 import binascii
@@ -72,13 +75,22 @@ app.add_middleware(
     allow_headers=['*']
 )
 
+
+
+class Item(BaseModel):
+    test_output: list
+
+
+
 @app.get('/')
 async def root():
     print('Hello World!')
     return {'Hello': 'World'}
 
-@app.get('/items/{account_name}')
-async def read_item(account_name: str, level: str, group: str, question: str): 
+
+
+@app.post('/get_tests/{account_name}')
+async def give_tests(account_name: str, level: str, group: str, question: str): 
 
     if QuestionTester.account is None:
         QuestionTester.print_data()
@@ -102,11 +114,49 @@ async def read_item(account_name: str, level: str, group: str, question: str):
     question_directory = question_directory.content[group]
     question_directory = question_directory.content[question]
 
-    output = question_directory.test_question()
+    test_cases = [test['input'] for test in question_directory.question_data['test cases']]
+
+    # output = question_directory.test_question()
+
+    json_compatible_data = jsonable_encoder(test_cases)
+
+    return JSONResponse(content = json_compatible_data)
 
 
+
+@app.get('/give_outputs/{account_name}')
+async def recieve_outputs(account_name: str, level: str, group: str, question: str, outputs: Item):
+
+
+    if QuestionTester.account is None:
+        QuestionTester.print_data()
+        print(f"\nError handling request: account has not been initialized.\n")
+        return
+
+    if QuestionTester.account_directory.split('\\')[-1] != account_name:
+        print('\nError handling request: account name invalid.\n')
+        return
+
+    user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question, 'outputs': outputs.test_output}
+
+    print(f"\ndata: {user_input}\n")
+
+    # call function in QuestionTester class and pass it the directory of the file to test
+    question_directory = QuestionTester.directory_tree[level]
+    question_directory = question_directory.content[group]
+    question_directory = question_directory.content[question]
+
+
+
+    output = question_directory.test_question2(outputs.test_outputs)
 
     return output
+
+
+
+
+
+
 
 
 
@@ -559,11 +609,46 @@ class Question(QuestionGroup):
 
 
 
+    def test_question2(self, input):
+
+        for index in range(len(self.question_data['test cases'])):
+
+            self.question_data['test cases'][index]['output'] = input[index]
+
+            self.question_data['test cases'][index]['correct'] = (self.question_data['test cases'][index]['output'] == self.question_data['test cases'][index]['answer'])
+
+        print(f"test case output: {self.question_data['test cases']}")
+
+        # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
+        # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
+        passed_question = True
+
+        for test_case in self.question_data['test cases']:
+
+            if not test_case['correct']:
+
+                passed_question = False
+
+
+        if passed_question:
+            result = '\nYou passed the question.\n'
+
+        else:
+            result = '\nYou did not pass the question.\n'
+        
+        print(result)
+        return result
+
+
+
+
+
     def test_question(self):
 
         # import the main function from the code that is being tested
         sys.path.append(self.directory)
         import main
+        sys.path.pop()
 
         # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
 
@@ -574,6 +659,10 @@ class Question(QuestionGroup):
             test_case['output'] = main.main_function(*test_case['input'])
 
             test_case['correct'] = (test_case['output'] == test_case['answer'])
+
+
+
+        print(f"\ntest case output: {self.question_data['test cases']}")
 
 
 

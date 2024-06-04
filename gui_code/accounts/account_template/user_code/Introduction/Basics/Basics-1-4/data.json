@@ -1,6 +1,6 @@
 {
     "title": "Hours to Seconds",
-    "description": "Write a function that takes in a number that represents hours and converts it to seconds. The function should return the number of seconds.",
+    "description": "Write a function that takes in a number that represents hours and converts it to seconds.\n\nThe function should return the number of seconds.",
     "test cases": [
         {
             "input": [1],

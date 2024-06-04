@@ -153,12 +153,24 @@ class Gui(question_tester.QuestionTester):
     def back_directory(self):
 
         try:
-            self.question_description.place_forget()
+            self.menu_bar_frame.place_forget()
             self.description_button.place_forget()
             self.test_cases_button.place_forget()
-            self.menu_bar_frame.place_forget()
+            self.parent.unbind_all('<MouseWheel>')
+            self.parent.unbind('<Up>')
+            self.parent.unbind('<Down>')
+        except:print('fuck1')
+
+        try:
             self.description_frame.place_forget()
-        except:pass
+            self.question_description.place_forget()
+            self.begin_button.place_forget()
+        except:print('fuck2')
+
+        try:
+            # try to remove test cases display stuff heredxex
+            pass
+        except:print('fuck3')
 
         Gui.current_directory.pop()
 
@@ -200,6 +212,10 @@ class Gui(question_tester.QuestionTester):
 
         # bind scroll wheel and arrow keys
         self.parent.bind_all('<MouseWheel>', self.scroll_question_data)
+        self.parent.bind('<Up>', self.scroll_question_data)
+        self.parent.bind('<Down>', self.scroll_question_data)
+
+
 
 
         # remove all previous buttons
@@ -214,6 +230,10 @@ class Gui(question_tester.QuestionTester):
                 
         ButtonList.displayed_buttons = {}
 
+        self.description_displayed = False
+
+        self.description_display(question)
+
         self.create_header(question.question_data['title'])
 
         self.menu_height = 80
@@ -221,29 +241,26 @@ class Gui(question_tester.QuestionTester):
         self.menu_bar_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), height = self.menu_height)
         self.menu_bar_frame.place(x = 0, y = self.parent.winfo_height() - self.menu_height)
 
-        self.description_button = tk.Button(self.menu_bar_frame, text = 'Description', anchor = 'center', bg = 'gray25', fg = 'white', command = lambda:self.description_display())
+        self.description_button = tk.Button(self.menu_bar_frame, text = 'Description', anchor = 'center', bg = 'gray25', fg = 'white', command = lambda:self.description_display(question))
         self.description_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
         self.description_button.place(x = 0, y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height)
 
-        self.test_cases_button = tk.Button(self.menu_bar_frame, text = 'Test Cases', anchor = 'center', bg = 'gray30', fg = 'white', command = lambda:self.test_cases_display())
+        self.test_cases_button = tk.Button(self.menu_bar_frame, text = 'Test Cases', anchor = 'center', bg = 'gray30', fg = 'white', command = lambda:self.test_cases_display(question))
         self.test_cases_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
         self.test_cases_button.place(x = self.parent.winfo_width(), y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height, anchor = 'ne')
 
-        self.description_displayed = False
 
-        self.description_display(question)
-
-
-        
 
     def description_display(self, question):
 
-        if self.description_displayed: pass
+        if self.description_displayed: return
 
         self.description_displayed = True
 
-        self.description_button.configure(bg = 'gray25')
-        self.test_cases_button.configure(bg = 'gray30')
+        try:
+            self.description_button.configure(bg = 'gray25')
+            self.test_cases_button.configure(bg = 'gray30')
+        except:pass
 
 
 
@@ -257,49 +274,27 @@ class Gui(question_tester.QuestionTester):
 
         self.description_frame.place(x = 0, y = self.header_height, height = self.question_description.winfo_reqheight() + 125)
 
-        # maybe create a canvas here to put the circles on the sides of the button?
-        # self.description_canvas = tk.Canvas(self.parent, width = self.parent.winfo_width(), height = self.description_frame.winfo_height(), background = 'dimgrey', highlightthickness = 0)
-        # self.description_canvas.pack(fill = BOTH)
-
         self.question_description.place(x = 20, y = 20)
 
         # button to begin
         description_height = self.question_description.winfo_reqheight()
         self.begin_button = tk.Button(self.description_frame, text = 'Begin', anchor = 'center', command = lambda:self.begin_question(question))
-        self.begin_button.configure(font=('Cascadia Code', 18), bg = 'gray30', fg = 'white', bd = 0, activebackground = 'white', activeforeground = 'gray30', relief = RIDGE)
+        self.begin_button.configure(font=('Cascadia Code', 18), bg = 'gray30', fg = 'white', bd = 2, activebackground = 'white', activeforeground = 'gray30', relief = RIDGE)
         self.parent.update()
         self.begin_button.place(x = self.parent.winfo_width() / 2 - self.begin_button.winfo_reqwidth() / 2, y = description_height + 75, height = 38 + 9, anchor = 'w')
 
 
-        
 
+    def scroll_question_data(self, event = None):
 
-        # begin_button_height = 37
-        # bg_circle_radius = (begin_button_height + 10) / 2 - 1
+        print(f"input detected: {event}")
 
-        # test = self.description_canvas.create_rectangle(
-        #     0, 0,
-        #     50, 50,
-        #     fill = 'black'
-        # )
-
-        # self.button_circle_left = self.description_canvas.create_oval(
-        #     self.begin_button.winfo_x() - 25 - bg_circle_radius, description_height + 75 - bg_circle_radius, 
-        #     self.begin_button.winfo_x() - 25 + bg_circle_radius, description_height + 75 + bg_circle_radius, 
-        #     fill = 'ivory4', outline = ''
-        # )
-
-        # self.button_circle_right = self.description_canvas.create_oval(
-        #     self.begin_button.winfo_x() + self.begin_button.winfo_reqwidth() - bg_circle_radius, description_height + 75 - bg_circle_radius, 
-        #     self.begin_button.winfo_x() + self.begin_button.winfo_reqwidth() + bg_circle_radius, description_height + 75 + bg_circle_radius, 
-        #     fill = 'ivory4', outline = ''
-        # )
-
-
-
-    def scroll_question_data(self, event = None, is_up_arrow = None):
-
-        print('scroll detected')
+        try:
+            print(f"{event.keysym} arrow key detected\n")
+            scroll_wheel = False
+        except:
+            print('scrol detected\n')
+            scroll_wheel = True
 
         if self.description_displayed:
             data_frame = self.description_frame
@@ -308,13 +303,13 @@ class Gui(question_tester.QuestionTester):
             data_frame = self.test_cases_frame
 
         # scroll wheel was used
-        if is_up_arrow is None:
+        if scroll_wheel:
 
             # check if the data frame is small enough that it doesn't need to be scrolled
             if data_frame.winfo_height() <= self.parent.winfo_height() - self.header_height - self.menu_height:
                 return
             
-            movement_distance = (event.delta/30)
+            movement_distance = (event.delta/12)
 
             # check if the data frame can be moved in the direction the user wants to move it
             if (movement_distance > 0 and data_frame.winfo_y() == self.header_height) or (
@@ -341,27 +336,45 @@ class Gui(question_tester.QuestionTester):
                     data_frame.place(x = data_frame.winfo_x(), y = data_frame.winfo_y() + movement_distance)
 
 
+        else:
 
-        self.header_frame.place(x = 0, y = 0)
-        self.question_title.place(relx = 0.5, y = 45, anchor = CENTER)
-        self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
+            # check if the data frame is small enough that it doesn't need to be scrolled
+            if data_frame.winfo_height() <= self.parent.winfo_height() - self.header_height - self.menu_height:
+                return
+            
+            movement_distance = (-10 * (event.keysym == 'Down')) + (10 * (event.keysym == 'Up'))
 
-        self.menu_bar_frame.place(x = 0, y = self.parent.winfo_height() - self.menu_height)
-        self.description_button.place(x = 0, y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height)
-        self.test_cases_button.place(x = self.parent.winfo_width(), y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height, anchor = 'ne')
+            print(f"movement distance: {movement_distance}")
+
+            # check if the data frame can be moved in the direction the user wants to move it
+            if (movement_distance > 0 and data_frame.winfo_y() == self.header_height) or (
+                movement_distance < 0 and data_frame.winfo_y() + data_frame.winfo_height() == self.menu_bar_frame.winfo_y()):
+                return
+            
 
 
+            bottom_location = data_frame.winfo_y() + data_frame.winfo_height()
+            bottom_distance = self.menu_bar_frame.winfo_y() - bottom_location
+            top_location = data_frame.winfo_y()
+            top_distance = self.header_height - top_location
 
+            if movement_distance > 0:
+                if movement_distance > top_distance: 
+                    data_frame.place(x = data_frame.winfo_x(), y = data_frame.winfo_y() + top_distance)
+                else:
+                    data_frame.place(x = data_frame.winfo_x(), y = data_frame.winfo_y() + movement_distance)
 
-
-
-
-
+            else:
+                if movement_distance < bottom_distance:
+                    data_frame.place(x = data_frame.winfo_x(), y = data_frame.winfo_y() + bottom_distance)
+                else:
+                    data_frame.place(x = data_frame.winfo_x(), y = data_frame.winfo_y() + movement_distance)
         
 
-    def test_cases_display(self):
 
-        if not self.description_displayed: pass
+    def test_cases_display(self, question):
+
+        if not self.description_displayed: return
 
         self.description_displayed = False
 
@@ -371,8 +384,8 @@ class Gui(question_tester.QuestionTester):
         # put button to test code if no test cases are detected
 
         # otherwise, 
-        self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'dimgrey')
-        self.test_cases_frame.place(x = 0, y = self.header_height, height = 500)
+        # self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'dimgrey')
+        # self.test_cases_frame.place(x = 0, y = self.header_height, height = 500)
         
 
 

@@ -2,20 +2,16 @@ import os
 import urllib.request
 
 
-'''
 
-Write a function that takes in two numbers and returns the sum of those two numbers.
-
-'''
-
+# leave this alone, it will break stuff if you change it
 def main_function(*variables):
-    
-    return sum(variables[0], variables[1])
+    return divisible(*variables)
 
 
-def sum(num1, num2):
 
-    return num1 + num2
+def divisible(num, divisor):
+
+    pass
 
 
 

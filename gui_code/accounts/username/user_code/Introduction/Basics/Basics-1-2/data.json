@@ -1,6 +1,6 @@
 {
     "title": "Odd Man Out",
-    "description": "Write a function that takes in a number of people and a number of groups. The people will be split up into the groups evenly (there might be left over people). Return the number of people that are left over after creating the even groups.",
+    "description": "Write a function that takes in a number of people and a number of groups. The people will be split up into the groups evenly (there might be left over people).\n\nReturn the number of people that are left over after creating the even groups.",
     "test cases": [
         {
             "input": [10, 5],
