@@ -77,7 +77,7 @@ app.add_middleware(
 
 
 
-class Item(BaseModel):
+class TestOutput(BaseModel):
     test_output: list
 
 
@@ -89,7 +89,7 @@ async def root():
 
 
 
-@app.post('/get_tests/{account_name}')
+@app.get('/get_tests/{account_name}')
 async def give_tests(account_name: str, level: str, group: str, question: str): 
 
     if QuestionTester.account is None:
@@ -124,8 +124,8 @@ async def give_tests(account_name: str, level: str, group: str, question: str):
 
 
 
-@app.get('/give_outputs/{account_name}')
-async def recieve_outputs(account_name: str, level: str, group: str, question: str, outputs: Item):
+@app.post('/give_outputs/{account_name}')
+async def recieve_outputs(account_name: str, level: str, group: str, question: str, test_output: TestOutput):
 
 
     if QuestionTester.account is None:
@@ -137,7 +137,7 @@ async def recieve_outputs(account_name: str, level: str, group: str, question: s
         print('\nError handling request: account name invalid.\n')
         return
 
-    user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question, 'outputs': outputs.test_output}
+    user_input = {'account_name': account_name, 'level': level, 'group': group, 'question': question, 'outputs': test_output.test_output}
 
     print(f"\ndata: {user_input}\n")
 
@@ -148,15 +148,9 @@ async def recieve_outputs(account_name: str, level: str, group: str, question: s
 
 
 
-    output = question_directory.test_question2(outputs.test_outputs)
+    output = question_directory.test_question(test_output.test_output)
 
     return output
-
-
-
-
-
-
 
 
 
@@ -609,7 +603,7 @@ class Question(QuestionGroup):
 
 
 
-    def test_question2(self, input):
+    def test_question(self, input):
 
         for index in range(len(self.question_data['test cases'])):
 
@@ -631,10 +625,10 @@ class Question(QuestionGroup):
 
 
         if passed_question:
-            result = '\nYou passed the question.\n'
+            result = 'You passed the question.'
 
         else:
-            result = '\nYou did not pass the question.\n'
+            result = 'You did not pass the question.'
         
         print(result)
         return result
@@ -642,76 +636,76 @@ class Question(QuestionGroup):
 
 
 
+    # no longer using this function, the question verification now gets the question code to perform the tests, instead of this function.
+    # def test_question(self):
 
-    def test_question(self):
+    #     # import the main function from the code that is being tested
+    #     sys.path.append(self.directory)
+    #     import main
+    #     sys.path.pop()
 
-        # import the main function from the code that is being tested
-        sys.path.append(self.directory)
-        import main
-        sys.path.pop()
+    #     # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
 
-        # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
+    #     # iterate over the array of test cases, calling the main function within the question file, and store each output in another array
+    #     # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
+    #     for test_case in self.question_data['test cases']:
 
-        # iterate over the array of test cases, calling the main function within the question file, and store each output in another array
-        # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
-        for test_case in self.question_data['test cases']:
+    #         test_case['output'] = main.main_function(*test_case['input'])
 
-            test_case['output'] = main.main_function(*test_case['input'])
-
-            test_case['correct'] = (test_case['output'] == test_case['answer'])
-
-
-
-        print(f"\ntest case output: {self.question_data['test cases']}")
+    #         test_case['correct'] = (test_case['output'] == test_case['answer'])
 
 
 
-        # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
-        # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
-        passed_question = True
-
-        for test_case in self.question_data['test cases']:
-
-            if not test_case['correct']:
-
-                passed_question = False
+    #     print(f"\ntest case output: {self.question_data['test cases']}")
 
 
-        if passed_question:
-            result = '\nYou passed the question.\n'
 
-        else:
-            result = '\nYou did not pass the question.\n'
+    #     # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
+    #     # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
+    #     passed_question = True
+
+    #     for test_case in self.question_data['test cases']:
+
+    #         if not test_case['correct']:
+
+    #             passed_question = False
+
+
+    #     if passed_question:
+    #         result = '\nYou passed the question.\n'
+
+    #     else:
+    #         result = '\nYou did not pass the question.\n'
         
-        print(result)
-        return result
+    #     print(result)
+    #     return result
 
 
-        # format for this dictionary will look like this:
-        # evaluation_data = [
-        #   {
-        #       "input": (argument_1, argument_2, argument_3), 
-        #       "answer": expected_answer, 
-        #       "output": 'code output',
-        #       "correct": 'bool'
-        #   }, 
-        #   {
-        #       "input": (argument_1, argument_2, argument_3), 
-        #       "answer": expected_answer, 
-        #       "output": 'code output', 
-        #       "correct": 'bool'
-        #   }
-        # ]
+    #     # format for this dictionary will look like this:
+    #     # evaluation_data = [
+    #     #   {
+    #     #       "input": (argument_1, argument_2, argument_3), 
+    #     #       "answer": expected_answer, 
+    #     #       "output": 'code output',
+    #     #       "correct": 'bool'
+    #     #   }, 
+    #     #   {
+    #     #       "input": (argument_1, argument_2, argument_3), 
+    #     #       "answer": expected_answer, 
+    #     #       "output": 'code output', 
+    #     #       "correct": 'bool'
+    #     #   }
+    #     # ]
 
-        # pass all information to a function in 'main_gui.py' that will display the test case results
+    #     # pass all information to a function in 'main_gui.py' that will display the test case results
 
-        # call function in 'QuestionTester' to update the save file if 'self.completed' is 'None' or if the user passed the question
-        # if the user passed the question, then iterate over the directories above the question and update their data
+    #     # call function in 'QuestionTester' to update the save file if 'self.completed' is 'None' or if the user passed the question
+    #     # if the user passed the question, then iterate over the directories above the question and update their data
 
 
 
-        # this function will test a question, and update the completion values of the question it is called on, and every folder above it
-        pass
+    #     # this function will test a question, and update the completion values of the question it is called on, and every folder above it
+    #     pass
 
 
 

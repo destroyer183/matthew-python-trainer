@@ -1,5 +1,3 @@
-import os
-import urllib.request
 
 
 
@@ -26,6 +24,9 @@ def sum(num1, num2):
 
 
 
+
+
+
 def main():
 
     # put your function tests here
@@ -36,8 +37,12 @@ def main():
     request_question_test()
 
 
+
 # don't touch this stuff, it'll break lots of other things if you change this code
 def request_question_test():
+
+    import os
+    import requests
 
     directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -48,17 +53,33 @@ def request_question_test():
     group        = directory[-2]
     question     = directory[-1]
 
-    url = f'http://127.0.0.1:8000/items/{account_name}?level={level}&group={group}&question={question}'
+    url = f"http://127.0.0.1:8000/get_tests/{account_name}"
 
-    print(f"directory: {directory}")
+    params = {'level': level, 'group': group, 'question': question}
 
-    url = url.replace(' ', '%20')
+    response = requests.get(url, params=params)
 
-    print(f"url: {url}")
+    data = response.json()
 
-    output = urllib.request.urlopen(url)
+    print(f"data: {data}\ntype: {type(data)}")
 
-    print(f"output: {output}")
+    test_outputs = []
+
+    for test_case in data:
+
+        test_outputs.append(main_function(*test_case))
+
+    url = f"http://127.0.0.1:8000/give_outputs/{account_name}"
+    params = {'level': level, 'group': group, 'question': question}
+    payload = {'test_output': test_outputs}
+
+    url = url.replace(' ', '')
+
+    response = requests.post(url, params=params, json=payload)
+
+    data = response.json()
+
+    print(f"response: {data}\ntype: {type(data)}")
 
 
 

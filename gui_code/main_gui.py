@@ -165,6 +165,8 @@ class Gui(question_tester.QuestionTester):
             self.description_frame.place_forget()
             self.question_description.place_forget()
             self.begin_button.place_forget()
+            self.description_canvas.delete(self.button_circle_left)
+            self.description_canvas.delete(self.button_circle_right)
         except:print('fuck2')
 
         try:
@@ -269,20 +271,45 @@ class Gui(question_tester.QuestionTester):
 
 
         self.description_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'dimgrey')
+
         self.question_description = tk.Label(self.description_frame, text = question.question_data['description'], anchor = 'center', wraplength = 700, justify = LEFT)
         self.question_description.configure(font=('Cascadia Code', 18), bg = 'dimgrey', fg = 'white')
 
         self.description_frame.place(x = 0, y = self.header_height, height = self.question_description.winfo_reqheight() + 125)
 
+        self.description_canvas = tk.Canvas(self.description_frame, background = 'dimgrey', highlightthickness = 0, 
+                                            width = self.parent.winfo_width(), 
+                                            height = self.question_description.winfo_reqheight() + 125)
+        self.description_canvas.pack(fill = BOTH)
+
+        self.question_description = tk.Label(self.description_frame, text = question.question_data['description'], anchor = 'center', wraplength = 700, justify = LEFT)
+        self.question_description.configure(font=('Cascadia Code', 18), bg = 'dimgrey', fg = 'white')
         self.question_description.place(x = 20, y = 20)
 
         # button to begin
         description_height = self.question_description.winfo_reqheight()
+
         self.begin_button = tk.Button(self.description_frame, text = 'Begin', anchor = 'center', command = lambda:self.begin_question(question))
-        self.begin_button.configure(font=('Cascadia Code', 18), bg = 'gray30', fg = 'white', bd = 2, activebackground = 'white', activeforeground = 'gray30', relief = RIDGE)
+        self.begin_button.configure(font=('Cascadia Code', 18), bg = 'gray30', fg = 'white', bd = 0, activebackground = 'white', activeforeground = 'gray30')
         self.parent.update()
         self.begin_button.place(x = self.parent.winfo_width() / 2 - self.begin_button.winfo_reqwidth() / 2, y = description_height + 75, height = 38 + 9, anchor = 'w')
+        self.parent.update()
 
+
+        # create bg
+        bg_circle_radius = (self.begin_button.winfo_height() + 1) / 2 - 1
+
+        self.button_circle_left = self.description_canvas.create_oval(
+            self.begin_button.winfo_x() - bg_circle_radius, description_height + 75 - bg_circle_radius, 
+            self.begin_button.winfo_x() + bg_circle_radius, description_height + 75 + bg_circle_radius, 
+            fill = 'gray30', outline = ''
+        )
+
+        self.button_circle_right = self.description_canvas.create_oval(
+            self.begin_button.winfo_x() + self.begin_button.winfo_reqwidth() - bg_circle_radius - 1, description_height + 75 - bg_circle_radius, 
+            self.begin_button.winfo_x() + self.begin_button.winfo_reqwidth() + bg_circle_radius - 1, description_height + 75 + bg_circle_radius, 
+            fill = 'gray30', outline = ''
+        )
 
 
     def scroll_question_data(self, event = None):
@@ -290,11 +317,15 @@ class Gui(question_tester.QuestionTester):
         print(f"input detected: {event}")
 
         try:
-            print(f"{event.keysym} arrow key detected\n")
-            scroll_wheel = False
+            if event.keysym in ['Down', 'Up']:
+                scroll_wheel = False
+                print(f"{event.keysym} arrow key detected\n")
+            else:
+                scroll_wheel = True
+                print('scroll detected\n')
         except:
-            print('scrol detected\n')
             scroll_wheel = True
+            print('scroll detected\n')
 
         if self.description_displayed:
             data_frame = self.description_frame
@@ -381,11 +412,85 @@ class Gui(question_tester.QuestionTester):
         self.description_button.configure(bg = 'gray30')
         self.test_cases_button.configure(bg = 'gray25')
 
-        # put button to test code if no test cases are detected
+        # remove description frame
+        try:
+            self.description_frame.place_forget()
+            self.question_description.place_forget()
+            self.begin_button.place_forget()
+            self.description_canvas.delete(self.button_circle_left)
+            self.description_canvas.delete(self.button_circle_right)
+        except:print('fuck2')
 
-        # otherwise, 
-        # self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'dimgrey')
-        # self.test_cases_frame.place(x = 0, y = self.header_height, height = 500)
+
+
+
+
+        # the following try/except block isn't working because the 'question' variable isn't acting as a pointer properly.
+
+        # put button to test code if no test cases are detected
+        try:
+            print('test outputs found.\n' + question.question_data['test cases'][0]['output'] * 0)
+            test_cases_found = True            
+        except:
+            print('test outputs not found.\n')
+            test_cases_found = False
+
+
+
+        self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'grey')
+
+        # if input type is not an array or dictionary, then put the full test case data in the test case description. otherwise, just put 'array' or 'dictionary' as the function parameter.
+
+        # determine the height of the frame by first figuring out how tall each test case box will be, and the spacing, and then multiply those by the amount of test cases.
+
+        test_button_space = 100
+
+        subheader_space = 40
+
+        spacing = 50
+
+        initial_y = 10
+
+        bd_weight = 8
+
+        if test_cases_found:
+            frame_height = test_button_space + subheader_space + spacing * len(question.question_data['test_cases'])
+
+        else:
+            frame_height = test_button_space + subheader_space + spacing
+
+        self.test_cases_frame.place(x = 0, y = self.header_height, height = frame_height)
+
+
+
+
+        # at first, display every test with basic info on arguments, and display additional info on the exact data passed in, and the expected output and test output
+
+
+
+
+        test_frames = []
+
+        # for i in range(5):
+
+        #     temp = {}
+
+        #     temp['frame'] = tk.Frame(self.test_cases_frame, width = self.parent.winfo_width() - 50, height = spacing, bg = 'gray20')
+        #     temp['frame'].place(relx = 0.5, y = (spacing - bd_weight/2) * i + (spacing/2) + initial_y, anchor = CENTER)
+
+        #     self.parent.update()
+
+        #     temp['canvas'] = tk.Canvas(temp['frame'], bg = 'dimgrey', highlightthickness = 0, width = temp['frame'].winfo_width() - bd_weight, height = temp['frame'].winfo_height() - bd_weight)
+
+        #     temp['canvas'].place(relx = 0.5, rely = 0.5, anchor = CENTER)
+
+
+
+
+
+
+
+
         
 
 
@@ -433,7 +538,7 @@ class ButtonList():
         # print(f"\ndirectory path: {Gui.current_directory}\n")
         # print(f"\ncurrent directory: {ButtonList.directory}\n")
 
-        self.items = [x for x in ButtonList.directory.values()]
+        self.items = [ButtonList.directory[x] for x in ButtonList.directory]
 
         # remove all previous buttons
         for button in ButtonList.displayed_buttons.values():
@@ -480,8 +585,8 @@ class ButtonList():
             except:pass
 
             self.gui.parent.update()
-            print(f"label width: {temp['info'].winfo_reqwidth()}")
-            print(f"label height: {temp['info'].winfo_reqheight()}")
+            # print(f"label width: {temp['info'].winfo_reqwidth()}")
+            # print(f"label height: {temp['info'].winfo_reqheight()}")
 
             # place button normally if there is only one row
             if two_rows is False:
@@ -501,8 +606,8 @@ class ButtonList():
             self.gui.parent.update()
             # print(f"label x: {temp['info'].winfo_x()}")
             # print(f"label y: {temp['info'].winfo_y()}")
-            print(f"label final width: {temp['info'].winfo_width()}")
-            print(f"label final height: {temp['info'].winfo_height()}")
+            # print(f"label final width: {temp['info'].winfo_width()}")
+            # print(f"label final height: {temp['info'].winfo_height()}")
 
             # create bg
             bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 1
