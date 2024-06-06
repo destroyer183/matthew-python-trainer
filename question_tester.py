@@ -625,10 +625,10 @@ class Question(QuestionGroup):
 
 
         if passed_question:
-            result = 'You passed the question.'
+            result = '\nYou passed the question.\n'
 
         else:
-            result = 'You did not pass the question.'
+            result = '\nYou did not pass the question.\n'
         
         print(result)
         return result

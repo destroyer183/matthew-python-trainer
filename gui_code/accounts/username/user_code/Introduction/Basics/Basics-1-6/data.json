@@ -1,5 +1,6 @@
 {
     "title": "Area of a Triangle",
+    "function name": "area_of_triangle",
     "description": "Write a function that takes two numbers that represent the base and the height of a triangle and returns the area of the triangle.",
     "test cases": [
         {

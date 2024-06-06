@@ -86,7 +86,8 @@ class Gui(question_tester.QuestionTester):
             try: header_text = Gui.current_directory[-1]
             except: header_text = 'Overview'
 
-        try: self.question_title.place_forget()
+        try: 
+            self.question_title.place_forget()
         except: pass
 
         self.header_height = 90
@@ -102,6 +103,32 @@ class Gui(question_tester.QuestionTester):
         self.settings_button = tk.Button(self.header_frame, image = self.settings_image, anchor = 'center', command = lambda:self.account_settings())
         self.settings_button.configure(bg = 'gray30', bd = 0, activebackground = 'gray30', activeforeground = 'gray30')
         self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
+
+
+
+    def create_footer(self, question):
+
+        try:
+            self.test_cases_button.place_forget()
+            self.description_button.place_forget()
+            self.menu_bar_frame.place_forget()
+        except:pass
+        
+        self.menu_height = 80
+
+        description_bg = ('gray25' * self.description_displayed) + ('gray30' * (not self.description_displayed))
+        test_cases_bg = ('gray25' * (not self.description_displayed) + ('gray30' * self.description_displayed))
+
+        self.menu_bar_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), height = self.menu_height)
+        self.menu_bar_frame.place(x = 0, y = self.parent.winfo_height() - self.menu_height)
+
+        self.description_button = tk.Button(self.menu_bar_frame, text = 'Description', anchor = 'center', bg = description_bg, fg = 'white', command = lambda:self.description_display(question))
+        self.description_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
+        self.description_button.place(x = 0, y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height)
+
+        self.test_cases_button = tk.Button(self.menu_bar_frame, text = 'Test Cases', anchor = 'center', bg = test_cases_bg, fg = 'white', command = lambda:self.test_cases_display(question))
+        self.test_cases_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
+        self.test_cases_button.place(x = self.parent.winfo_width(), y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height, anchor = 'ne')
 
 
 
@@ -238,18 +265,7 @@ class Gui(question_tester.QuestionTester):
 
         self.create_header(question.question_data['title'])
 
-        self.menu_height = 80
-
-        self.menu_bar_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), height = self.menu_height)
-        self.menu_bar_frame.place(x = 0, y = self.parent.winfo_height() - self.menu_height)
-
-        self.description_button = tk.Button(self.menu_bar_frame, text = 'Description', anchor = 'center', bg = 'gray25', fg = 'white', command = lambda:self.description_display(question))
-        self.description_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
-        self.description_button.place(x = 0, y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height)
-
-        self.test_cases_button = tk.Button(self.menu_bar_frame, text = 'Test Cases', anchor = 'center', bg = 'gray30', fg = 'white', command = lambda:self.test_cases_display(question))
-        self.test_cases_button.configure(font=('Cascadia Code', 25), bd = 0, activebackground = 'gray25', activeforeground = 'white')
-        self.test_cases_button.place(x = self.parent.winfo_width(), y = 0, width = self.parent.winfo_width() / 2, height = self.menu_height, anchor = 'ne')
+        self.create_footer(question)
 
 
 
@@ -407,6 +423,8 @@ class Gui(question_tester.QuestionTester):
 
         if not self.description_displayed: return
 
+        print(f"question data: {question.question_data}")
+
         self.description_displayed = False
 
         self.description_button.configure(bg = 'gray30')
@@ -429,7 +447,8 @@ class Gui(question_tester.QuestionTester):
 
         # put button to test code if no test cases are detected
         try:
-            print('test outputs found.\n' + question.question_data['test cases'][0]['output'] * 0)
+            temp = question.question_data['test cases'][0]['output']
+            print('test outputs found.\n')
             test_cases_found = True            
         except:
             print('test outputs not found.\n')
@@ -437,57 +456,171 @@ class Gui(question_tester.QuestionTester):
 
 
 
-        self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'grey')
+        self.test_cases_frame = tk.Frame(self.parent, width = self.parent.winfo_width(), bg = 'dimgrey')
 
         # if input type is not an array or dictionary, then put the full test case data in the test case description. otherwise, just put 'array' or 'dictionary' as the function parameter.
 
         # determine the height of the frame by first figuring out how tall each test case box will be, and the spacing, and then multiply those by the amount of test cases.
 
-        test_button_space = 100
+        self.test_button = tk.Button(self.test_cases_frame, text = 'Check', anchor = 'center', command = '')
+        self.test_button.configure(font=('Cascadia Code', 25), bg = 'gray30', fg = 'white', bd = 2, relief = RIDGE)
 
-        subheader_space = 40
+        self.table_header_left = tk.Label(self.test_cases_frame, text = 'Test                                 Pass', anchor = 'center', bg = 'dimgrey', fg = 'white')
+        self.table_header_left.configure(font=('Cascadia Code', 20))
 
-        spacing = 50
+        self.parent.update()
 
-        initial_y = 10
+        print(f"table header size: {self.table_header_left.winfo_reqheight()}")
+        print(f"test button size: {self.test_button.winfo_reqheight()}")
+
+        test_button_space = 105
+
+        test_spacing = 50
+
+        initial_y = 145
 
         bd_weight = 8
 
         if test_cases_found:
-            frame_height = test_button_space + subheader_space + spacing * len(question.question_data['test_cases'])
+            frame_height = test_button_space + self.table_header_left.winfo_reqheight() + test_spacing * len(question.question_data['test cases'])
 
         else:
-            frame_height = test_button_space + subheader_space + spacing
+            frame_height = test_button_space + self.table_header_left.winfo_reqheight() + test_spacing
 
         self.test_cases_frame.place(x = 0, y = self.header_height, height = frame_height)
 
 
+        self.test_button = tk.Button(self.test_cases_frame, text = 'Check', anchor = 'center', command = '')
+        self.test_button.configure(font=('Cascadia Code', 25), bg = 'gray30', fg = 'white', bd = 2, relief = RIDGE)
+        self.test_button.place(x = 25, y = 25, height = 70)
+
+        self.table_header_right = tk.Label(self.test_cases_frame, text = 'Pass', anchor = 'e', bg = 'dimgrey', fg = 'white')
+        self.table_header_right.configure(font=('Cascadia Code', 20))
+        self.parent.update()
+        self.table_header_right.place(relx = 0.5, y = 105, width = self.parent.winfo_width() - 100, anchor = 'n')
+
+        self.table_header_left = tk.Label(self.test_cases_frame, text = 'Test', anchor = 'w', bg = 'dimgrey', fg = 'white')
+        self.table_header_left.configure(font=('Cascadia Code', 20))
+        self.table_header_left.place(relx = 0.5, y = 105, width = self.parent.winfo_width() / 2 - 50, anchor = 'ne')
+
+        if not test_cases_found:
+
+            self.placeholder_box = {}
+
+            self.placeholder_box['frame'] = tk.Frame(self.test_cases_frame, width = self.parent.winfo_width() - 50, height = test_spacing, bg = 'gray20')
+            self.placeholder_box['frame'].place(relx = 0.5, y = test_spacing / 2 + initial_y, anchor = CENTER)
+
+            self.parent.update()
+
+            self.placeholder_box['canvas'] = tk.Canvas(self.placeholder_box['frame'], bg = 'dimgrey', highlightthickness = 0, 
+                                                       width = self.placeholder_box['frame'].winfo_width() - bd_weight,
+                                                       height = self.placeholder_box['frame'].winfo_height() - bd_weight)
+
+            self.placeholder_box['canvas'].place(relx = 0.5, rely = 0.5, anchor = CENTER)
+
+            self.placeholder_box['label'] = tk.Label(self.placeholder_box['frame'], text = 'Test results will show here.', anchor = 'center', bg = 'dimgrey', fg = 'white')
+            self.placeholder_box['label'].configure(font=('Cascadia Code', 20))
+            self.placeholder_box['label'].place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
 
-        # at first, display every test with basic info on arguments, and display additional info on the exact data passed in, and the expected output and test output
+        # at first, display every test with basic info on arguments and if the uesr passed, 
+        # and display additional info on the exact data passed in, and the expected output and test output
+
+
+        else:
+
+            self.test_cases_array = []
+
+            for index, test_case in enumerate(question.question_data['test cases']):
+
+                temp = {}
+
+
+                temp['frame'] = tk.Frame(self.test_cases_frame, width = self.parent.winfo_width() - 50, height = test_spacing, bg = 'gray20')
+                temp['frame'].place(relx = 0.5, y = (test_spacing - bd_weight/2) * index + (test_spacing/2) + initial_y, anchor = CENTER)
+
+                self.parent.update()
+
+                temp['canvas'] = tk.Canvas(temp['frame'], bg = 'dimgrey', highlightthickness = 0, width = temp['frame'].winfo_width() - bd_weight, height = temp['frame'].winfo_height() - bd_weight)
+                temp['canvas'].place(relx = 0.5, rely = 0.5, anchor = CENTER)
+
+                # determine the format of the function parameters in the display
+                test_data = []
+                for test in test_case['input']:
+
+                    match type(test):
+
+                        case type([]):
+                            test_data.append('[...]')
+
+                        case type({'test': 0}):
+                            test_data.append('{...}')
+
+                        case type(''):
+                            test_data.append(f"\"{test}\"")
+
+                        case type(1.1):
+                            test_data.append(test)
+
+                        case type(10):
+                            test_data.append(test)
+
+                        case type(True):
+                            test_data.append('True' * (test is True) + 'False' * (test is False))
+
+                test_data_text = question.question_data['function name'] + '('
+                if len(test_data) == 1:
+                    test_data_text += test_data[0]
+
+                else:
+                    for index in range(len(test_data) - 1):
+
+                        test_data_text += test_data[index] + ', '
+
+                    test_data_text += test_data[-1]
+
+                
+                temp['test input'] = tk.Label(temp['frame'], text = test_data_text + ')', anchor = 'w', bg = 'dimgrey', fg = 'white')
+                temp['test input'].configure(font=('Cascadia Code', 20))
+                temp['test input'].place(x = bd_weight, rely = 0.5, anchor = 'w')
+
+
+                    
+                    
+
+
+                self.test_cases_array.append(temp)
+
+
+        self.create_header(question.question_data['title'])
+
+        self.create_footer(question)
 
 
 
 
-        test_frames = []
-
-        # for i in range(5):
-
-        #     temp = {}
-
-        #     temp['frame'] = tk.Frame(self.test_cases_frame, width = self.parent.winfo_width() - 50, height = spacing, bg = 'gray20')
-        #     temp['frame'].place(relx = 0.5, y = (spacing - bd_weight/2) * i + (spacing/2) + initial_y, anchor = CENTER)
-
-        #     self.parent.update()
-
-        #     temp['canvas'] = tk.Canvas(temp['frame'], bg = 'dimgrey', highlightthickness = 0, width = temp['frame'].winfo_width() - bd_weight, height = temp['frame'].winfo_height() - bd_weight)
-
-        #     temp['canvas'].place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
 
 
 
 
+    def update_test_display(self):
+
+        # load the test cases directly through the 'QuestionTester' class
+        question = self.master.directory_tree[Gui.current_directory[0]]
+        question = question.content[Gui.current_directory[1]]
+        question = question.content[Gui.current_directory[2]]
+
+        if self.description_displayed: pass
+
+        else:
+            # remove everything in the test case display
+            self.test_cases_frame.place_forget()
+
+
+
+        # call function to create test case display and pass in updated question data
+        self.test_cases_display(question)
 
 
 

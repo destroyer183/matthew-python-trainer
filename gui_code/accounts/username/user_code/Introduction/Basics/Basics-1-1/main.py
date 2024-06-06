@@ -3,11 +3,11 @@
 
 # leave this alone, it will break stuff if you change it
 def main_function(*variables):
-    return left_over(*variables)
+    return split_groups(*variables)
 
 
 
-def left_over(num_people, num_groups):
+def split_groups(num_people, num_groups):
 
     pass
 

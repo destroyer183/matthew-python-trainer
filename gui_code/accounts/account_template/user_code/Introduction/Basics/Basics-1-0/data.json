@@ -1,5 +1,6 @@
 {
     "title": "Sum",
+    "function name": "sum",
     "description": "Write a function that takes in two numbers and returns the sum of those two numbers.",
     "test cases": [
         {
