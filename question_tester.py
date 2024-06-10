@@ -178,6 +178,7 @@ class QuestionTester:
     backup = None
     directory_tree = None
     completed = 0
+    redundancy_index = None
 
     def __init__(self, gui) -> None:
 
@@ -204,13 +205,47 @@ class QuestionTester:
 
 
     @classmethod
-    def update_save_file(cls, question: str, correct_solution: bool):
+    def update_save_file(cls, question: "Question"):
 
         # make sure to update both the main save file and the backup save file
 
-        # figure out how to assign the 'account' class variable to the account file
 
-        pass
+
+        # get current state of the question out of the save file
+
+        # mmap.seek() - go to position in file
+        cls.account.seek(question.save_file_index)
+        # mmap.read_byte() - read the data at the position and advance the position by 1
+        save_file_data = cls.account.read(1)
+
+        # decrypt byte - decrypt data
+        save_file_data = cls.byte_to_string(bytes(save_file_data))
+
+        # mmap.seek() - go back to position in file
+        cls.account.seek(question.save_file_index)
+
+        # check if the question has already been completed, and do nothing if it has already been completed
+        if save_file_data == '1':
+            return
+
+        # if the question has not been submitted, update save file regardless of whether or not the user passed the question
+        elif save_file_data != '1':
+            if question.completed:
+                question_data = cls.string_to_byte('1')
+            else:
+                question_data = cls.string_to_byte('0')
+            cls.account.write(question_data)
+        # if the user has submitted an incorrect answer for the question previously, only update the save file if the user submitted a correct answer
+
+        # update the data in the dictionary of the question groupings
+
+
+
+
+
+
+        # don't forget to update the redundancy data - THIS IS THE NEXT THING TO BE DONE ATM
+
 
 
 
@@ -235,7 +270,6 @@ class QuestionTester:
 
         return output
     
-
 
 
     @staticmethod
@@ -273,7 +307,6 @@ class QuestionTester:
         print(f"hexlified: {binascii.hexlify(output)}")
 
         return output
-
 
 
 
@@ -337,12 +370,6 @@ class QuestionTester:
     
 
 
-    @staticmethod
-    def check_type():
-        print(f"\ninstance type: {type(QuestionTester.instance)}\n")
-
-
-
     def initialize_account(self, directory, question_data_index, master, account_password):
 
         from dict_tree_constructor import construct_dict_tree
@@ -383,9 +410,9 @@ class QuestionTester:
 
         # check if saved completion data has been tampered with
         print(f"\nverifying file...")
-        redundancy_index = question_data_index + 108
+        QuestionTester.redundancy_index = question_data_index + 108
 
-        QuestionTester.account.seek(redundancy_index)
+        QuestionTester.account.seek(QuestionTester.redundancy_index)
 
         chars = QuestionTester.account.read()
         
@@ -439,7 +466,7 @@ class QuestionTester:
             print('error 1')
 
             # put error text on screen that says 'Account verification error.'
-            self.verify_details('exception', '', '')
+            self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
             QuestionTester.account = None
@@ -448,7 +475,7 @@ class QuestionTester:
             QuestionTester.completed = 0
 
             # skip the rest of the code to avoid logging into account
-            return
+            return True
         
         QuestionTester.account.seek(0)
         QuestionTester.backup.seek(0)
@@ -462,7 +489,7 @@ class QuestionTester:
             print('error 2')
 
             # put error text on screen that says 'Account verification error.'
-            self.verify_details('exception', '', '')
+            self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
             QuestionTester.account = None
@@ -471,7 +498,7 @@ class QuestionTester:
             QuestionTester.completed = 0
 
             # sip the rest of the code to avoid logging into account
-            return
+            return True
         
         
 
@@ -580,6 +607,7 @@ class Question(QuestionGroup):
         self.directory = directory
         self.name = name
         self.save_file_index = save_file_index
+        self.master = master
 
         self.extract_question_data()
 
@@ -626,9 +654,14 @@ class Question(QuestionGroup):
 
         if passed_question:
             result = '\nYou passed the question.\n'
+            if not self.completed:
+                self.completed = True
 
         else:
             result = '\nYou did not pass the question.\n'
+
+
+        self.master.update_save_file(self)
         
         print(result)
         return result

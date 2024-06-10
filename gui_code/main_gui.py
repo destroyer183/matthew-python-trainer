@@ -752,6 +752,11 @@ class ButtonList():
 
         for index, item in enumerate(self.items):
 
+            # don't display a group if it is not unlocked
+            try:
+                if not item.unlocked: return
+            except:pass
+
             # print(f"two_rows: {two_rows}")
 
             # incrament y offset

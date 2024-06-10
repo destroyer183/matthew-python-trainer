@@ -147,7 +147,7 @@ class Gui(question_tester.QuestionTester):
 
         self.parent.resizable(False, False)
 
-        self.find_account('username', 'password')
+        # self.find_account('username', 'password')
 
 
 
@@ -235,7 +235,7 @@ class Gui(question_tester.QuestionTester):
                 self.master.backup = mmap.mmap(f2.fileno(), 0)
                 self.master.account_directory = account_directory
 
-            self.master.instance.initialize_account(account_directory, index + 1, self.master, self.account_password)
+            if self.master.instance.initialize_account(account_directory, index + 1, self.master, self.account_password): return
 
             self.master.instance.make_gui('questions')
 
@@ -324,6 +324,8 @@ class Gui(question_tester.QuestionTester):
 
         try: self.login_error_text.place_forget()
         except:pass
+
+        self.enable_gui()
 
         if type == 'exception':
             self.account_error_text = tk.Label(self.parent, text = 'Account verification error.', bg = 'dimgrey', fg = 'red')
@@ -496,4 +498,6 @@ class Gui(question_tester.QuestionTester):
             f.write(fourth_line)
             f2.write(fourth_line)
 
-        
+
+        os.system(f"attrib +h \"{account}\"")
+        os.system(f"attrib +h \"{backup}\"")
