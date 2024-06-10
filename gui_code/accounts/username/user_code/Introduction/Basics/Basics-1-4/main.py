@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def hours_to_seconds(hours):
 
-    pass
+    return hours * 3600
 
 
 

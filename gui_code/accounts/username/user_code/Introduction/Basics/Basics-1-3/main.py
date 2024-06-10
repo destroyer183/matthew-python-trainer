@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def percentage(num, percent):
 
-    pass
+    return num * (percent / 100)
 
 
 

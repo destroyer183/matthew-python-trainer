@@ -1,9 +1,9 @@
 
 
 
-def area_of_triangle(base, height):
+def two_args(a, b):
 
-    pass
+    return b
 
 
 
@@ -30,7 +30,7 @@ def main():
 
 # leave this alone, it will break stuff if you change it
 def main_function(*variables):
-    return area_of_triangle(*variables)
+    return two_args(*variables)
 
 
 

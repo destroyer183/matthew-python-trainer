@@ -9,7 +9,8 @@ def main_function(*variables):
 
 def divisible(num, divisor):
 
-    pass
+    if num % divisor == 0: return True
+    else: return False
 
 
 

@@ -1,17 +1,9 @@
 
 
 
-# leave this alone, it will break stuff if you change it
-def main_function(*variables):
-    return split_groups(*variables)
-
-
-
 def split_groups(num_people, num_groups):
 
     pass
-
-
 
 
 
@@ -36,6 +28,9 @@ def main():
 
 
 
+# leave this alone, it will break stuff if you change it
+def main_function(*variables):
+    return split_groups(*variables)
 
 
 
@@ -62,7 +57,7 @@ def request_question_test():
 
     data = response.json()
 
-    print(f"data: {data}\ntype: {type(data)}")
+    print(f"\ndata: {data}\ntype: {type(data)}\n")
 
     test_outputs = []
 
@@ -80,7 +75,7 @@ def request_question_test():
 
     data = response.json()
 
-    print(f"response: {data}\ntype: {type(data)}")
+    print(f"\nresponse: {data}\ntype: {type(data)}\n")
 
 
 

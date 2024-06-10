@@ -1,0 +1,19 @@
+{
+    "title": "Variable Arguments",
+    "function name": "variable_args",
+    "description": "A function in Python can take a variable number of arguments using the '*args' syntax. This means that arguments passed in are stored as a list in the 'args' variable, regardless of how many are provided.\n\nWrite a function that always returns the last argument provided to it.",
+    "test cases": [
+        {
+            "input": [[1], "hello", "z", 0],
+            "answer": 0
+        },
+        {
+            "input": [0, 1, 2, 3, 4],
+            "answer": 4
+        },
+        {
+            "input": ["arg one", ["arg", "two"], 3, "four"],
+            "answer": "four"
+        }
+    ]
+}

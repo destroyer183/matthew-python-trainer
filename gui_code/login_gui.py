@@ -441,7 +441,9 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        passwrd = self.string_to_int(password)
+        # passwrd = self.string_to_int(password)
+
+        passwrd = password
 
         password = self.string_to_byte(password)
 
@@ -468,32 +470,9 @@ class Gui(question_tester.QuestionTester):
                 f.write(temp)
                 f2.write(temp)
 
-
-
-            temp = []
-
-            for element in passwrd:
-                temp.append(int(element, 16))
                 
-            sum = 0
-            for num in temp:
-                sum += num
 
-            fourth_line = 0 + sum
-            print(f"fourth line int: {fourth_line}")
-            fourth_line = hex(fourth_line)[2:]
-            print(f"fourth line hex: {fourth_line}")
-
-            if len(fourth_line) == 1:
-                fourth_line = f"0{fourth_line}"
-
-            fourth_line = self.string_to_int(fourth_line)
-            fourth_line = ('').join(fourth_line)
-            fourth_line = binascii.unhexlify(fourth_line)
-
-            print(f"fourth line unhexlified: {fourth_line}")
-
-            print(f"fourth line hexlified: {binascii.hexlify(fourth_line)}")
+            fourth_line = self.encrypt_redundancy_value(passwrd, 0)
 
             f.write(fourth_line)
             f2.write(fourth_line)

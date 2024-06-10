@@ -54,6 +54,12 @@ class QuestionType(enum.Enum):
 
 USE 'BEAUTIFUL SOUP' TO GET THE HTML DATA
 
+next steps: make the 'check' button in the test cases work
+
+fix the button formatting
+
+fix the 
+
 '''
 
 
@@ -179,6 +185,7 @@ class QuestionTester:
     directory_tree = None
     completed = 0
     redundancy_index = None
+    password = None
 
     def __init__(self, gui) -> None:
 
@@ -215,6 +222,7 @@ class QuestionTester:
 
         # mmap.seek() - go to position in file
         cls.account.seek(question.save_file_index)
+        cls.backup.seek(question.save_file_index)
         # mmap.read_byte() - read the data at the position and advance the position by 1
         save_file_data = cls.account.read(1)
 
@@ -230,21 +238,53 @@ class QuestionTester:
 
         # if the question has not been submitted, update save file regardless of whether or not the user passed the question
         elif save_file_data != '1':
+            
             if question.completed:
                 question_data = cls.string_to_byte('1')
             else:
                 question_data = cls.string_to_byte('0')
+
             cls.account.write(question_data)
-        # if the user has submitted an incorrect answer for the question previously, only update the save file if the user submitted a correct answer
+            cls.backup.write(question_data)
+
+            cls.account.seek(cls.redundancy_index)
+            cls.backup.seek(cls.redundancy_index)
+
+            new_redundancy_value = cls.encrypt_redundancy_value(cls.password, cls.completed)
+
+            cls.account.write(new_redundancy_value)
+            cls.backup.write(new_redundancy_value)
+
+
 
         # update the data in the dictionary of the question groupings
+        # iterate over all folders to see if they are completed or not
+        for level in cls.directory_tree.values():
+
+            if type(level) == str:
+                continue
+
+            for group in level.content.values():
+
+                group.check_completion()
+
+                print(f"{group.name} completion: {group.completed}")
+
+            level.check_completion()
 
 
 
+        # check if new things need to be unlocked or not
+        if cls.directory_tree['Introduction'].completed:
+            cls.directory_tree['Level-1'].unlocked = True
+
+        elif cls.directory_tree['Level-1'].completed:
+            cls.directory_tree['Level-2'].unlocked = True
+
+        elif cls.directory_tree['Level-2'].completed:
+            cls.directory_tree['Level-3'].unlocked = True
 
 
-
-        # don't forget to update the redundancy data - THIS IS THE NEXT THING TO BE DONE ATM
 
 
 
@@ -367,6 +407,86 @@ class QuestionTester:
         print(f"output: {output}\n")
 
         return output
+
+
+
+    @staticmethod
+    def encrypt_redundancy_value(password: str, completed: int):
+
+        print('\nencrypting redundancy value...')
+
+        print(f"password input: {password}\ncompletion input: {completed}")
+
+        password_int = QuestionTester.string_to_int(password)
+
+        print(f"integer password: {password_int}")
+
+        temp = []
+
+        for element in password_int:
+            temp.append(int(element, 16))
+
+        sum = 0
+        for num in temp:
+            sum += num
+
+        print(f"hexed & summed password: {sum}")
+
+        base_value = completed + sum
+
+        hex_value = hex(base_value)[2:]
+
+        if len(hex_value) == 1:
+            hex_value = f"0{hex_value}"
+
+        print(f"hexed total sum: {hex_value}")
+
+        int_value = QuestionTester.string_to_int(hex_value)
+        int_value = ('').join(int_value)
+        final_value = binascii.unhexlify(int_value)
+
+        print(f"final value: {final_value}")
+
+        return final_value
+    
+
+
+    @staticmethod
+    def decrypt_redundancy_value(chars: bytes):
+
+        print('\ndecrypting redundancy value...')
+
+        print(f"input: {chars}")
+
+        hexed_chars = str(binascii.hexlify(chars))
+
+        hexed_chars = hexed_chars[2:len(hexed_chars) - 1]
+
+        print(f"hexed chars: {hexed_chars}")
+
+        split_size = 2
+        temp_list = []
+        temp_str = ''
+
+        for value in hexed_chars:
+            temp_str += str(value)
+            if len(temp_str) == split_size:
+                temp_list.append(temp_str)
+                temp_str = ''
+
+        print(f"split chars: {temp_list}")
+
+        output = ''
+
+        for value in temp_list:
+
+            output += list(char_values.keys())[list(char_values.values()).index(value)]
+
+        output = int(output, 16)
+
+        print(f"final value: {output}")
+
+        return output
     
 
 
@@ -418,43 +538,15 @@ class QuestionTester:
         
         print(f"verification chars: {chars}")
 
-        chars = str(binascii.hexlify(chars))
+        verification_number = self.decrypt_redundancy_value(chars)
 
-        chars = chars[2:len(chars) - 1]
+        QuestionTester.password = account_password
 
-        print(f"chars: {chars}")
-        split_size = 2
-        temp_list = []
-        temp_str = ''
-
-        for value in chars:
-            temp_str += str(value)
-            if len(temp_str) == split_size:
-                temp_list.append(temp_str)
-                temp_str = ''
-
-        output = ''
-
-        print(f"temp list: {temp_list}")
-
-        for value in temp_list:
-
-            output += list(char_values.keys())[list(char_values.values()).index(value)]
-
-        output = int(output, 16)
-
-        print(f"verification output: {output}")
-
-        verification_number = output
-
-        # the next step is to count the full integer value of the password
-        # account directory is stored in a class variable, just read it and count the numbers like in the account file setup
-
-        account_password = self.string_to_int(account_password)
+        password = self.string_to_int(account_password)
 
         temp = []
 
-        for element in account_password:
+        for element in password:
             temp.append(int(element, 16))
             
         password_sum = 0
@@ -469,10 +561,13 @@ class QuestionTester:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
+            QuestionTester.account_directory = None
             QuestionTester.account = None
             QuestionTester.backup = None
             QuestionTester.directory_tree = None
             QuestionTester.completed = 0
+            QuestionTester.redundancy_index = None
+            QuestionTester.password = None
 
             # skip the rest of the code to avoid logging into account
             return True
@@ -492,10 +587,13 @@ class QuestionTester:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
+            QuestionTester.account_directory = None
             QuestionTester.account = None
             QuestionTester.backup = None
             QuestionTester.directory_tree = None
             QuestionTester.completed = 0
+            QuestionTester.redundancy_index = None
+            QuestionTester.password = None
 
             # sip the rest of the code to avoid logging into account
             return True
@@ -508,15 +606,6 @@ class QuestionTester:
 
         print('account sucessfully logged into.')
 
-
-
-    def update_account(self):
-        pass
-
-
-
-    def read_account(self, type):
-        pass
 
 
 
@@ -555,18 +644,21 @@ class DifficultyGroup:
         if True not in completion_data and False not in completion_data:
             return
 
+        self.completed = True
+
+        temp = 0
+
         for item in self.content.values():
 
             if not item.completed:
                 self.completed = False
-                return
+                continue
             
-            self.completion_count += 1
+            temp += 1
+
+        self.completion_count = temp
 
             
-        self.completed = True
-
-
 
     def unlock_folder(self):
         pass
@@ -656,9 +748,11 @@ class Question(QuestionGroup):
             result = '\nYou passed the question.\n'
             if not self.completed:
                 self.completed = True
+                self.master.completed += 1
 
         else:
             result = '\nYou did not pass the question.\n'
+            self.completed = False
 
 
         self.master.update_save_file(self)

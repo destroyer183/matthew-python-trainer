@@ -1,4 +1,4 @@
-
+import math
 
 
 # leave this alone, it will break stuff if you change it
@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def split_groups(num_people, num_groups):
 
-    pass
+    return math.floor(num_people / num_groups)
 
 
 

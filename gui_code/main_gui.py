@@ -112,6 +112,8 @@ class Gui(question_tester.QuestionTester):
         self.settings_button.configure(bg = 'gray30', bd = 0, activebackground = 'gray30', activeforeground = 'gray30')
         self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
 
+        self.update_back_button()
+
 
 
     def create_footer(self, question):
@@ -359,18 +361,18 @@ class Gui(question_tester.QuestionTester):
 
     def scroll_question_data(self, event = None):
 
-        print(f"input detected: {event}")
+        # print(f"input detected: {event}")
 
         try:
             if event.keysym in ['Down', 'Up']:
                 scroll_wheel = False
-                print(f"{event.keysym} arrow key detected\n")
+                # print(f"{event.keysym} arrow key detected\n")
             else:
                 scroll_wheel = True
-                print('scroll detected\n')
+                # print('scroll detected\n')
         except:
             scroll_wheel = True
-            print('scroll detected\n')
+            # print('scroll detected\n')
 
         if self.description_displayed:
             data_frame = self.description_frame
@@ -420,7 +422,7 @@ class Gui(question_tester.QuestionTester):
             
             movement_distance = (-10 * (event.keysym == 'Down')) + (10 * (event.keysym == 'Up'))
 
-            print(f"movement distance: {movement_distance}")
+            # print(f"movement distance: {movement_distance}")
 
             # check if the data frame can be moved in the direction the user wants to move it
             if (movement_distance > 0 and data_frame.winfo_y() == self.header_height) or (
@@ -587,7 +589,7 @@ class Gui(question_tester.QuestionTester):
                         test_data.append(f"\"{test}\"")
 
                     elif type(test) == bool:
-                        test_data.append('True' * (test is True) + 'False' * (test is False))
+                        test_data.append('True' * (test is True) + 'False' * (test is False) + 'None' * (test is None))
 
                     else:
                         test_data.append(str(test))
@@ -603,7 +605,9 @@ class Gui(question_tester.QuestionTester):
 
                         test_data_text += test_data[index] + ', '
 
-                    test_data_text += test_data[-1]
+                    try:
+                        test_data_text += test_data[-1]
+                    except: test_data_text += ""
 
                 if test_case['correct']:
                     image_source = self.correct_answer
@@ -612,7 +616,7 @@ class Gui(question_tester.QuestionTester):
                     image_source = self.incorrect_answer
 
                 temp['test input'] = tk.Label(temp['frame'], text = test_data_text + ')', anchor = 'w', bg = 'dimgrey', fg = 'white')
-                temp['test input'].configure(font=('Cascadia Code', 20))
+                temp['test input'].configure(font=('Cascadia Code', 18))
                 self.parent.update()
 
                 temp['pass image'] = tk.Label(temp['frame'], image = image_source, anchor = 'e', bg = 'dimgrey')
@@ -622,26 +626,12 @@ class Gui(question_tester.QuestionTester):
 
 
 
-                
-
-
-
-                    
-                    
-
-
                 self.test_cases_array.append(temp)
 
 
         self.create_header(question.question_data['title'])
 
         self.create_footer(question)
-
-
-
-
-
-
 
 
 
@@ -673,10 +663,6 @@ class Gui(question_tester.QuestionTester):
 
         # call function to create test case display and pass in updated question data
         self.test_cases_display(question)
-
-
-
-        
 
 
 
@@ -754,7 +740,7 @@ class ButtonList():
 
             # don't display a group if it is not unlocked
             try:
-                if not item.unlocked: return
+                if not item.unlocked: continue
             except:pass
 
             # print(f"two_rows: {two_rows}")

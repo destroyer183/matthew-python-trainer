@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def left_over(num_people, num_groups):
 
-    pass
+    return num_people % num_groups
 
 
 

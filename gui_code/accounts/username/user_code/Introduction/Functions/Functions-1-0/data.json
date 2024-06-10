@@ -1,0 +1,23 @@
+{
+    "title": "The Identity Function",
+    "function name": "identity",
+    "description": "Write the function 'identity' which takes an input 'x' and returns that input.",
+    "test cases": [
+        {
+            "input": [1],
+            "answer": 1 
+        },
+        {
+            "input": [null],
+            "answer": null
+        },
+        {
+            "input": [0],
+            "answer": 0
+        },
+        {
+            "input": ["hello"],
+            "answer": "hello"
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 
 
 
-def area_of_triangle(base, height):
+def identity(x):
 
     pass
 
@@ -30,7 +30,7 @@ def main():
 
 # leave this alone, it will break stuff if you change it
 def main_function(*variables):
-    return area_of_triangle(*variables)
+    return identity(*variables)
 
 
 

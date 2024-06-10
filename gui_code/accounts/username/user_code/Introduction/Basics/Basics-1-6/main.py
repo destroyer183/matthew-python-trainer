@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def area_of_triangle(base, height):
 
-    pass
+    return base * height / 2
 
 
 

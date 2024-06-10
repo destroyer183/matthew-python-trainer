@@ -9,7 +9,7 @@ def main_function(*variables):
 
 def era(earned_runs, innings_pitched):
 
-    pass
+    return earned_runs * 9 / innings_pitched
 
 
 

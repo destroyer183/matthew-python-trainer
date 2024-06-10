@@ -9,7 +9,8 @@ def main_function(*variables):
 
 def divisible_by_ten(num):
 
-    pass
+    if num % 10 == 0: return True
+    else: return False
 
 
 
