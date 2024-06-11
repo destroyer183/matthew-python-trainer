@@ -58,7 +58,7 @@ next steps: make the 'check' button in the test cases work
 
 fix the button formatting
 
-fix the 
+fix the sizing of the test case text display
 
 '''
 
