@@ -54,11 +54,17 @@ class QuestionType(enum.Enum):
 
 USE 'BEAUTIFUL SOUP' TO GET THE HTML DATA
 
-next steps: make the 'check' button in the test cases work
+NEXT STEPS: 
 
-fix the button formatting
+make the 'check' button in the test cases work - DONE
 
-fix the sizing of the test case text display
+make the 'account settings' button do something
+
+fix the sizing of the test case text display - DONE
+
+fix the formatting of the buttons - DONE
+
+allow the user to click on test cases to get more info
 
 '''
 
@@ -212,6 +218,22 @@ class QuestionTester:
 
 
     @classmethod
+    def log_out(cls):
+
+        # clear all class variables
+        cls.account_directory = None
+        cls.account = None
+        cls.backup = None
+        cls.directory_tree = None
+        cls.completed = 0
+        cls.redundancy_index = None
+        cls.password = None
+
+        cls.instance.make_gui('login')
+
+
+
+    @classmethod
     def update_save_file(cls, question: "Question"):
 
         # make sure to update both the main save file and the backup save file
@@ -283,9 +305,6 @@ class QuestionTester:
 
         elif cls.directory_tree['Level-2'].completed:
             cls.directory_tree['Level-3'].unlocked = True
-
-
-
 
 
 
@@ -755,8 +774,12 @@ class Question(QuestionGroup):
             self.completed = False
 
 
+
+        # update the test case display
+        self.master.instance.gui.update_test_display() # the 'Check' button breaks when it gets to this line
+
         self.master.update_save_file(self)
-        
+
         print(result)
         return result
 

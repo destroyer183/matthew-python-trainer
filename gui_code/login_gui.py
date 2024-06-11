@@ -441,15 +441,11 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        # passwrd = self.string_to_int(password)
-
-        passwrd = password
-
-        password = self.string_to_byte(password)
+        encrypted_password = self.string_to_byte(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
-            first_line = password
+            first_line = encrypted_password
             second_line = b'\n'
 
             f.write(first_line)
@@ -458,21 +454,17 @@ class Gui(question_tester.QuestionTester):
             f2.write(first_line)
             f2.write(second_line)
 
-            third_line = []
+            third_line = ''
 
             for i in range(108):
-                third_line.append(' ')
+                third_line += ' '
 
-            for item in third_line:
+            temp = self.string_to_byte(third_line)
 
-                temp = self.string_to_byte(item)
+            f.write(temp)
+            f2.write(temp)
 
-                f.write(temp)
-                f2.write(temp)
-
-                
-
-            fourth_line = self.encrypt_redundancy_value(passwrd, 0)
+            fourth_line = self.encrypt_redundancy_value(password, 0)
 
             f.write(fourth_line)
             f2.write(fourth_line)

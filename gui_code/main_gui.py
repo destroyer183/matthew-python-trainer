@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import *
 import os
+import subprocess
 import sys
 import enum
 import shutil
@@ -90,7 +91,10 @@ class Gui(question_tester.QuestionTester):
 
     def create_header(self, header_text = None):
 
+        question = True
+
         if header_text is None:
+            question = False
             try: header_text = Gui.current_directory[-1]
             except: header_text = 'Overview'
 
@@ -108,9 +112,10 @@ class Gui(question_tester.QuestionTester):
         self.question_title.place(relx = 0.5, y = 45, anchor = CENTER)
 
         # button to access account settings (log out, clear save data, etc.)
-        self.settings_button = tk.Button(self.header_frame, image = self.settings_image, anchor = 'center', command = lambda:self.account_settings())
-        self.settings_button.configure(bg = 'gray30', bd = 0, activebackground = 'gray30', activeforeground = 'gray30')
-        self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, width = 40, height = 40, anchor = 'ne')
+        if not question:
+            self.settings_button = tk.Button(self.header_frame, text = 'Log out', bg = 'gray40', fg = 'white', anchor = 'center', command = lambda:self.account_settings())
+            self.settings_button.configure(font=('Cascadia Code', 15), relief = RIDGE)
+            self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, height = 40, anchor = 'ne')
 
         self.update_back_button()
 
@@ -143,7 +148,15 @@ class Gui(question_tester.QuestionTester):
 
 
     def account_settings(self):
-        pass
+
+        # remove input detections
+
+        self.parent.unbind('<Button-1>')
+        self.parent.unbind_all('<MouseWheel>')
+        self.parent.unbind('<Up>')
+        self.parent.unbind('<Down>')
+
+        self.master.instance.log_out()
 
 
 
@@ -204,6 +217,9 @@ class Gui(question_tester.QuestionTester):
             self.begin_button.place_forget()
             self.description_canvas.delete(self.button_circle_left)
             self.description_canvas.delete(self.button_circle_right)
+            self.parent.unbind_all('<MouseWheel>')
+            self.parent.unbind('<Up>')
+            self.parent.unbind('<Down>')
         except:print('fuck2')
 
         try:
@@ -219,6 +235,9 @@ class Gui(question_tester.QuestionTester):
             self.table_header_right.place_forget()
             self.test_button.place_forget()
             self.test_cases_frame.place_forget()
+            self.parent.unbind_all('<MouseWheel>')
+            self.parent.unbind('<Up>')
+            self.parent.unbind('<Down>')
         except:print('fuck3')
 
         Gui.current_directory.pop()
@@ -515,7 +534,7 @@ class Gui(question_tester.QuestionTester):
         self.test_cases_frame.place(x = 0, y = self.header_height, height = frame_height)
 
 
-        self.test_button = tk.Button(self.test_cases_frame, text = 'Check', anchor = 'center', command = '')
+        self.test_button = tk.Button(self.test_cases_frame, text = 'Check', anchor = 'center', command = lambda: self.run_test_cases(question))
         self.test_button.configure(font=('Cascadia Code', 25), bg = 'gray30', fg = 'white', bd = 2, relief = RIDGE)
         self.test_button.place(x = 25, y = 25, height = 70)
 
@@ -642,9 +661,7 @@ class Gui(question_tester.QuestionTester):
         question = question.content[Gui.current_directory[1]]
         question = question.content[Gui.current_directory[2]]
 
-        if self.description_displayed: pass
-
-        else:
+        if not self.description_displayed:
             # try to remove test case display
             try:
                 for item in self.test_cases_array:
@@ -657,12 +674,35 @@ class Gui(question_tester.QuestionTester):
                 self.table_header_right.place_forget()
                 self.test_button.place_forget()
                 self.test_cases_frame.place_forget()
-            except:pass
 
+            except:print('hmm')
 
+            self.description_displayed = True
 
         # call function to create test case display and pass in updated question data
         self.test_cases_display(question)
+
+
+
+    # function that is called when the user presses the 'Check' button to test their code through the gui
+    def run_test_cases(self, question):
+
+        # set command to run the python file
+        command = f"py \"{question.directory}\\main.py\""
+
+        # print out the command
+        print(f"command: {command}")
+
+        # run command
+        return_code = subprocess.Popen(['py', f"{question.directory}\\main.py"])
+
+        # these all broke for some reason, and in the most incomprehensible way. 
+        # they didn't break when running the command, but when the code tried to remove stuff from the gui????????????
+        # return_code = os.system(command)
+        # return_code = subprocess.run(['powershell', '-Command', command])
+
+        # print out the output
+        print(f"return code: {return_code}")
 
 
 
@@ -670,6 +710,9 @@ class Gui(question_tester.QuestionTester):
 
         # set command to open directory in vscode
         command = f"code \"{question.directory}\""
+
+        # print out the command
+        print(f"command: {command}")
 
         # run command 
         return_code = os.system(command)
@@ -680,11 +723,15 @@ class Gui(question_tester.QuestionTester):
         # set command to open python file in new vscode window
         command = f"code \"{question.directory}\\main.py\""
 
+        # print out the command
+        print(f"command: {command}")
+
         # run command
         return_code = os.system(command)
 
         # print out the return code
         print(f"return code: {return_code}")
+
 
 
 
@@ -902,27 +949,23 @@ class ButtonList():
                 # create a new label with just the completion data as text
                 # place it on the screen and anchor it on the right side to place it at the same spot as the largest button
                 
-                item['info2'] = tk.Label(self.gui.parent, text = text_data[1], anchor = 'e', bg = 'ivory4', fg = 'white')
+                item['info2'] = tk.Label(self.gui.parent, text = text_data[1].strip(), anchor = 'e', bg = 'ivory4', fg = 'white')
                 item['info2'].configure(font=('Cascadia Code', 18))
 
                 button_length = largest_button['info'].cget('text')
                 button_length = button_length.split('   ')
                 button_length = button_length[1]
 
-                if len(button_length) > 19:
-                    item['info2'].place(
-                        x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
-                        width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()) - 14,
-                        height = item['info'].winfo_reqheight() + 10
-                    )
+                text = largest_button['info'].cget('text')
+                initial_index = text.rindex('(')
+                index = len(text) - initial_index - 1
 
+                offset = index - 4
 
-                else:
-                    item['info2'].place(
-                        x = item['info'].winfo_x() + item['info'].winfo_reqwidth(), y = item['info'].winfo_y(),
-                        width = largest_button['info'].winfo_x() + largest_button['info'].winfo_reqwidth() - (item['info'].winfo_x() + item['info'].winfo_reqwidth()),
-                        height = item['info'].winfo_reqheight() + 10
-                    )
+                item['info2'].place(
+                    x = largest_button['info'].winfo_x() + largest_button['info'].winfo_width() - 14 * offset, y = item['info'].winfo_y(),
+                    height = item['info'].winfo_reqheight() + 10, anchor = 'ne'
+                )
 
             except:pass
 
