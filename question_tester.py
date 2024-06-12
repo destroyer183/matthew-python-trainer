@@ -58,7 +58,7 @@ NEXT STEPS:
 
 make the 'check' button in the test cases work - DONE
 
-make the 'account settings' button do something
+make the 'account settings' button do something - DONE
 
 fix the sizing of the test case text display - DONE
 
@@ -249,7 +249,7 @@ class QuestionTester:
         save_file_data = cls.account.read(1)
 
         # decrypt byte - decrypt data
-        save_file_data = cls.byte_to_string(bytes(save_file_data))
+        save_file_data = cls.decrypt_data(bytes(save_file_data))
 
         # mmap.seek() - go back to position in file
         cls.account.seek(question.save_file_index)
@@ -262,9 +262,9 @@ class QuestionTester:
         elif save_file_data != '1':
             
             if question.completed:
-                question_data = cls.string_to_byte('1')
+                question_data = cls.encrypt_data('1')
             else:
-                question_data = cls.string_to_byte('0')
+                question_data = cls.encrypt_data('0')
 
             cls.account.write(question_data)
             cls.backup.write(question_data)
@@ -308,15 +308,12 @@ class QuestionTester:
 
 
 
+    # function to convert strings to integer values based on a table created when the file runs
     @staticmethod
-    def string_to_int(input = None):
+    def string_to_int(input: str):
 
         print(f"\nconverting string to int...")
 
-        if input is None:
-            print('no value given\n\n')
-            return
-        
         print(f"input: {input}")
 
         output = []
@@ -331,15 +328,12 @@ class QuestionTester:
     
 
 
+    # function to encrypt normal data to be written to a save file
     @staticmethod
-    def string_to_byte(input: str = None):
+    def encrypt_data(input: str):
 
         print(f"\nconverting string to byte...")
 
-        if input is None:
-            print('no value given\n\n')
-            return
-        
         print(f"input: {input}")
 
         output = b''
@@ -369,15 +363,12 @@ class QuestionTester:
 
 
 
+    # function to decrypt normal data that has been read from a save file
     @staticmethod
-    def byte_to_string(input: bytes = None):
+    def decrypt_data(input: bytes):
 
         print(f"\nconverting byte to string...")
 
-        if input is None:
-            print('no value given\n\n')
-            return
-        
         print(f"input: {input}")
 
         input = binascii.hexlify(input)
@@ -471,13 +462,13 @@ class QuestionTester:
 
 
     @staticmethod
-    def decrypt_redundancy_value(chars: bytes):
+    def decrypt_redundancy_value(input: bytes):
 
         print('\ndecrypting redundancy value...')
 
-        print(f"input: {chars}")
+        print(f"input: {input}")
 
-        hexed_chars = str(binascii.hexlify(chars))
+        hexed_chars = str(binascii.hexlify(input))
 
         hexed_chars = hexed_chars[2:len(hexed_chars) - 1]
 
@@ -619,27 +610,9 @@ class QuestionTester:
         
         
 
-        # run function that changes the gui and logs into the account
-        
-        # QuestionTester.make_gui('questions')
-
         print('account sucessfully logged into.')
 
 
-
-
-
-
-'''
-have a large dictionary that stores all the question data
-
-make every level and folder/group an object - each difficulty group, type of question, and question
-
-class names: Question, QuestionGroup, DifficultyGroup
-
-QuestionGroup will inherit from DifficultyGroup, mainly the method that checks the completion of the contents
-
-'''
 
 class DifficultyGroup:
 
@@ -677,11 +650,6 @@ class DifficultyGroup:
 
         self.completion_count = temp
 
-            
-
-    def unlock_folder(self):
-        pass
-
 
 
 class QuestionGroup(DifficultyGroup):
@@ -705,7 +673,7 @@ class Question(QuestionGroup):
         master.account.seek(save_file_index)
         temp = master.account.read(1)
 
-        temp = QuestionTester.byte_to_string(bytes(temp))
+        temp = QuestionTester.decrypt_data(bytes(temp))
 
         if temp == ' ': self.completed = None
         if temp == '0': self.completed = False
@@ -782,80 +750,6 @@ class Question(QuestionGroup):
 
         print(result)
         return result
-
-
-
-
-    # no longer using this function, the question verification now gets the question code to perform the tests, instead of this function.
-    # def test_question(self):
-
-    #     # import the main function from the code that is being tested
-    #     sys.path.append(self.directory)
-    #     import main
-    #     sys.path.pop()
-
-    #     # get 'self.question_data' which is a dictionary that contains all the question data, and an array of each test case
-
-    #     # iterate over the array of test cases, calling the main function within the question file, and store each output in another array
-    #     # refer to 'json_testing.py' to pass each element of a tuple to a function instead of the whole tuple
-    #     for test_case in self.question_data['test cases']:
-
-    #         test_case['output'] = main.main_function(*test_case['input'])
-
-    #         test_case['correct'] = (test_case['output'] == test_case['answer'])
-
-
-
-    #     print(f"\ntest case output: {self.question_data['test cases']}")
-
-
-
-    #     # evaluate whether or not the outputs were correct, and determine if the user passed the question (only pass if every test case is correct)
-    #     # add the outputs to the question data dictionary, and also add a boolean that represents whether or not the answer was correct
-    #     passed_question = True
-
-    #     for test_case in self.question_data['test cases']:
-
-    #         if not test_case['correct']:
-
-    #             passed_question = False
-
-
-    #     if passed_question:
-    #         result = '\nYou passed the question.\n'
-
-    #     else:
-    #         result = '\nYou did not pass the question.\n'
-        
-    #     print(result)
-    #     return result
-
-
-    #     # format for this dictionary will look like this:
-    #     # evaluation_data = [
-    #     #   {
-    #     #       "input": (argument_1, argument_2, argument_3), 
-    #     #       "answer": expected_answer, 
-    #     #       "output": 'code output',
-    #     #       "correct": 'bool'
-    #     #   }, 
-    #     #   {
-    #     #       "input": (argument_1, argument_2, argument_3), 
-    #     #       "answer": expected_answer, 
-    #     #       "output": 'code output', 
-    #     #       "correct": 'bool'
-    #     #   }
-    #     # ]
-
-    #     # pass all information to a function in 'main_gui.py' that will display the test case results
-
-    #     # call function in 'QuestionTester' to update the save file if 'self.completed' is 'None' or if the user passed the question
-    #     # if the user passed the question, then iterate over the directories above the question and update their data
-
-
-
-    #     # this function will test a question, and update the completion values of the question it is called on, and every folder above it
-    #     pass
 
 
 

@@ -201,7 +201,7 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                self.account_password = self.byte_to_string(line).strip()
+                self.account_password = self.decrypt_data(line).strip()
                 break
 
         
@@ -227,7 +227,7 @@ class Gui(question_tester.QuestionTester):
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = self.byte_to_string(bytes(item))
+                item = self.decrypt_data(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
@@ -441,7 +441,7 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        encrypted_password = self.string_to_byte(password)
+        encrypted_password = self.encrypt_data(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -459,7 +459,7 @@ class Gui(question_tester.QuestionTester):
             for i in range(108):
                 third_line += ' '
 
-            temp = self.string_to_byte(third_line)
+            temp = self.encrypt_data(third_line)
 
             f.write(temp)
             f2.write(temp)

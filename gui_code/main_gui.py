@@ -30,12 +30,11 @@ class GuiSpacing(enum.Enum):
 
 class Gui(question_tester.QuestionTester):
 
-    current_directory = []
-
     def __init__(self, parent, master) -> None:
 
         self.parent = parent
         self.master = master
+        self.current_directory = []
 
 
 
@@ -83,19 +82,22 @@ class Gui(question_tester.QuestionTester):
         self.incorrect_answer = self.incorrect_answer.resize((40, 40))
         self.incorrect_answer = ImageTk.PhotoImage(self.incorrect_answer)
 
-        self.current_buttons = ButtonList(self)
+        self.buttons = ButtonList(self)
 
         self.parent.resizable(False, False)
 
 
 
-    def create_header(self, header_text = None):
+    def create_header(self, header_text = None, buttons = None):
+
+        if buttons is None:
+            buttons = self.buttons
 
         question = True
 
         if header_text is None:
             question = False
-            try: header_text = Gui.current_directory[-1]
+            try: header_text = self.current_directory[-1]
             except: header_text = 'Overview'
 
         try: 
@@ -113,11 +115,11 @@ class Gui(question_tester.QuestionTester):
 
         # button to access account settings (log out, clear save data, etc.)
         if not question:
-            self.settings_button = tk.Button(self.header_frame, text = 'Log out', bg = 'gray40', fg = 'white', anchor = 'center', command = lambda:self.account_settings())
+            self.settings_button = tk.Button(self.header_frame, text = 'Log out', bg = 'gray40', fg = 'white', anchor = 'center', command = lambda:self.log_out())
             self.settings_button.configure(font=('Cascadia Code', 15), relief = RIDGE)
             self.settings_button.place(x = self.parent.winfo_width() - 5, y = 8, height = 40, anchor = 'ne')
 
-        self.update_back_button()
+        self.update_back_button(buttons)
 
 
 
@@ -147,14 +149,17 @@ class Gui(question_tester.QuestionTester):
 
 
 
-    def account_settings(self):
+    def log_out(self):
 
         # remove input detections
-
         self.parent.unbind('<Button-1>')
         self.parent.unbind_all('<MouseWheel>')
         self.parent.unbind('<Up>')
         self.parent.unbind('<Down>')
+
+        self.clear_gui()
+
+
 
         self.master.instance.log_out()
 
@@ -169,7 +174,7 @@ class Gui(question_tester.QuestionTester):
         # print(f"mouse coordinates: {mouse_x}, {mouse_y}")
 
         # loop over every button
-        for key, button in ButtonList.displayed_buttons.items():
+        for key, button in self.buttons.displayed_buttons.items():
 
             # print(f"button: {button}")
 
@@ -188,15 +193,15 @@ class Gui(question_tester.QuestionTester):
         except:return
 
         # update current directory
-        Gui.current_directory.append(new_directory)
+        self.current_directory.append(new_directory)
 
-        if type(ButtonList.directory[Gui.current_directory[-1]]) == question_tester.Question:
-            self.question_display(ButtonList.directory[Gui.current_directory[-1]])
-            self.update_back_button()
+        if type(self.buttons.directory[self.current_directory[-1]]) == question_tester.Question:
+            self.question_display(self.buttons.directory[self.current_directory[-1]])
+            self.update_back_button(self.buttons)
             return
         
         # change display
-        self.current_buttons = ButtonList(self)
+        self.buttons.create_buttons(self)
 
 
 
@@ -240,18 +245,18 @@ class Gui(question_tester.QuestionTester):
             self.parent.unbind('<Down>')
         except:print('fuck3')
 
-        Gui.current_directory.pop()
+        self.current_directory.pop()
 
-        self.current_buttons = ButtonList(self)
+        self.buttons.create_buttons(self)
 
 
 
-    def update_back_button(self):
+    def update_back_button(self, buttons):
 
         try: self.back_button.place_forget()
         except: pass
 
-        if type([x for x in ButtonList.directory.values()][0]) != question_tester.DifficultyGroup:
+        if type([x for x in buttons.directory.values()][0]) != question_tester.DifficultyGroup:
 
             self.back_button = tk.Button(self.header_frame, image = self.back_image, anchor = 'center', command = lambda:self.back_directory())
             self.back_button.configure(bg = 'gray30', bd = 0, activebackground = 'gray30', activeforeground = 'gray30')
@@ -287,7 +292,7 @@ class Gui(question_tester.QuestionTester):
 
 
         # remove all previous buttons
-        for button in ButtonList.displayed_buttons.values():
+        for button in self.buttons.displayed_buttons.values():
             button['info'].place_forget()
             self.canvas.delete(button['circle'])
             self.canvas.delete(button['bg circle 1'])
@@ -296,7 +301,7 @@ class Gui(question_tester.QuestionTester):
             try: button['info2'].place_forget()
             except:pass
                 
-        ButtonList.displayed_buttons = {}
+        self.buttons.displayed_buttons = {}
 
         self.description_displayed = False
 
@@ -470,6 +475,20 @@ class Gui(question_tester.QuestionTester):
 
 
     def test_cases_display(self, question):
+
+
+
+
+
+        '''
+
+        when there is data that can be loaded, calculate the percentage of correctly completed test cases, and display it next to the 'Check' button.
+
+        '''
+
+
+
+
 
         if not self.description_displayed: return
 
@@ -657,9 +676,9 @@ class Gui(question_tester.QuestionTester):
     def update_test_display(self):
 
         # load the test cases directly through the 'QuestionTester' class
-        question = self.master.directory_tree[Gui.current_directory[0]]
-        question = question.content[Gui.current_directory[1]]
-        question = question.content[Gui.current_directory[2]]
+        question = self.master.directory_tree[self.current_directory[0]]
+        question = question.content[self.current_directory[1]]
+        question = question.content[self.current_directory[2]]
 
         if not self.description_displayed:
             # try to remove test case display
@@ -737,29 +756,37 @@ class Gui(question_tester.QuestionTester):
 
 class ButtonList():
 
-    displayed_buttons = {}
-    directory = None
-
     def __init__(self, gui) -> None:
 
+
+        self.displayed_buttons = {}
+
+        self.directory = None
+
+        self.create_buttons(gui)
+
+
+
+    def create_buttons(self, gui):
+
         self.gui = gui
-        ButtonList.directory = self.gui.master.directory_tree
+        self.directory = self.gui.master.directory_tree
 
         self.gui.parent.bind('<Button-1>', self.gui.change_directory)
         
         self.initial_y = 100
         self.current_y = self.initial_y
 
-        for subdirectory in Gui.current_directory:
-            ButtonList.directory = ButtonList.directory[subdirectory].content
+        for subdirectory in self.gui.current_directory:
+            self.directory = self.directory[subdirectory].content
 
-        # print(f"\ndirectory path: {Gui.current_directory}\n")
-        # print(f"\ncurrent directory: {ButtonList.directory}\n")
+        # print(f"\ndirectory path: {self.gui.current_directory}\n")
+        # print(f"\ncurrent directory: {self.directory}\n")
 
-        self.items = [ButtonList.directory[x] for x in ButtonList.directory]
+        self.items = [self.directory[x] for x in self.directory]
 
         # remove all previous buttons
-        for button in ButtonList.displayed_buttons.values():
+        for button in self.displayed_buttons.values():
             button['info'].place_forget()
             self.gui.canvas.delete(button['circle'])
             self.gui.canvas.delete(button['bg circle 1'])
@@ -768,9 +795,9 @@ class ButtonList():
             try: button['info2'].place_forget()
             except:pass
                 
-        ButtonList.displayed_buttons = {}
+        self.displayed_buttons = {}
 
-        self.gui.create_header()
+        self.gui.create_header(buttons = self)
 
         # create variable for x offset
         if len(self.items) > 5:
@@ -868,15 +895,15 @@ class ButtonList():
 
 
             # add button data to dictionary
-            ButtonList.displayed_buttons[item.name] = temp
+            self.displayed_buttons[item.name] = temp
 
 
 
         # add 'back' button
-        self.gui.update_back_button()
+        self.gui.update_back_button(self)
 
         # skip the rest of the function if the buttons being displayed are for questions and not directories
-        if type([x for x in ButtonList.directory.values()][0]) == question_tester.Question:
+        if type([x for x in self.directory.values()][0]) == question_tester.Question:
             return
         
         self.align_buttons()
@@ -888,7 +915,7 @@ class ButtonList():
         # take all the buttons, find the largest, and fit every other button to be the same length.
         largest_button = {}
         other_buttons = []
-        for item in ButtonList.displayed_buttons.values():
+        for item in self.displayed_buttons.values():
 
             try:
                 if largest_button['info'].winfo_reqwidth() < item['info'].winfo_reqwidth():
@@ -908,7 +935,7 @@ class ButtonList():
 
             # make sure to use try/except for some of these expressions
 
-            if type([x for x in ButtonList.directory.values()][0]) != question_tester.Question:
+            if type([x for x in self.directory.values()][0]) != question_tester.Question:
 
                 # split the text into two variables with the '\t'
                 text_data = item['info'].cget('text')
