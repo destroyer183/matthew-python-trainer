@@ -34,17 +34,18 @@ allow the user to click on test cases to get more info
 class Emulator:
 
     instance: "Emulator" = None
-    account_directory = None
-    account = None
-    backup = None
-    directory_tree = None
-    completed = 0
-    redundancy_index = None
-    password = None
 
     def __init__(self, gui) -> None:
 
-        self.gui = login_gui.Gui(gui, Emulator)
+        self.account_directory = None
+        self.account = None
+        self.backup = None
+        self.directory_tree = None
+        self.completed = 0
+        self.redundancy_index = None
+        self.password = None
+
+        self.gui = login_gui.Gui(gui, self)
 
 
 
@@ -52,8 +53,8 @@ class Emulator:
 
         from gui_code import main_gui
 
-        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent, Emulator)
-        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent, Emulator)
+        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent, self)
+        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent, self)
 
         self.gui.create_gui()
 
@@ -66,36 +67,34 @@ class Emulator:
 
 
 
-    @classmethod
-    def log_out(cls):
+    def log_out(self):
 
         # clear all class variables
-        cls.account_directory = None
-        cls.account = None
-        cls.backup = None
-        cls.directory_tree = None
-        cls.completed = 0
-        cls.redundancy_index = None
-        cls.password = None
+        self.account_directory = None
+        self.account = None
+        self.backup = None
+        self.directory_tree = None
+        self.completed = 0
+        self.redundancy_index = None
+        self.password = None
 
-        cls.instance.make_gui('login')
+        Emulator.instance.make_gui('login')
 
 
 
-    @classmethod
-    def update_save_file(cls, question):
+    def update_save_file(self, question):
 
         # mmap.seek() - go to position in file
-        cls.account.seek(question.save_file_index)
-        cls.backup.seek(question.save_file_index)
+        self.account.seek(question.save_file_index)
+        self.backup.seek(question.save_file_index)
         # mmap.read_byte() - read the data at the position and advance the position by 1
-        save_file_data = cls.account.read(1)
+        save_file_data = self.account.read(1)
 
         # decrypt byte - decrypt data
         save_file_data = decrypt_data(bytes(save_file_data))
 
         # mmap.seek() - go back to position in file
-        cls.account.seek(question.save_file_index)
+        self.account.seek(question.save_file_index)
 
         # check if the question has already been completed, and do nothing if it has already been completed
         if save_file_data == '1':
@@ -109,22 +108,22 @@ class Emulator:
             else:
                 question_data = encrypt_data('0')
 
-            cls.account.write(question_data)
-            cls.backup.write(question_data)
+            self.account.write(question_data)
+            self.backup.write(question_data)
 
-            cls.account.seek(cls.redundancy_index)
-            cls.backup.seek(cls.redundancy_index)
+            self.account.seek(self.redundancy_index)
+            self.backup.seek(self.redundancy_index)
 
-            new_redundancy_value = encrypt_redundancy_value(cls.password, cls.completed)
+            new_redundancy_value = encrypt_redundancy_value(self.password, self.completed)
 
-            cls.account.write(new_redundancy_value)
-            cls.backup.write(new_redundancy_value)
+            self.account.write(new_redundancy_value)
+            self.backup.write(new_redundancy_value)
 
 
 
         # update the data in the dictionary of the question groupings
         # iterate over all folders to see if they are completed or not
-        for level in cls.directory_tree.values():
+        for level in self.directory_tree.values():
 
             if type(level) == str:
                 continue
@@ -140,14 +139,14 @@ class Emulator:
 
 
         # check if new things need to be unlocked or not
-        if cls.directory_tree['Introduction'].completed:
-            cls.directory_tree['Level-1'].unlocked = True
+        if self.directory_tree['Introduction'].completed:
+            self.directory_tree['Level-1'].unlocked = True
 
-        elif cls.directory_tree['Level-1'].completed:
-            cls.directory_tree['Level-2'].unlocked = True
+        elif self.directory_tree['Level-1'].completed:
+            self.directory_tree['Level-2'].unlocked = True
 
-        elif cls.directory_tree['Level-2'].completed:
-            cls.directory_tree['Level-3'].unlocked = True
+        elif self.directory_tree['Level-2'].completed:
+            self.directory_tree['Level-3'].unlocked = True
 
 
 
@@ -155,10 +154,10 @@ class Emulator:
 
         from dict_tree_constructor import construct_dict_tree
 
-        Emulator.directory_tree = construct_dict_tree(directory, question_data_index, master)
+        self.instance.directory_tree = construct_dict_tree(directory, question_data_index, master)
 
         # iterate over all folders to see if they are completed or not
-        for level in Emulator.directory_tree.values():
+        for level in self.instance.directory_tree.values():
 
             if type(level) == str:
                 continue
@@ -176,32 +175,32 @@ class Emulator:
 
 
         # check if folders are unlocked
-        Emulator.directory_tree['Introduction'].unlocked = True
+        self.directory_tree['Introduction'].unlocked = True
 
-        if Emulator.directory_tree['Introduction'].completed:
-            Emulator.directory_tree['Level-1'].unlocked = True
+        if self.directory_tree['Introduction'].completed:
+            self.directory_tree['Level-1'].unlocked = True
 
-        elif Emulator.directory_tree['Level-1'].completed:
-            Emulator.directory_tree['Level-2'].unlocked = True
+        elif self.directory_tree['Level-1'].completed:
+            self.directory_tree['Level-2'].unlocked = True
 
-        elif Emulator.directory_tree['Level-2'].completed:
-            Emulator.directory_tree['Level-3'].unlocked = True
+        elif self.directory_tree['Level-2'].completed:
+            self.directory_tree['Level-3'].unlocked = True
 
         
 
         # check if saved completion data has been tampered with
         print(f"\nverifying file...")
-        Emulator.redundancy_index = question_data_index + 108
+        self.redundancy_index = question_data_index + 108
 
-        Emulator.account.seek(Emulator.redundancy_index)
+        self.account.seek(self.redundancy_index)
 
-        chars = Emulator.account.read()
+        chars = self.account.read()
         
         print(f"verification chars: {chars}")
 
         verification_number = decrypt_redundancy_value(chars)
 
-        Emulator.password = account_password
+        self.password = account_password
 
         password = string_to_int(account_password)
 
@@ -214,7 +213,7 @@ class Emulator:
         for num in temp:
             password_sum += num
 
-        if verification_number != Emulator.completed + password_sum:
+        if verification_number != self.completed + password_sum:
 
             print('error 1')
 
@@ -222,22 +221,22 @@ class Emulator:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
-            Emulator.account_directory = None
-            Emulator.account = None
-            Emulator.backup = None
-            Emulator.directory_tree = None
-            Emulator.completed = 0
-            Emulator.redundancy_index = None
-            Emulator.password = None
+            self.account_directory = None
+            self.account = None
+            self.backup = None
+            self.directory_tree = None
+            self.completed = 0
+            self.redundancy_index = None
+            self.password = None
 
             # skip the rest of the code to avoid logging into account
             return True
         
-        Emulator.account.seek(0)
-        Emulator.backup.seek(0)
+        self.account.seek(0)
+        self.backup.seek(0)
 
-        account_data = Emulator.account.read()
-        backup_data = Emulator.backup.read()
+        account_data = self.account.read()
+        backup_data = self.backup.read()
 
         # check to see if the main account file matches the backup file
         if account_data != backup_data:
@@ -248,13 +247,13 @@ class Emulator:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
-            Emulator.account_directory = None
-            Emulator.account = None
-            Emulator.backup = None
-            Emulator.directory_tree = None
-            Emulator.completed = 0
-            Emulator.redundancy_index = None
-            Emulator.password = None
+            self.account_directory = None
+            self.account = None
+            self.backup = None
+            self.directory_tree = None
+            self.completed = 0
+            self.redundancy_index = None
+            self.password = None
 
             # sip the rest of the code to avoid logging into account
             return True

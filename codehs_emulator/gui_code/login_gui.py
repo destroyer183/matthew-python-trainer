@@ -227,9 +227,9 @@ class Gui():
                 self.master.backup = mmap.mmap(f2.fileno(), 0)
                 self.master.account_directory = account_directory
 
-            if self.master.instance.initialize_account(account_directory, index + 1, self.master, self.account_password): return
+            if self.master.initialize_account(account_directory, index + 1, self.master, self.account_password): return
 
-            self.master.instance.make_gui('questions')
+            self.master.make_gui('questions')
 
         else:
             self.enable_gui()

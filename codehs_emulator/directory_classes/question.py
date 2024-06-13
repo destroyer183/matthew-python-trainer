@@ -81,7 +81,7 @@ class Question:
 
 
         # update the test case display
-        self.master.instance.gui.update_test_display() # the 'Check' button breaks when it gets to this line
+        self.master.gui.update_test_display()
 
         self.master.update_save_file(self)
 

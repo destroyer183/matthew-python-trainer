@@ -69,12 +69,15 @@ async def give_tests(account_name: str, level: str, group: str, question: str):
     print(f"\ndata: {user_input}\n")
 
     # use the string arguments as dictionary keys to navigate through the nested dictionaries to get to the required question object
-    question_directory = Emulator.directory_tree[level]
+    question_directory = Emulator.instance.directory_tree[level]
     question_directory = question_directory.content[group]
     question_directory = question_directory.content[question]
 
     # get just the test case inputs from the test case data in the question object
     test_cases = [test['input'] for test in question_directory.question_data['test cases']]
+
+    # print test case data
+    print(f"test case data: {test_cases}")
 
     # format data to be json compatible so it can be returned
     json_compatible_data = jsonable_encoder(test_cases)
@@ -109,7 +112,7 @@ async def recieve_outputs(account_name: str, level: str, group: str, question: s
     print(f"\ndata: {user_input}\n")
 
     # use the string arguments as dictionary keys to navigate through the nested dictionaries to get to the required question object
-    question_directory = Emulator.directory_tree[level]
+    question_directory = Emulator.instance.directory_tree[level]
     question_directory = question_directory.content[group]
     question_directory = question_directory.content[question]
 
@@ -147,4 +150,4 @@ if __name__ == '__main__':
     import uvicorn
 
     # run the FastAPI server with uvicorn
-    uvicorn.run(app, port=8000)
+    uvicorn.run(app)

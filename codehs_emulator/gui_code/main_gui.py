@@ -154,9 +154,7 @@ class Gui():
 
         self.clear_gui()
 
-
-
-        self.master.instance.log_out()
+        self.master.log_out()
 
 
 
