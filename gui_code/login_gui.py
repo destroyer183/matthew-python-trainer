@@ -441,7 +441,7 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        encrypted_password = self.encrypt_data(password)
+        encrypted_password = question_tester.QuestionTester.encrypt_data([x for x in password])
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -454,12 +454,12 @@ class Gui(question_tester.QuestionTester):
             f2.write(first_line)
             f2.write(second_line)
 
-            third_line = ''
+            third_line = []
 
             for i in range(108):
-                third_line += ' '
+                third_line.append(' ')
 
-            temp = self.encrypt_data(third_line)
+            temp = question_tester.QuestionTester.encrypt_data(third_line)
 
             f.write(temp)
             f2.write(temp)

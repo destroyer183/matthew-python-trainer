@@ -758,7 +758,6 @@ class ButtonList():
 
     def __init__(self, gui) -> None:
 
-
         self.displayed_buttons = {}
 
         self.directory = None

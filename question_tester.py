@@ -66,6 +66,10 @@ fix the formatting of the buttons - DONE
 
 allow the user to click on test cases to get more info
 
+split this file up with each class being in a different file, also take the static encryption/decryption functions and put those in their own file
+
+split the two classes in the main_gui.py file into two different files
+
 '''
 
 
@@ -262,9 +266,9 @@ class QuestionTester:
         elif save_file_data != '1':
             
             if question.completed:
-                question_data = cls.encrypt_data('1')
+                question_data = cls.encrypt_data(['1'])
             else:
-                question_data = cls.encrypt_data('0')
+                question_data = cls.encrypt_data(['0'])
 
             cls.account.write(question_data)
             cls.backup.write(question_data)
@@ -330,9 +334,9 @@ class QuestionTester:
 
     # function to encrypt normal data to be written to a save file
     @staticmethod
-    def encrypt_data(input: str):
+    def encrypt_data(input: list):
 
-        print(f"\nconverting string to byte...")
+        print(f"\nconverting list to byte...")
 
         print(f"input: {input}")
 
@@ -500,7 +504,7 @@ class QuestionTester:
     
 
 
-    def initialize_account(self, directory, question_data_index, master, account_password):
+    def initialize_account(self, directory: str, question_data_index: int, master: "QuestionTester", account_password: str):
 
         from dict_tree_constructor import construct_dict_tree
 
@@ -695,12 +699,12 @@ class Question(QuestionGroup):
     def extract_question_data(self):
 
         try:
-            f = open(f"{self.directory}\\data.json")
+            with open(f"{self.directory}\\data.json") as f:
+                data = json.load(f)
+
         except:
             self.question_data = {}
             return
-
-        data = json.load(f)
 
         for test_case in data['test cases']:
 

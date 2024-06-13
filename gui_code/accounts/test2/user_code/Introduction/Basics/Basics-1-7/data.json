@@ -1,0 +1,27 @@
+{
+    "title": "Divisible By Value",
+    "function name": "divisible",
+    "description": "Write a function that takes in two integers. The function will check if the first integer is divisible by the second integer and return a boolean.",
+    "test cases": [
+        {
+            "input": [10, 5],
+            "answer": true
+        },
+        {
+            "input": [200, 30],
+            "answer": false
+        },
+        {
+            "input": [0.5, 2],
+            "answer": false
+        },
+        {
+            "input": [3, 6],
+            "answer": false
+        },
+        {
+            "input": [12, 4],
+            "answer": true
+        }
+    ]
+}

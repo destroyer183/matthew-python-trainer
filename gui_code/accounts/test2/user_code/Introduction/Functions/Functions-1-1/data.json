@@ -1,0 +1,23 @@
+{
+    "title": "Multiple Arguments",
+    "function name": "two_args",
+    "description": "This functions receives two arguments, 'a' and 'b'. Return the second argument.",
+    "test cases": [
+        {
+            "input": ["mac", "cheese"],
+            "answer": "cheese"
+        },
+        {
+            "input": ["surf", "turf"],
+            "answer": "turf"
+        },
+        {
+            "input": ["apples", "oranges"],
+            "answer": "oranges"
+        },
+        {
+            "input": ["java", "python"],
+            "answer": "python"
+        }
+    ]
+}
