@@ -1,6 +1,7 @@
-import question_tester
-from question_tester import DifficultyGroup, QuestionGroup, Question
-from question_tester import DifficultyLevel, QuestionType
+from directory_classes.difficulty_group import DifficultyGroup, DifficultyLevel
+from directory_classes.question_group import QuestionGroup, QuestionType
+from directory_classes.question import Question
+
 
 
 def construct_dict_tree(directory, question_data_index, master):

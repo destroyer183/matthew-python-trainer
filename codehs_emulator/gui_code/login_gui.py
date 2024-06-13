@@ -1,19 +1,11 @@
 import tkinter as tk
 from tkinter import *
-import enum
+from enum import Enum
 import os
-import sys
 import shutil
-import binascii
 import mmap
 
-current = os.path.dirname(os.path.realpath(__file__)) # get current directory
-parent = os.path.dirname(current) # go up one directory level
-print(f"current: {parent}")
-sys.path.append(parent) # set current directory
-import question_tester
-
-
+from data_formatters import encrypt_data, decrypt_data, encrypt_redundancy_value
 
 ''' NOTES
 
@@ -29,7 +21,7 @@ make a backup file hidden in the code storage
 
 '''
 
-class GuiAnchor(enum.Enum):
+class GuiAnchor(Enum):
     UsernameX = 25
     UsernameY = 140
     PasswordX = 25
@@ -39,7 +31,7 @@ class GuiAnchor(enum.Enum):
 
 
 
-class Gui(question_tester.QuestionTester):
+class Gui():
 
     def __init__(self, parent, master) -> None:
         
@@ -188,7 +180,7 @@ class Gui(question_tester.QuestionTester):
         if password is None: password = self.password_box.get().strip()
 
         if not self.verify_details('login', username, password):
-            account_directory = os.getcwd() + f"\\gui_code\\accounts\\{username}"
+            account_directory = os.getcwd() + f"\\accounts\\{username}"
 
         else:
             self.enable_gui()
@@ -201,7 +193,7 @@ class Gui(question_tester.QuestionTester):
 
             for line in f:
 
-                self.account_password = self.decrypt_data(line).strip()
+                self.account_password = decrypt_data(line).strip()
                 break
 
         
@@ -227,7 +219,7 @@ class Gui(question_tester.QuestionTester):
                 print(f"item: {item}")
                 print(f"item type: {type(item)}")
 
-                item = self.decrypt_data(bytes(item))
+                item = decrypt_data(bytes(item))
 
                 print(f"item value: \"{item}\"")
 
@@ -340,7 +332,7 @@ class Gui(question_tester.QuestionTester):
             self.login_error_text = tk.Label(self.parent, bg = 'dimgrey', fg = 'red')
             self.login_error_text.configure(font=('Cascadia Code', 10))
 
-            if username not in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+            if username not in os.listdir(os.getcwd() + '\\accounts'):
 
                 # place error text on screen
                 self.login_error_text.configure(font=('Cascadia Code', 10), text = 'Account does not exist.')
@@ -365,7 +357,7 @@ class Gui(question_tester.QuestionTester):
             self.create_account_error_text = tk.Label(self.parent, bg = 'dimgrey', fg = 'red')
             self.create_account_error_text.configure(font=('Cascadia Code', 10))
 
-            if username in os.listdir(os.getcwd() + '\\gui_code\\accounts'):
+            if username in os.listdir(os.getcwd() + '\\accounts'):
 
                 # place error text on screen
                 self.create_account_error_text.configure(text = 'Username is taken.')
@@ -415,8 +407,8 @@ class Gui(question_tester.QuestionTester):
             return
 
         current_directory = os.getcwd().replace('\\', '/')
-        source_file = 'gui_code/accounts/account_template'
-        destination_folder = 'gui_code/accounts/'
+        source_file = 'accounts/account_template'
+        destination_folder = 'accounts/'
 
 
         self.create_account_directory(current_directory, source_file, destination_folder, username)
@@ -441,7 +433,7 @@ class Gui(question_tester.QuestionTester):
 
     def set_account_password(self, backup, account, password):
 
-        encrypted_password = question_tester.QuestionTester.encrypt_data([x for x in password])
+        encrypted_password = encrypt_data([x for x in password])
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -459,12 +451,12 @@ class Gui(question_tester.QuestionTester):
             for i in range(108):
                 third_line.append(' ')
 
-            temp = question_tester.QuestionTester.encrypt_data(third_line)
+            temp = encrypt_data(third_line)
 
             f.write(temp)
             f2.write(temp)
 
-            fourth_line = self.encrypt_redundancy_value(password, 0)
+            fourth_line = encrypt_redundancy_value(password, 0)
 
             f.write(fourth_line)
             f2.write(fourth_line)
