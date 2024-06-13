@@ -40,7 +40,7 @@ class Question:
             return
 
         for test_case in data['test cases']:
-
+            
             test_case['input'] = tuple(test_case['input'])
 
         self.question_data = data

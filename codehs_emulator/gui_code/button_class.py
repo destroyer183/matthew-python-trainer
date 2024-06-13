@@ -35,9 +35,6 @@ class ButtonList():
         for subdirectory in self.gui.current_directory:
             self.directory = self.directory[subdirectory].content
 
-        # print(f"\ndirectory path: {self.gui.current_directory}\n")
-        # print(f"\ncurrent directory: {self.directory}\n")
-
         self.items = [self.directory[x] for x in self.directory]
 
         # remove all previous buttons
@@ -72,8 +69,6 @@ class ButtonList():
                 if not item.unlocked: continue
             except:pass
 
-            # print(f"two_rows: {two_rows}")
-
             # incrament y offset
             if two_rows is False or index % 2 == 0:
                 self.current_y += GuiSpacing.YOffset.value
@@ -90,8 +85,6 @@ class ButtonList():
             except:pass
 
             self.gui.parent.update()
-            # print(f"label width: {temp['info'].winfo_reqwidth()}")
-            # print(f"label height: {temp['info'].winfo_reqheight()}")
 
             # place button normally if there is only one row
             if two_rows is False:
@@ -109,10 +102,6 @@ class ButtonList():
                     temp['info'].place(x = self.gui.parent.winfo_width() / 4 - temp['info'].winfo_reqwidth() / 2 + 12, y = self.current_y, height = temp['info'].winfo_reqheight() + 9, anchor = 'w')
 
             self.gui.parent.update()
-            # print(f"label x: {temp['info'].winfo_x()}")
-            # print(f"label y: {temp['info'].winfo_y()}")
-            # print(f"label final width: {temp['info'].winfo_width()}")
-            # print(f"label final height: {temp['info'].winfo_height()}")
 
             # create bg
             bg_circle_radius = (temp['info'].winfo_reqheight() + 10) / 2 - 1
@@ -183,9 +172,6 @@ class ButtonList():
             except:
                 largest_button = item
 
-        # print(f"other buttons: {other_buttons}")
-        # print(f"largest button: {largest_button}")
-        
         for item in other_buttons:
 
             # make sure to use try/except for some of these expressions
@@ -196,16 +182,12 @@ class ButtonList():
                 text_data = item['info'].cget('text')
                 text_data = text_data.split('   ')
 
-                # print(f"text data: {text_data}")
-
                 # place the text normally again with just the name of the button
                 item['info'].configure(text = text_data[0])
 
                 previous = item['info'].place_info()
 
                 item['info'].place(x = largest_button['info'].winfo_x(), y = previous['y'], height = previous['height'], anchor = previous['anchor'])
-
-                # print(f"info text: {item['info'].cget('text')}")
 
             # get the coords of the background shapes of the largest button and the current other button
             current_rect_coords = self.gui.canvas.coords(item['bg rect'])
@@ -216,8 +198,6 @@ class ButtonList():
             big_circle1_coords = self.gui.canvas.coords(largest_button['bg circle 1'])
             big_circle2_coords = self.gui.canvas.coords(largest_button['bg circle 2'])
             big_color_circle_coords = self.gui.canvas.coords(largest_button['circle'])
-
-            # print(f"current rect coords: {current_rect_coords}")
 
             # update the size of the background rectangle and second background circle
             self.gui.canvas.coords(item['bg rect'], [big_rect_coords[0], current_rect_coords[1], big_rect_coords[2], current_rect_coords[3]])
@@ -250,4 +230,3 @@ class ButtonList():
                 )
 
             except:pass
-

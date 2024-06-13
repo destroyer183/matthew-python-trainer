@@ -11,7 +11,7 @@ for value, key in enumerate(chars):
     if len(str(value)) == 1:
 
         char_values[key] = f'0{value}'
-    
+
     else:
 
         char_values[key] = str(value)
@@ -38,7 +38,7 @@ def string_to_int(input: str):
 
 
 # function to encrypt normal data to be written to a save file
-def encrypt_data(input: list):
+def encrypt_data(input: str):
 
     print(f"\nconverting list to byte...")
 

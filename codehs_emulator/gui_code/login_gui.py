@@ -433,7 +433,7 @@ class Gui():
 
     def set_account_password(self, backup, account, password):
 
-        encrypted_password = encrypt_data([x for x in password])
+        encrypted_password = encrypt_data(password)
 
         with open(account, 'wb') as f, open(backup, 'wb') as f2:
             
@@ -446,10 +446,10 @@ class Gui():
             f2.write(first_line)
             f2.write(second_line)
 
-            third_line = []
+            third_line = ''
 
             for i in range(108):
-                third_line.append(' ')
+                third_line += ' '
 
             temp = encrypt_data(third_line)
 

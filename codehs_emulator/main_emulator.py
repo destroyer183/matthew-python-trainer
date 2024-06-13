@@ -10,6 +10,7 @@ from data_formatters import string_to_int, encrypt_data, decrypt_data, encrypt_r
 current_directory = os.path.dirname(os.path.realpath(__file__)) # get current directory
 
 
+
 '''
 
 USE 'BEAUTIFUL SOUP' TO GET THE HTML DATA
@@ -26,18 +27,13 @@ fix the formatting of the buttons - DONE
 
 allow the user to click on test cases to get more info
 
-split this file up with each class being in a different file, also take the static encryption/decryption functions and put those in their own file
-
-split the two classes in the main_gui.py file into two different files
-
 '''
 
 
 
+class Emulator:
 
-class QuestionTester:
-
-    instance: "QuestionTester" = None
+    instance: "Emulator" = None
     account_directory = None
     account = None
     backup = None
@@ -48,17 +44,16 @@ class QuestionTester:
 
     def __init__(self, gui) -> None:
 
-        self.gui = login_gui.Gui(gui, QuestionTester)
-    
+        self.gui = login_gui.Gui(gui, Emulator)
+
 
 
     def make_gui(self, gui_type):
 
-        # main_gui = importlib.import_module('main_gui')
         from gui_code import main_gui
 
-        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent, QuestionTester)
-        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent, QuestionTester)
+        if   gui_type == 'login'    : self.gui = login_gui.Gui(self.gui.parent, Emulator)
+        elif gui_type == 'questions': self.gui = main_gui.Gui(self.gui.parent, Emulator)
 
         self.gui.create_gui()
 
@@ -90,12 +85,6 @@ class QuestionTester:
     @classmethod
     def update_save_file(cls, question):
 
-        # make sure to update both the main save file and the backup save file
-
-
-
-        # get current state of the question out of the save file
-
         # mmap.seek() - go to position in file
         cls.account.seek(question.save_file_index)
         cls.backup.seek(question.save_file_index)
@@ -116,9 +105,9 @@ class QuestionTester:
         elif save_file_data != '1':
             
             if question.completed:
-                question_data = encrypt_data(['1'])
+                question_data = encrypt_data('1')
             else:
-                question_data = encrypt_data(['0'])
+                question_data = encrypt_data('0')
 
             cls.account.write(question_data)
             cls.backup.write(question_data)
@@ -162,16 +151,14 @@ class QuestionTester:
 
 
 
-
-
-    def initialize_account(self, directory: str, question_data_index: int, master: "QuestionTester", account_password: str):
+    def initialize_account(self, directory: str, question_data_index: int, master: "Emulator", account_password: str):
 
         from dict_tree_constructor import construct_dict_tree
 
-        QuestionTester.directory_tree = construct_dict_tree(directory, question_data_index, master)
+        Emulator.directory_tree = construct_dict_tree(directory, question_data_index, master)
 
         # iterate over all folders to see if they are completed or not
-        for level in QuestionTester.directory_tree.values():
+        for level in Emulator.directory_tree.values():
 
             if type(level) == str:
                 continue
@@ -189,32 +176,32 @@ class QuestionTester:
 
 
         # check if folders are unlocked
-        QuestionTester.directory_tree['Introduction'].unlocked = True
+        Emulator.directory_tree['Introduction'].unlocked = True
 
-        if QuestionTester.directory_tree['Introduction'].completed:
-            QuestionTester.directory_tree['Level-1'].unlocked = True
+        if Emulator.directory_tree['Introduction'].completed:
+            Emulator.directory_tree['Level-1'].unlocked = True
 
-        elif QuestionTester.directory_tree['Level-1'].completed:
-            QuestionTester.directory_tree['Level-2'].unlocked = True
+        elif Emulator.directory_tree['Level-1'].completed:
+            Emulator.directory_tree['Level-2'].unlocked = True
 
-        elif QuestionTester.directory_tree['Level-2'].completed:
-            QuestionTester.directory_tree['Level-3'].unlocked = True
+        elif Emulator.directory_tree['Level-2'].completed:
+            Emulator.directory_tree['Level-3'].unlocked = True
 
         
 
         # check if saved completion data has been tampered with
         print(f"\nverifying file...")
-        QuestionTester.redundancy_index = question_data_index + 108
+        Emulator.redundancy_index = question_data_index + 108
 
-        QuestionTester.account.seek(QuestionTester.redundancy_index)
+        Emulator.account.seek(Emulator.redundancy_index)
 
-        chars = QuestionTester.account.read()
+        chars = Emulator.account.read()
         
         print(f"verification chars: {chars}")
 
         verification_number = decrypt_redundancy_value(chars)
 
-        QuestionTester.password = account_password
+        Emulator.password = account_password
 
         password = string_to_int(account_password)
 
@@ -227,7 +214,7 @@ class QuestionTester:
         for num in temp:
             password_sum += num
 
-        if verification_number != QuestionTester.completed + password_sum:
+        if verification_number != Emulator.completed + password_sum:
 
             print('error 1')
 
@@ -235,22 +222,22 @@ class QuestionTester:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
-            QuestionTester.account_directory = None
-            QuestionTester.account = None
-            QuestionTester.backup = None
-            QuestionTester.directory_tree = None
-            QuestionTester.completed = 0
-            QuestionTester.redundancy_index = None
-            QuestionTester.password = None
+            Emulator.account_directory = None
+            Emulator.account = None
+            Emulator.backup = None
+            Emulator.directory_tree = None
+            Emulator.completed = 0
+            Emulator.redundancy_index = None
+            Emulator.password = None
 
             # skip the rest of the code to avoid logging into account
             return True
         
-        QuestionTester.account.seek(0)
-        QuestionTester.backup.seek(0)
+        Emulator.account.seek(0)
+        Emulator.backup.seek(0)
 
-        account_data = QuestionTester.account.read()
-        backup_data = QuestionTester.backup.read()
+        account_data = Emulator.account.read()
+        backup_data = Emulator.backup.read()
 
         # check to see if the main account file matches the backup file
         if account_data != backup_data:
@@ -261,18 +248,16 @@ class QuestionTester:
             self.gui.verify_details('exception', '', '')
 
             # reset all account related variables
-            QuestionTester.account_directory = None
-            QuestionTester.account = None
-            QuestionTester.backup = None
-            QuestionTester.directory_tree = None
-            QuestionTester.completed = 0
-            QuestionTester.redundancy_index = None
-            QuestionTester.password = None
+            Emulator.account_directory = None
+            Emulator.account = None
+            Emulator.backup = None
+            Emulator.directory_tree = None
+            Emulator.completed = 0
+            Emulator.redundancy_index = None
+            Emulator.password = None
 
             # sip the rest of the code to avoid logging into account
             return True
-        
-        
 
         print('account sucessfully logged into.')
 
@@ -280,7 +265,7 @@ class QuestionTester:
 
 def setup():
 
-    QuestionTester.instance = QuestionTester(tk.Tk())
+    Emulator.instance = Emulator(tk.Tk())
 
     # override windows scaling
     if os.name == 'nt':
@@ -293,7 +278,7 @@ def setup():
             success   = ctypes.windll.user32.SetProcessDPIAware()
         except:pass 
 
-    QuestionTester.instance.make_gui('login')
+    Emulator.instance.make_gui('login')
 
     # run the gui
-    QuestionTester.instance.gui.parent.mainloop()
+    Emulator.instance.gui.parent.mainloop()
