@@ -2,19 +2,14 @@ import tkinter as tk
 from tkinter import *
 import os
 import subprocess
-import sys
-import shutil
-import binascii
-import mmap
 from PIL import Image, ImageTk
-import math
 
 from directory_classes.difficulty_group import DifficultyGroup
 from directory_classes.question import Question
 
 from .button_class import ButtonList
 
-from main_emulator import current_directory
+
 
 ''' NOTES
 
@@ -60,20 +55,21 @@ class Gui():
         self.canvas = tk.Canvas(self.parent, width = self.parent.winfo_width(), height = self.parent.winfo_height(), background = 'dimgrey', highlightthickness = 0)
         self.canvas.pack(fill = BOTH)
 
+        from main_emulator import root_directory
         
-        self.settings_image = Image.open(f"{current_directory}\\assets\\settings.png")
+        self.settings_image = Image.open(f"{root_directory}\\assets\\settings.png")
         self.settings_image = self.settings_image.resize((40, 40))
         self.settings_image = ImageTk.PhotoImage(self.settings_image)
 
-        self.back_image = Image.open(f"{current_directory}\\assets\\back button.png")
+        self.back_image = Image.open(f"{root_directory}\\assets\\back button.png")
         self.back_image = self.back_image.resize((40, 40))
         self.back_image = ImageTk.PhotoImage(self.back_image)
 
-        self.correct_answer = Image.open(f"{current_directory}\\assets\\checkmark.png")
+        self.correct_answer = Image.open(f"{root_directory}\\assets\\checkmark.png")
         self.correct_answer = self.correct_answer.resize((40, 40))
         self.correct_answer = ImageTk.PhotoImage(self.correct_answer)
 
-        self.incorrect_answer = Image.open(f"{current_directory}\\assets\\crossmark.png")
+        self.incorrect_answer = Image.open(f"{root_directory}\\assets\\crossmark.png")
         self.incorrect_answer = self.incorrect_answer.resize((40, 40))
         self.incorrect_answer = ImageTk.PhotoImage(self.incorrect_answer)
 
@@ -207,7 +203,7 @@ class Gui():
             self.parent.unbind_all('<MouseWheel>')
             self.parent.unbind('<Up>')
             self.parent.unbind('<Down>')
-        except:print('fuck1')
+        except:print('failed to remove some widgets')
 
         try:
             self.description_frame.place_forget()
@@ -218,7 +214,7 @@ class Gui():
             self.parent.unbind_all('<MouseWheel>')
             self.parent.unbind('<Up>')
             self.parent.unbind('<Down>')
-        except:print('fuck2')
+        except:print('failed to remove some widgets.')
 
         try:
             # try to remove test cases display stuff heredxex
@@ -236,7 +232,7 @@ class Gui():
             self.parent.unbind_all('<MouseWheel>')
             self.parent.unbind('<Up>')
             self.parent.unbind('<Down>')
-        except:print('fuck3')
+        except:print('failed to remove some widgets.')
 
         self.current_directory.pop()
 
@@ -499,7 +495,7 @@ class Gui():
             self.begin_button.place_forget()
             self.description_canvas.delete(self.button_circle_left)
             self.description_canvas.delete(self.button_circle_right)
-        except:print('fuck2')
+        except:print('failed to remove some widgets.')
 
 
 

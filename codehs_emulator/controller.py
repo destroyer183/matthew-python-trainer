@@ -8,6 +8,16 @@ import threading
 import os
 import signal
 from main_emulator import Emulator, setup
+import sys
+import uvicorn
+
+
+
+if __package__ is None and not hasattr(sys, 'frozen'):
+    import os.path
+    path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.realpath(path))
+
 
 
 # initialize server api
@@ -51,14 +61,14 @@ async def root():
 async def give_tests(account_name: str, level: str, group: str, question: str): 
 
     # check if no account has been initialized
-    if Emulator.account is None:
+    if Emulator.instance.account is None:
 
         # print out error message and return
         print(f"\nError handling request: account has not been initialized.\n")
         return
 
     # check if account name argument matches the name of the initialized account in the main emulator
-    if Emulator.account_directory.split('\\')[-1] != account_name:
+    if Emulator.instance.account_directory.split('\\')[-1] != account_name:
         print('\nError handling request: account name invalid.\n')
         return
 
@@ -92,14 +102,14 @@ async def give_tests(account_name: str, level: str, group: str, question: str):
 async def recieve_outputs(account_name: str, level: str, group: str, question: str, test_output: TestOutput):
 
     # check if no account has been initialized
-    if Emulator.account is None:
+    if Emulator.instance.account is None:
 
         # print out error message and return
         print(f"\nError handling request: account has not been initialized.\n")
         return
 
     # check if account name argument matches the name of the initialized account in the main emulator
-    if Emulator.account_directory.split('\\')[-1] != account_name:
+    if Emulator.instance.account_directory.split('\\')[-1] != account_name:
 
         # print out error message and return
         print('\nError handling request: account name invalid.\n')
@@ -140,14 +150,9 @@ def main():
 # main function call
 if __name__ == '__main__':
 
-    # use threading to run the gui main function separately
-    import threading
-
     # thread the main function to allow the gui and the server to run at the same time
     main_thread = threading.Thread(target=main)
     main_thread.start()
-
-    import uvicorn
 
     # run the FastAPI server with uvicorn
     uvicorn.run(app)

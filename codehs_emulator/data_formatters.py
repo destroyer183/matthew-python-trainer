@@ -1,38 +1,49 @@
 import binascii
 
 
-
+# create string to store every character that needs an integer representation
 chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890!@#$%^&*()`-=[]\;\',./~_+{}|:\"<>?\n'
 
+# create dict to store integer representations of every character above 
 char_values = {}
 
-for value, key in enumerate(chars):
+# loop over every character with both the index and the value
+for index, value in enumerate(chars):
 
-    if len(str(value)) == 1:
+    # check if the string representation of the index is only one character long
+    if len(str(index)) == 1:
 
-        char_values[key] = f'0{value}'
+        # create dictionary item with a key that is the charcter, and a value that is the index of that value
+        # add a '0' to the front of the value, this is for purposes with converting hexidecimal to integer and vice versa, it makes things easier
+        char_values[value] = f'0{index}'
 
     else:
 
-        char_values[key] = str(value)
+        # create dictionary item with a key that is the character, and a value that is the index of that value
+        char_values[value] = str(index)
 
 
 
 # function to convert strings to integer values based on a table created when the file runs
 def string_to_int(input: str):
 
+    # print data
     print(f"\nconverting string to int...")
-
     print(f"input: {input}")
 
+    # create list for the output
     output = []
 
+    # loop over every character in the input string
     for value in input:
 
+        # pass the string into the dictionary of character values as a key, and get the cooresponding value, and append it to the output list
         output.append(char_values[value])
 
+    # print output list
     print(f"output: {output}\n")
 
+    # return output list
     return output
 
 
@@ -40,33 +51,45 @@ def string_to_int(input: str):
 # function to encrypt normal data to be written to a save file
 def encrypt_data(input: str):
 
-    print(f"\nconverting list to byte...")
-
+    # print data
+    print(f"\nconverting string to byte...")
     print(f"input: {input}")
 
+    # create empty byte for the output
     output = b''
 
+    # loop over every character in the input string
     for value in input:
 
+        # use the value as a key in the dictionary of character values to get the value associated with that key
         char_value = char_values[value]
 
+        # pretend that the character value is a hexidecimal number (even though it isn't) and convert it back to an integer number
         hex_element = str(int(char_value, 16))
 
+        # make sure that the element is at least 2 characters long
         if len(hex_element) % 2 != 0:
             hex_element = f"0{hex_element}"
 
+        # print out element
         print(f"string: \"{hex_element}\"")
 
+        # convert element to bytes with binascii function and add it to the output
         output += binascii.unhexlify(hex_element)
 
+        # print out the byte value of the element
         print(f"value: {binascii.unhexlify(hex_element)}")
 
+        # print out the current output bytes
         print(f"current output: {output}")
 
+    # print out the full output
     print(f"output: {output}\n")
 
+    # print out the integer representation of the output to make it easier to understand the output in the terminal
     print(f"hexlified: {binascii.hexlify(output)}")
 
+    # return the output
     return output
 
 
@@ -167,7 +190,6 @@ def encrypt_redundancy_value(password: str, completed: int):
 
 
 
-@staticmethod
 def decrypt_redundancy_value(input: bytes):
 
     print('\ndecrypting redundancy value...')
