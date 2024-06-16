@@ -3,18 +3,9 @@ from tkinter import *
 import os
 import subprocess
 from PIL import Image, ImageTk
-
 from directory_classes.difficulty_group import DifficultyGroup
 from directory_classes.question import Question
-
 from .button_class import ButtonList
-
-
-
-''' NOTES
-
-'''
-
 
 
 

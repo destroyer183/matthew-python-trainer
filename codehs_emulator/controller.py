@@ -13,6 +13,7 @@ import uvicorn
 
 
 
+# if running from source, update the path to the parent directory
 if __package__ is None and not hasattr(sys, 'frozen'):
     import os.path
     path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
