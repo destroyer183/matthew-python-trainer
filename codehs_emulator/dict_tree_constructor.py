@@ -23,36 +23,30 @@ def construct_dict_tree(directory: str, question_data_index: int, master: Emulat
     # create dict to represent directory tree
     directory_tree = {
 
-        '''
-        each item in a dictionary will be an object of a class, which class it is part of depends on where it is located in the directory
-        the uppermost items will be 'DifficultyGroup' objects,
-        the content of 'DifficultyGroup' objects will be 'QuestionGroup' objects,
-        the content of 'QuestionGroup' objects will be 'Question' objects
+        # each item in a dictionary will be an object of a class, which class it is part of depends on where it is located in the directory
+        # the uppermost items will be 'DifficultyGroup' objects,
+        # the content of 'DifficultyGroup' objects will be 'QuestionGroup' objects,
+        # the content of 'QuestionGroup' objects will be 'Question' objects
         
-        for 'DifficultyGroup' objects, the data passed in is as follows:
-        the full directory path to the cooresponding folder - string
-        an enumeration value to provide information on exactly what content this folder holds - 'DifficultyLevel'
-        the name of the folder - string
-        the content in the folder, which is a dict containing more objects - dictionary
-        '''
+        # for 'DifficultyGroup' objects, the data passed in is as follows:
+        # the full directory path to the cooresponding folder - string
+        # an enumeration value to provide information on exactly what content this folder holds - 'DifficultyLevel'
+        # the name of the folder - string
+        # the content in the folder, which is a dict containing more objects - dictionary
         "Introduction": DifficultyGroup(f"{directory}\\Introduction", DifficultyLevel.Level0, 'Introduction', {
 
-            '''
-            for 'QuestionGroup objects, the data passed in is as follows:
-            the full directory path to the cooresponding folder - string
-            the enumeration value to provide information on exactly what type of question this folder holds - 'QuestionType' 
-            the name of the folder - string
-            the content in the folder, which is a dict containing more objects - dictionary
-            '''
+            # for 'QuestionGroup objects, the data passed in is as follows:
+            # the full directory path to the cooresponding folder - string
+            # the enumeration value to provide information on exactly what type of question this folder holds - 'QuestionType' 
+            # the name of the folder - string
+            # the content in the folder, which is a dict containing more objects - dictionary
             "Basics": QuestionGroup(f"{directory}\\Introduction\\Basics", QuestionType.Basics, 'Basics', {
 
-                '''
-                for 'Question' objects, the data passed in is as follows:
-                the full directory path to the cooresponding folder - string
-                the name of the folder - string
-                the index of where its cooresponding data is stored in the save file - integer
-                the instance of the 'Emulator' object it is connected to
-                '''
+                # for 'Question' objects, the data passed in is as follows:
+                # the full directory path to the cooresponding folder - string
+                # the name of the folder - string
+                # the index of where its cooresponding data is stored in the save file - integer
+                # the instance of the 'Emulator' object it is connected to
                 "Basics-1-0": Question(f"{directory}\\Introduction\\Basics\\Basics-1-0", 'Basics-1-0', index + 0, master),
                 "Basics-1-1": Question(f"{directory}\\Introduction\\Basics\\Basics-1-1", 'Basics-1-1', index + 1, master),
                 "Basics-1-2": Question(f"{directory}\\Introduction\\Basics\\Basics-1-2", 'Basics-1-2', index + 2, master),

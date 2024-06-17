@@ -130,7 +130,7 @@ async def recieve_outputs(account_name: str, level: str, group: str, question: s
 
 
     # pass the test output argument to a function that will compare the outputs to the expected answers
-    output = question_directory.test_question(test_output.test_output)
+    output = question_directory.test_question(test_output.test_output, question)
 
     # return the output
     return output

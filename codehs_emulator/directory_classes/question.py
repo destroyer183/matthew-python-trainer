@@ -1,6 +1,5 @@
 import json
 from data_formatters import decrypt_data
-from main_emulator import Emulator
 
 
 
@@ -8,7 +7,7 @@ from main_emulator import Emulator
 class Question:
 
     # create constructor for class, for arguments, take in the directory, the name, the save file index, and the master instance
-    def __init__(self, directory: str, name: str, save_file_index: int, master: Emulator) -> None:
+    def __init__(self, directory: str, name: str, save_file_index: int, master) -> None:
 
         # read the data stored at the location in the save file where the data for this question is stored
         master.account.seek(save_file_index)
@@ -63,8 +62,10 @@ class Question:
 
 
 
-    # function to test a question
-    def test_question(self, input):
+    # function to test a question that takes in arguments for:
+    # the list of outputs from a question
+    # the name of the question folder
+    def test_question(self, input: str, question_folder: str):
 
         # loop over the question test cases by index
         for index in range(len(self.question_data['test cases'])):
@@ -118,7 +119,7 @@ class Question:
 
 
         # update the test case display
-        self.master.gui.update_test_display()
+        self.master.gui.update_test_display(question_folder)
 
         # update save file
         self.master.update_save_file(self)
