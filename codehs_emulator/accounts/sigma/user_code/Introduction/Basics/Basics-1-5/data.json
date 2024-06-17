@@ -1,0 +1,23 @@
+{
+    "title": "Divisible By 10?",
+    "function name": "divisible_by_ten",
+    "description": "Write a function that takes in a number and checks if the number is divisible by 10.\n\nThe function should return a boolean.",
+    "test cases": [
+        {
+            "input": [10],
+            "answer": true
+        },
+        {
+            "input": [200],
+            "answer": true
+        },
+        {
+            "input": [0.5],
+            "answer": false
+        },
+        {
+            "input": [3],
+            "answer": false
+        }
+    ]
+}
